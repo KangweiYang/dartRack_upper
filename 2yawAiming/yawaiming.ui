@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>yawAiming</class>
+ <widget class="QWidget" name="yawAiming">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1200</width>
+    <height>700</height>
+   </rect>
+  </property>
+  <property name="acceptDrops">
+   <bool>false</bool>
+  </property>
+  <property name="windowTitle">
+   <string>yaw轴瞄准</string>
+  </property>
+  <widget class="QLineEdit" name="currentYawLineEdit">
+   <property name="geometry">
+    <rect>
+     <x>530</x>
+     <y>260</y>
+     <width>113</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>520</x>
+     <y>240</y>
+     <width>131</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>当前yaw移动总脉冲</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>150</y>
+     <width>1098</width>
+     <height>65</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QPushButton" name="left16384PushButton">
+      <property name="text">
+       <string>左移16384脉冲(q)</string>
+      </property>
+      <property name="shortcut">
+       <string>Q</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QPushButton" name="left4096PushButton">
+      <property name="text">
+       <string>左移4096脉冲(w)</string>
+      </property>
+      <property name="shortcut">
+       <string>W</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="2">
+     <widget class="QPushButton" name="left1024PushButton">
+      <property name="text">
+       <string>左移1024脉冲(e)</string>
+      </property>
+      <property name="shortcut">
+       <string>E</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="3">
+     <widget class="QPushButton" name="left256PushButton">
+      <property name="text">
+       <string>左移256脉冲(r)</string>
+      </property>
+      <property name="shortcut">
+       <string>R</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QPushButton" name="left64PushButton">
+      <property name="text">
+       <string>左移64脉冲(a)</string>
+      </property>
+      <property name="shortcut">
+       <string>A</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="6">
+     <widget class="QPushButton" name="right4PushButton">
+      <property name="text">
+       <string>右移4脉冲(k)</string>
+      </property>
+      <property name="shortcut">
+       <string>K</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="4">
+     <spacer name="horizontalSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="0" column="6">
+     <widget class="QPushButton" name="right1024PushButton">
+      <property name="text">
+       <string>右移1024脉冲(i)</string>
+      </property>
+      <property name="shortcut">
+       <string>I</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="7">
+     <widget class="QPushButton" name="right4096PushButton">
+      <property name="text">
+       <string>右移4096脉冲(o)</string>
+      </property>
+      <property name="shortcut">
+       <string>O</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="4">
+     <spacer name="horizontalSpacer_2">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="1" column="8">
+     <widget class="QPushButton" name="pushButton_8">
+      <property name="text">
+       <string>右移64脉冲(;)</string>
+      </property>
+      <property name="shortcut">
+       <string>;</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="2">
+     <widget class="QPushButton" name="left4PushButton">
+      <property name="text">
+       <string>左移4脉冲(d)</string>
+      </property>
+      <property name="shortcut">
+       <string>D</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="3">
+     <widget class="QPushButton" name="left1PushButton">
+      <property name="text">
+       <string>左移1脉冲(f)</string>
+      </property>
+      <property name="shortcut">
+       <string>F</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="5">
+     <widget class="QPushButton" name="right1PushButton">
+      <property name="text">
+       <string>右移1脉冲(j)</string>
+      </property>
+      <property name="shortcut">
+       <string>J</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="5">
+     <widget class="QPushButton" name="right256PushButton">
+      <property name="text">
+       <string>右移256脉冲(u)</string>
+      </property>
+      <property name="shortcut">
+       <string>U</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QPushButton" name="left16PushButton">
+      <property name="text">
+       <string>左移16脉冲(s)</string>
+      </property>
+      <property name="shortcut">
+       <string>S</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="7">
+     <widget class="QPushButton" name="right16PushButton">
+      <property name="text">
+       <string>右移16脉冲(l)</string>
+      </property>
+      <property name="shortcut">
+       <string>L</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="8">
+     <widget class="QPushButton" name="right16384PushButton">
+      <property name="text">
+       <string>右移16384脉冲(p)</string>
+      </property>
+      <property name="shortcut">
+       <string>P</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QPushButton" name="resetFeedPushButton">
+   <property name="geometry">
+    <rect>
+     <x>510</x>
+     <y>80</y>
+     <width>131</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>供弹系统复位(F4)</string>
+   </property>
+   <property name="shortcut">
+    <string>F4</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="layoutWidget_2">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>1178</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <item>
+     <widget class="QPushButton" name="testDartPushButton">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="text">
+       <string>第零步:标定飞镖(F10)</string>
+      </property>
+      <property name="shortcut">
+       <string>F10</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <spacer name="horizontalSpacer_6">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>180</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item>
+     <widget class="QPushButton" name="ConnectUartPushButton">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="text">
+       <string>第一步:连接串口(F1)</string>
+      </property>
+      <property name="shortcut">
+       <string>F1</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <spacer name="horizontalSpacer_4">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>99</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item>
+     <widget class="QPushButton" name="yawAimingPushButton">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>第二步:yaw轴瞄准(F2)</string>
+      </property>
+      <property name="shortcut">
+       <string>F2</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <spacer name="horizontalSpacer_5">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>168</width>
+        <height>25</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item>
+     <widget class="QPushButton" name="dartsParasComputingPushButton">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="text">
+       <string>第三步:飞镖参数计算(F3)</string>
+      </property>
+      <property name="shortcut">
+       <string>F3</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QPushButton" name="sonicRangeTestPushButton">
+   <property name="geometry">
+    <rect>
+     <x>500</x>
+     <y>370</y>
+     <width>171</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>测试超声波测距距离(F5)</string>
+   </property>
+   <property name="shortcut">
+    <string>F5</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="sonicRangeTestLineEdit">
+   <property name="geometry">
+    <rect>
+     <x>530</x>
+     <y>410</y>
+     <width>113</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="sonicRangeTestSetParasLineEdit">
+   <property name="geometry">
+    <rect>
+     <x>850</x>
+     <y>410</y>
+     <width>113</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="sonicRangeTestSetParasPushButton">
+   <property name="geometry">
+    <rect>
+     <x>820</x>
+     <y>370</y>
+     <width>171</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>发送超声波阈值距离(F6)</string>
+   </property>
+   <property name="shortcut">
+    <string>F6</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
