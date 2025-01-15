@@ -7,9 +7,10 @@ int main(int argc, char *argv[])
 
     QStringList serialNamePort;
 
+    QSerialPort *serialPortTS = new QSerialPort;
     QSerialPort *serialPort = new QSerialPort;
 
-    Widget *w = new Widget(serialPort);
+    Widget *w = new Widget(serialPort, serialPortTS);
     w->show();
 
     return a.exec();

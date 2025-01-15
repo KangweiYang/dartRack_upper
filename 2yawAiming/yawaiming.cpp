@@ -56,7 +56,7 @@ void yawAiming::closeEvent(QCloseEvent *event){
 void yawAiming::ChangeTarYawAndSetCurYawZero(QWidget *parent, QSerialPort *serialPort, int yawChange){
     tarYaw += yawChange;
     QSerialPort *serialPort1 = serialPort;
-    SetYaw(this, serialPort1, 1, QString::number(tarYaw));
+    SetYaw(this, serialPort1, 1, QString::number(yawChange));
     SetCurYawToZero(this, serialPort1);
     ui->currentYawLineEdit->setText(QString::number(tarYaw));
 }
@@ -89,17 +89,17 @@ void yawAiming::on_ConnectUartPushButton_clicked()
 
 void yawAiming::on_left16384PushButton_clicked()
 {
-    ChangeTarYawAndSetCurYawZero(this, serialPort1, -16384);
+    ChangeTarYawAndSetCurYawZero(this, serialPort1, -999);
 }
 
 void yawAiming::on_left4096PushButton_clicked()
 {
-    ChangeTarYawAndSetCurYawZero(this, serialPort1, -4096);
+    ChangeTarYawAndSetCurYawZero(this, serialPort1, -800);
 }
 
 void yawAiming::on_left1024PushButton_clicked()
 {
-    ChangeTarYawAndSetCurYawZero(this, serialPort1, -1024);
+    ChangeTarYawAndSetCurYawZero(this, serialPort1, -512);
 }
 
 void yawAiming::on_left256PushButton_clicked()
@@ -155,17 +155,17 @@ void yawAiming::on_right256PushButton_clicked()
 
 void yawAiming::on_right1024PushButton_clicked()
 {
-    ChangeTarYawAndSetCurYawZero(this, serialPort1, 1024);
+    ChangeTarYawAndSetCurYawZero(this, serialPort1, 512);
 }
 
 void yawAiming::on_right4096PushButton_clicked()
 {
-    ChangeTarYawAndSetCurYawZero(this, serialPort1, 4096);
+    ChangeTarYawAndSetCurYawZero(this, serialPort1, 800);
 }
 
 void yawAiming::on_right16384PushButton_clicked()
 {
-    ChangeTarYawAndSetCurYawZero(this, serialPort1, 16384);
+    ChangeTarYawAndSetCurYawZero(this, serialPort1, 1000);
 }
 
 void yawAiming::on_resetFeedPushButton_clicked()

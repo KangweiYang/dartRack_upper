@@ -47,15 +47,15 @@
     <rect>
      <x>30</x>
      <y>150</y>
-     <width>1098</width>
-     <height>65</height>
+     <width>1161</width>
+     <height>66</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
      <widget class="QPushButton" name="left16384PushButton">
       <property name="text">
-       <string>左移16384脉冲(q)</string>
+       <string>左移999脉冲(q)</string>
       </property>
       <property name="shortcut">
        <string>Q</string>
@@ -65,7 +65,7 @@
     <item row="0" column="1">
      <widget class="QPushButton" name="left4096PushButton">
       <property name="text">
-       <string>左移4096脉冲(w)</string>
+       <string>左移700脉冲(w)</string>
       </property>
       <property name="shortcut">
        <string>W</string>
@@ -75,7 +75,7 @@
     <item row="0" column="2">
      <widget class="QPushButton" name="left1024PushButton">
       <property name="text">
-       <string>左移1024脉冲(e)</string>
+       <string>左移512脉冲(e)</string>
       </property>
       <property name="shortcut">
        <string>E</string>
@@ -115,7 +115,7 @@
     <item row="0" column="4">
      <spacer name="horizontalSpacer">
       <property name="orientation">
-       <enum>Qt::Horizontal</enum>
+       <enum>Qt::Orientation::Horizontal</enum>
       </property>
       <property name="sizeHint" stdset="0">
        <size>
@@ -128,7 +128,7 @@
     <item row="0" column="6">
      <widget class="QPushButton" name="right1024PushButton">
       <property name="text">
-       <string>右移1024脉冲(i)</string>
+       <string>右移512脉冲(i)</string>
       </property>
       <property name="shortcut">
        <string>I</string>
@@ -138,7 +138,7 @@
     <item row="0" column="7">
      <widget class="QPushButton" name="right4096PushButton">
       <property name="text">
-       <string>右移4096脉冲(o)</string>
+       <string>右移800脉冲(o)</string>
       </property>
       <property name="shortcut">
        <string>O</string>
@@ -148,7 +148,7 @@
     <item row="1" column="4">
      <spacer name="horizontalSpacer_2">
       <property name="orientation">
-       <enum>Qt::Horizontal</enum>
+       <enum>Qt::Orientation::Horizontal</enum>
       </property>
       <property name="sizeHint" stdset="0">
        <size>
@@ -231,7 +231,7 @@
     <item row="0" column="8">
      <widget class="QPushButton" name="right16384PushButton">
       <property name="text">
-       <string>右移16384脉冲(p)</string>
+       <string>右移999脉冲(p)</string>
       </property>
       <property name="shortcut">
        <string>P</string>
@@ -262,7 +262,7 @@
      <x>10</x>
      <y>10</y>
      <width>1178</width>
-     <height>30</height>
+     <height>37</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -282,7 +282,7 @@
     <item>
      <spacer name="horizontalSpacer_6">
       <property name="orientation">
-       <enum>Qt::Horizontal</enum>
+       <enum>Qt::Orientation::Horizontal</enum>
       </property>
       <property name="sizeHint" stdset="0">
        <size>
@@ -308,7 +308,7 @@
     <item>
      <spacer name="horizontalSpacer_4">
       <property name="orientation">
-       <enum>Qt::Horizontal</enum>
+       <enum>Qt::Orientation::Horizontal</enum>
       </property>
       <property name="sizeHint" stdset="0">
        <size>
@@ -334,7 +334,7 @@
     <item>
      <spacer name="horizontalSpacer_5">
       <property name="orientation">
-       <enum>Qt::Horizontal</enum>
+       <enum>Qt::Orientation::Horizontal</enum>
       </property>
       <property name="sizeHint" stdset="0">
        <size>

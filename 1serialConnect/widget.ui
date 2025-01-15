@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1200</width>
-    <height>700</height>
+    <width>1304</width>
+    <height>771</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>川镖上位机</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_2">
-   <item row="0" column="0" colspan="2">
+  <layout class="QGridLayout" name="gridLayout_3">
+   <item row="0" column="0" colspan="4">
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <widget class="QPushButton" name="testDartPushButton">
@@ -22,7 +22,33 @@
         <bool>true</bool>
        </property>
        <property name="text">
-        <string>第零步:标定飞镖(F10)</string>
+        <string>第0步:标定飞镖(F10)</string>
+       </property>
+       <property name="shortcut">
+        <string>F10</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_8">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>180</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="testDartByTSPushButton">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="text">
+        <string>第0.5步:标定飞镖ByTS(F11)</string>
        </property>
        <property name="shortcut">
         <string>F10</string>
@@ -32,7 +58,7 @@
      <item>
       <spacer name="horizontalSpacer_6">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -48,7 +74,7 @@
         <bool>false</bool>
        </property>
        <property name="text">
-        <string>第一步:连接串口(F1)</string>
+        <string>第0步:连接串口(F1)</string>
        </property>
        <property name="shortcut">
         <string>F1</string>
@@ -58,7 +84,7 @@
      <item>
       <spacer name="horizontalSpacer_4">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -69,9 +95,22 @@
       </spacer>
      </item>
      <item>
+      <spacer name="horizontalSpacer_10">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>168</width>
+         <height>25</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
       <widget class="QPushButton" name="yawAimingPushButton">
        <property name="text">
-        <string>第二步:yaw轴瞄准(F2)</string>
+        <string>第2步:yaw轴瞄准(F2)</string>
        </property>
        <property name="shortcut">
         <string>F2</string>
@@ -79,9 +118,9 @@
       </widget>
      </item>
      <item>
-      <spacer name="horizontalSpacer_5">
+      <spacer name="horizontalSpacer_9">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -97,10 +136,36 @@
         <bool>true</bool>
        </property>
        <property name="text">
-        <string>第三步:飞镖参数计算(F3)</string>
+        <string>第3步:飞镖参数计算(F3)</string>
        </property>
        <property name="shortcut">
         <string>F3</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_5">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>168</width>
+         <height>25</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="dartsParasComputingByTSPushButton">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="text">
+        <string>第3.5步:飞镖参数计算ByTS(F4)</string>
+       </property>
+       <property name="shortcut">
+        <string>F4</string>
        </property>
       </widget>
      </item>
@@ -109,7 +174,7 @@
    <item row="1" column="0" colspan="2">
     <widget class="QPlainTextEdit" name="receivePlainTextEdit">
      <property name="lineWrapMode">
-      <enum>QPlainTextEdit::WidgetWidth</enum>
+      <enum>QPlainTextEdit::LineWrapMode::WidgetWidth</enum>
      </property>
      <property name="readOnly">
       <bool>true</bool>
@@ -118,6 +183,9 @@
       <bool>false</bool>
      </property>
     </widget>
+   </item>
+   <item row="1" column="2" colspan="2">
+    <widget class="QPlainTextEdit" name="receivePlainTextEdit_2"/>
    </item>
    <item row="2" column="0">
     <layout class="QGridLayout" name="gridLayout">
@@ -145,11 +213,11 @@
      <item row="1" column="1">
       <widget class="QComboBox" name="baudRateSelectComboBox">
        <property name="currentIndex">
-        <number>2</number>
+        <number>0</number>
        </property>
        <item>
         <property name="text">
-         <string>4800</string>
+         <string>115200</string>
         </property>
        </item>
        <item>
@@ -159,7 +227,7 @@
        </item>
        <item>
         <property name="text">
-         <string>115200</string>
+         <string>4800</string>
         </property>
        </item>
       </widget>
@@ -287,10 +355,10 @@
        <item>
         <widget class="QPushButton" name="startUartPushButton">
          <property name="text">
-          <string>打开串口(F4)</string>
+          <string>打开串口(F5)</string>
          </property>
          <property name="shortcut">
-          <string>F4</string>
+          <string>F5</string>
          </property>
          <property name="checkable">
           <bool>true</bool>
@@ -300,7 +368,7 @@
        <item>
         <spacer name="horizontalSpacer">
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Orientation::Horizontal</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -313,17 +381,14 @@
        <item>
         <widget class="QPushButton" name="sendUartPushButton">
          <property name="text">
-          <string>发送(F5)</string>
-         </property>
-         <property name="shortcut">
-          <string>F5</string>
+          <string>发送</string>
          </property>
         </widget>
        </item>
        <item>
         <spacer name="horizontalSpacer_3">
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Orientation::Horizontal</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -340,6 +405,231 @@
          </property>
          <property name="shortcut">
           <string>F6</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+   <item row="2" column="2">
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_8">
+       <property name="text">
+        <string>串口号</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="MyComboxBox" name="comSelectComboBox_2">
+       <property name="currentIndex">
+        <number>-1</number>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_9">
+       <property name="text">
+        <string>波特率</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QComboBox" name="baudRateSelectComboBox_2">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <item>
+        <property name="text">
+         <string>9600</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>4800</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>115200</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_10">
+       <property name="text">
+        <string>数据位</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QComboBox" name="dataBitsSelectComboBox_2">
+       <property name="currentIndex">
+        <number>3</number>
+       </property>
+       <item>
+        <property name="text">
+         <string>5</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>6</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>7</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>8</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_11">
+       <property name="text">
+        <string>停止位</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QComboBox" name="stopBitsSelectComboBox_2">
+       <item>
+        <property name="text">
+         <string>1</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>1.5</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>2</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="label_12">
+       <property name="text">
+        <string>校验位</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QComboBox" name="checkBitsSelectComboBox_2">
+       <item>
+        <property name="text">
+         <string>none</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="2" column="3">
+    <layout class="QVBoxLayout" name="verticalLayout_3">
+     <item>
+      <widget class="QGroupBox" name="groupBox_2">
+       <property name="minimumSize">
+        <size>
+         <width>240</width>
+         <height>80</height>
+        </size>
+       </property>
+       <property name="title">
+        <string/>
+       </property>
+       <widget class="QLabel" name="label_7">
+        <property name="geometry">
+         <rect>
+          <x>31</x>
+          <y>35</y>
+          <width>231</width>
+          <height>32</height>
+         </rect>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>200</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">border-image: url(:/byFelix.png);</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="sendLineEdit_2"/>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_7">
+       <item>
+        <widget class="QPushButton" name="startUartPushButton_2">
+         <property name="text">
+          <string>打开串口(F7)</string>
+         </property>
+         <property name="shortcut">
+          <string>F7</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Orientation::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="sendUartPushButton_2">
+         <property name="text">
+          <string>发送</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_7">
+         <property name="orientation">
+          <enum>Qt::Orientation::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="clearPushButton_2">
+         <property name="text">
+          <string>清空(F8)</string>
+         </property>
+         <property name="shortcut">
+          <string>F8</string>
          </property>
         </widget>
        </item>

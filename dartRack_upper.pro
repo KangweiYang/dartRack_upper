@@ -52,4 +52,8 @@ FORMS += \
 RESOURCES += \
     pic.qrc
 
-RC_ICONS=icon.ico
+# if Win
+# RC_ICONS=icon.ico
+
+# if Mac
+ICON = icon.ico
