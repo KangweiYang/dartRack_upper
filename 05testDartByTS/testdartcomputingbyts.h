@@ -1,21 +1,21 @@
-#ifndef TESTDARTCOMPUTING_H
-#define TESTDARTCOMPUTING_H
+#ifndef TESTDARTCOMPUTINGBYTS_H
+#define TESTDARTCOMPUTINGBYTS_H
 
 #include <QWidget>
 #include <QSerialPort>
 
 namespace Ui {
-class testDartComputing;
+class testDartComputingByTS;
 }
 
-class testDartComputing : public QWidget
+class testDartComputingByTS : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit testDartComputing(QSerialPort *serialPort, QWidget *parent = 0);
+    explicit testDartComputingByTS(QSerialPort *serialPort, QWidget *parent = 0);
     QSerialPort *serialPort1;
-    ~testDartComputing();
+    ~testDartComputingByTS();
 
 private slots:
 
@@ -52,8 +52,8 @@ private slots:
     void on_Tall1LineEditInput_editingFinished();
 
 private:
-    Ui::testDartComputing *ui;
+    Ui::testDartComputingByTS *ui;
     bool visible = true;
 };
 
-#endif // TESTDARTCOMPUTING_H
+#endif // TESTDARTCOMPUTINGBYTS_H

@@ -1,10 +1,11 @@
 #include "testdartcomputingbyts.h"
 #include "../main.h"
 #include "ui_testdartcomputingbyts.h"
-#include "ui_testdartbyts.h"
 #include "../2yawAiming/yawaiming.h"
 #include "../3dartsParasComp/dartsparascomputing.h"
 #include "../1serialConnect/widget.h"
+#include "../35dartsParasCompByTS/dartsparascomputingbyts.h"
+#include "../0testDart/testdart.h"
 #include <QSerialPortInfo>
 #include <QSerialPort>
 #include <QMessageBox>
@@ -19,15 +20,14 @@
 
 #include <QDebug>
 #include "../serial/serial.h"
-#include "testdartbyts.h"
 #include <QtMath>
 #include <QCloseEvent>
 
 const double PI = 3.14159265358979323846264338;
 
-testDartComputing::testDartComputing(QSerialPort *serialPort, QWidget *parent) :
+testDartComputingByTS::testDartComputingByTS(QSerialPort *serialPort, QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::testDartComputing)
+    ui(new Ui::testDartComputingByTS)
 {
     serialPort1 = serialPort;
     bool visible = true;
@@ -39,32 +39,32 @@ testDartComputing::testDartComputing(QSerialPort *serialPort, QWidget *parent) :
     setEditOnlyNum(ui->Tall1LineEditInput, ui->integralOfF0PlusDxtensionLineEditInput);
 }
 
-testDartComputing::~testDartComputing()
+testDartComputingByTS::~testDartComputingByTS()
 {
     delete ui;
 }
 
-void testDartComputing::on_ConnectUartPushButton_clicked()
+void testDartComputingByTS::on_ConnectUartPushButton_clicked()
 {
     this->visible = false;
     this->close();
 }
 
-void testDartComputing::on_yawAimingPushButton_clicked()
+void testDartComputingByTS::on_yawAimingPushButton_clicked()
 {
     yawAiming *yawAimingPage = new yawAiming(serialPort1);
     yawAimingPage->setGeometry(this->geometry());
     yawAimingPage->show();
 }
 
-void testDartComputing::on_dartsParasComputingPushButton_clicked()
+void testDartComputingByTS::on_dartsParasComputingPushButton_clicked()
 {
     dartsParasComputing *dartsParasComputingPage = new dartsParasComputing(serialPort1);
     dartsParasComputingPage->setGeometry(this->geometry());
     dartsParasComputingPage->show();
 }
 
-void testDartComputing::on_computeXandHPushButton_clicked()
+void testDartComputingByTS::on_computeXandHPushButton_clicked()
 {
     ui->xLineEdit->clear();
     ui->hLineEdit->clear();
@@ -72,38 +72,38 @@ void testDartComputing::on_computeXandHPushButton_clicked()
     ui->hLineEdit->insert(QString::number(ui->lLineEdit->text().toDouble() * qSin(ui->betaLineEdit->text().toDouble() * PI / 180.0) + ui->deltaHlineEdit->text().toDouble() / 1000));
 }
 
-void testDartComputing::on_deltaXlineEdit_editingFinished()
+void testDartComputingByTS::on_deltaXlineEdit_editingFinished()
 {
     this->on_computeXandHPushButton_clicked();
 }
 
-void testDartComputing::on_deltaHlineEdit_editingFinished()
+void testDartComputingByTS::on_deltaHlineEdit_editingFinished()
 {
     this->on_computeXandHPushButton_clicked();
 }
 
-void testDartComputing::on_betaLineEdit_editingFinished()
+void testDartComputingByTS::on_betaLineEdit_editingFinished()
 {
     this->on_computeXandHPushButton_clicked();
 }
 
-void testDartComputing::on_lLineEdit_editingFinished()
+void testDartComputingByTS::on_lLineEdit_editingFinished()
 {
     this->on_computeXandHPushButton_clicked();
 }
 
-void testDartComputing::on_computeTall4PushButton_clicked()
+void testDartComputingByTS::on_computeTall4PushButton_clicked()
 {
     ui->integralOfF0PlusDxtensionLineEditOutput->clear();
     ui->integralOfF0PlusDxtensionLineEditOutput->insert(QString::number((ui->mdart1PlusGLineEditInput->text().toDouble() + ui->mLauncherPlusGLineEditInput->text().toDouble()) / 1000 * ui->xLineEdit->text().toDouble() * ui->xLineEdit->text().toDouble() /( 4 * qCos(ui->setaLineEdit->text().toDouble() * PI / 180.0) * qCos(ui->setaLineEdit->text().toDouble() * PI / 180.0) * (ui->xLineEdit->text().toDouble() * qTan(ui->setaLineEdit->text().toDouble() * PI / 180.0) - ui->hLineEdit->text().toDouble()))));
 }
 
-void testDartComputing::on_mdart1PlusGLineEditInput_editingFinished()
+void testDartComputingByTS::on_mdart1PlusGLineEditInput_editingFinished()
 {
     this->on_computeTall4PushButton_clicked();
 }
 
-void testDartComputing::on_copyTall4PushButton_clicked()
+void testDartComputingByTS::on_copyTall4PushButton_clicked()
 {
     ui->integralOfF0PlusDxtensionLineEditInput->clear();
     ui->integralOfF0PlusDxtensionLineEditInput->insert(ui->integralOfF0PlusDxtensionLineEditOutput->text());
@@ -111,28 +111,28 @@ void testDartComputing::on_copyTall4PushButton_clicked()
     ui->mdart2PlusGLineEditInput->insert(ui->mdart1PlusGLineEditInput->text());
 }
 
-void testDartComputing::on_computeK1PlusXtensionPushButton_clicked()
+void testDartComputingByTS::on_computeK1PlusXtensionPushButton_clicked()
 {
     ui->k1PlusXtensionLineEditInput->clear();
     ui->k1PlusXtensionLineEditInput->insert(QString::number(((ui->mdart1PlusGLineEditInput->text().toDouble() + ui->mLauncherPlusGLineEditInput->text().toDouble()) / 1000 * ui->xLineEdit->text().toDouble() * ui->xLineEdit->text().toDouble() /( 4 * qCos(ui->setaLineEdit->text().toDouble() * PI / 180.0) * qCos(ui->setaLineEdit->text().toDouble() * PI / 180.0) * (ui->xLineEdit->text().toDouble() * qTan(ui->setaLineEdit->text().toDouble() * PI / 180.0) - ui->hLineEdit->text().toDouble())) - ui->integralOfF0PlusDxtensionLineEditInput->text().toDouble()) / (ui->Tall1LineEditInput->text().toDouble() - ui->f0LineEditInput->text().toDouble())));
 }
 
-void testDartComputing::on_f0LineEditInput_editingFinished()
+void testDartComputingByTS::on_f0LineEditInput_editingFinished()
 {
     this->on_computeK1PlusXtensionPushButton_clicked();
 }
 
-void testDartComputing::on_mdart2PlusGLineEditInput_editingFinished()
+void testDartComputingByTS::on_mdart2PlusGLineEditInput_editingFinished()
 {
     this->on_computeK1PlusXtensionPushButton_clicked();
 }
 
-void testDartComputing::on_integralOfF0PlusDxtensionLineEditInput_editingFinished()
+void testDartComputingByTS::on_integralOfF0PlusDxtensionLineEditInput_editingFinished()
 {
     this->on_computeK1PlusXtensionPushButton_clicked();
 }
 
-void testDartComputing::on_Tall1LineEditInput_editingFinished()
+void testDartComputingByTS::on_Tall1LineEditInput_editingFinished()
 {
     this->on_computeK1PlusXtensionPushButton_clicked();
 }

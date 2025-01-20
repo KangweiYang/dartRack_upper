@@ -10,13 +10,11 @@ find_package(Qt6 COMPONENTS
 
 target_sources(test_dart_by_ts
         PRIVATE
-        testdartbyts.cpp
         testdartcomputingbyts.cpp
 )
 
 target_include_directories(test_dart_by_ts
         INTERFACE
-        testdartbyts.h
         testdartcomputingbyts.h
 )
 

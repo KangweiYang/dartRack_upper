@@ -1,5 +1,5 @@
-#ifndef DARTSPARASCOMPUTING_H
-#define DARTSPARASCOMPUTING_H
+#ifndef DARTSPARASCOMPUTINGBYTS_H
+#define DARTSPARASCOMPUTINGBYTS_H
 
 #include <QWidget>
 #include <QSerialPortInfo>
@@ -11,16 +11,16 @@
 #include <QLineEdit>
 
 namespace Ui {
-class dartsParasComputing;
+class dartsParasComputingByTS;
 }
 
-class dartsParasComputing : public QWidget
+class dartsParasComputingByTS : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit dartsParasComputing(QSerialPort *serialPort, QWidget *parent = 0);
-    ~dartsParasComputing();
+    explicit dartsParasComputingByTS(QSerialPort *serialPort, QWidget *parent = 0);
+    ~dartsParasComputingByTS();
     QSerialPort *serialPort1;
     void closeEvent(QCloseEvent *event);
 
@@ -85,8 +85,8 @@ private slots:
     void on_abortShootPushButton_clicked();
 
 private:
-    Ui::dartsParasComputing *ui;
+    Ui::dartsParasComputingByTS *ui;
     bool visible = true;
 };
 
-#endif // DARTSPARASCOMPUTING_H
+#endif // DARTSPARASCOMPUTINGBYTS_H

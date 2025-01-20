@@ -9,7 +9,7 @@ find_package(Qt6 COMPONENTS
 
 target_sources(darts_paras_computing_by_ts
         PRIVATE
-        ./dartsparascomputing.cpp
+        dartsparascomputingbyts.cpp
 )
 
 target_include_directories(darts_paras_computing_by_ts

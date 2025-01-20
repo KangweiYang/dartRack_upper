@@ -8,9 +8,11 @@ set(CMAKE_AUTOUIC ON)
 #set(CMAKE_INCLUDE_CURRENT_DIR ON)
 project(dartRack_upper)
 
+add_subdirectory(0testDart)
 add_subdirectory(05testDartByTS)
 add_subdirectory(1serialConnect)
 add_subdirectory(2yawAiming)
+add_subdirectory(3dartsParasComp)
 add_subdirectory(35dartsParasCompByTS)
 add_subdirectory(serial)
 add_subdirectory(myComboxBox)
@@ -25,8 +27,8 @@ find_package(Qt6 COMPONENTS
         REQUIRED)
 qt6_wrap_ui(QT_FORMS_HPP ${ui_s})
 add_executable(dartRack_upper main.cpp
-        serial/serial.cpp 05testDartByTS/testdartcomputingbyts.cpp 05testDartByTS/testdartbyts.cpp 2yawAiming/yawaiming.cpp 35dartsParasCompByTS/dartsparascomputing.cpp myComboxBox/MyComboxBox.cpp
-        05testDartByTS/testdartbyts.ui 05testDartByTS/testdartcomputingbyts.ui 1serialConnect/widget.ui 2yawAiming/yawaiming.ui 35dartsParasCompByTS/dartsparascomputing.ui
+        serial/serial.cpp 0testDart/testdartcomputing.cpp 0testDart/testdart.cpp 05testDartByTS/testdartcomputingbyts.cpp 1serialConnect/widget.cpp 2yawAiming/yawaiming.cpp 3dartsParasComp/dartsparascomputing.cpp 35dartsParasCompByTS/dartsparascomputingbyts.cpp myComboxBox/MyComboxBox.cpp
+        0testDart/testdartcomputing.ui 0testDart/testdart.ui 05testDartByTS/testdartcomputingbyts.ui 1serialConnect/widget.ui 2yawAiming/yawaiming.ui 3dartsParasComp/dartsparascomputing.ui 35dartsParasCompByTS/dartsparascomputingbyts.ui
         pic.qrc
         main.h)
 target_link_libraries(dartRack_upper
@@ -41,5 +43,6 @@ target_link_libraries(dartRack_upper
         yaw_aiming
         my_combox_box
         test_dart_by_ts
+        darts_paras_computing_by_ts
 )
 

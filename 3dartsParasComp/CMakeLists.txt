@@ -14,7 +14,7 @@ target_sources(darts_paras_computing
 
 target_include_directories(darts_paras_computing
         INTERFACE
-        ./
+        ./dartsparascomputing.h
 )
 
 target_link_libraries(darts_paras_computing
