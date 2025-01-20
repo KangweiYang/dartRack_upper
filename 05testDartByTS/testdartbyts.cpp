@@ -1,9 +1,9 @@
-#include "testdart.h"
+#include "testdartbyts.h"
 #include "ui_testdart.h"
 #include "../main.h"
 #include "../2yawAiming/yawaiming.h"
 #include "../3dartsParasComp/dartsparascomputing.h"
-#include "testdartcomputing.h"
+#include "testdartcomputingbyts.h"
 #include "../1serialConnect/widget.h"
 #include <QSerialPortInfo>
 #include <QSerialPort>

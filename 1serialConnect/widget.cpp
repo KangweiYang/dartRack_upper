@@ -71,6 +71,7 @@ void Widget::serialPortReadyRead_Slot_2(){
 //    ui->receivePlainTextEdit_2->appendPlainText(buff);
 }
 
+
 void Widget::on_testDartPushButton_clicked()
 {
    testDartComputing *testDartComputingPage = new testDartComputing(serialPort1);
@@ -80,6 +81,17 @@ void Widget::on_testDartPushButton_clicked()
    testDart *testDartPage = new testDart(serialPort1);
    testDartPage->setGeometry(this->geometry());
    testDartPage->show();
+}
+
+void Widget::on_testDartPushButton_2_clicked()
+{
+    testDartComputing *testDartComputingPage = new testDartComputing(serialPort1);
+    testDartComputingPage->setGeometry(this->geometry());
+    testDartComputingPage->show();
+
+    testDart *testDartPage = new testDart(serialPort1);
+    testDartPage->setGeometry(this->geometry());
+    testDartPage->show();
 }
 
 void Widget::on_yawAimingPushButton_clicked()

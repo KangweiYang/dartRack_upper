@@ -27,6 +27,8 @@ public:
 private slots:
     void on_testDartPushButton_clicked();
 
+    void on_testDartPushButton_2_clicked();
+
     void on_yawAimingPushButton_clicked();
 
     void on_dartsParasComputingPushButton_clicked();

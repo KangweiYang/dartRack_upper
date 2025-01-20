@@ -1,4 +1,5 @@
-add_library(test_dart STATIC)
+add_library(test_dart_by_ts STATIC
+        )
 
 find_package(Qt6 COMPONENTS
         Core
@@ -7,19 +8,19 @@ find_package(Qt6 COMPONENTS
         SerialPort
         REQUIRED)
 
-target_sources(test_dart
+target_sources(test_dart_by_ts
         PRIVATE
-        ./testdart.cpp
-        ./testdartcomputing.cpp
+        testdartbyts.cpp
+        testdartcomputingbyts.cpp
 )
 
-target_include_directories(test_dart
+target_include_directories(test_dart_by_ts
         INTERFACE
-        ./testdart.h
-        ./testdartcomputing.h
+        testdartbyts.h
+        testdartcomputingbyts.h
 )
 
-target_link_libraries(test_dart
+target_link_libraries(test_dart_by_ts
         PRIVATE
         Qt::Core
         Qt::Gui

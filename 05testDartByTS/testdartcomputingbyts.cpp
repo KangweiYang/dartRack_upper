@@ -1,7 +1,7 @@
-#include "testdartcomputing.h"
+#include "testdartcomputingbyts.h"
 #include "../main.h"
-#include "ui_testdartcomputing.h"
-#include "ui_testdart.h"
+#include "ui_testdartcomputingbyts.h"
+#include "ui_testdartbyts.h"
 #include "../2yawAiming/yawaiming.h"
 #include "../3dartsParasComp/dartsparascomputing.h"
 #include "../1serialConnect/widget.h"
@@ -19,7 +19,7 @@
 
 #include <QDebug>
 #include "../serial/serial.h"
-#include "testdart.h"
+#include "testdartbyts.h"
 #include <QtMath>
 #include <QCloseEvent>
 

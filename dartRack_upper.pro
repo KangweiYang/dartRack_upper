@@ -31,7 +31,9 @@ SOURCES += \
     dartsparascomputing.cpp \
     serial.cpp \
     MyComboxBox.cpp \
-    testdartcomputing.cpp
+    testdartcomputing.cpp \
+    testdartbyts.cpp \
+    dartsparascomputingbyts.cpp
 
 HEADERS += \
         widget.h \
@@ -40,14 +42,18 @@ HEADERS += \
     dartsparascomputing.h \
     serial.h \
     MyComboxBox.h \
-    testdartcomputing.h
+    testdartcomputing.h \
+    testdartbyts.h \
+    dartsparascomputingbyts.h \
 
 FORMS += \
         widget.ui \
     testdart.ui \
     yawaiming.ui \
     dartsparascomputing.ui \
-    testdartcomputing.ui
+    testdartcomputing.ui \
+    testdartcomputingbyts.ui \
+    testdartbyts.ui
 
 RESOURCES += \
     pic.qrc

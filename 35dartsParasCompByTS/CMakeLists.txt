@@ -1,4 +1,4 @@
-add_library(darts_paras_computing STATIC)
+add_library(darts_paras_computing_by_ts STATIC)
 
 find_package(Qt6 COMPONENTS
         Core
@@ -7,17 +7,17 @@ find_package(Qt6 COMPONENTS
         SerialPort
         REQUIRED)
 
-target_sources(darts_paras_computing
+target_sources(darts_paras_computing_by_ts
         PRIVATE
         ./dartsparascomputing.cpp
 )
 
-target_include_directories(darts_paras_computing
+target_include_directories(darts_paras_computing_by_ts
         INTERFACE
         ./
 )
 
-target_link_libraries(darts_paras_computing
+target_link_libraries(darts_paras_computing_by_ts
         PRIVATE
         Qt::Core
         Qt::Gui
