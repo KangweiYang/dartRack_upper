@@ -13,11 +13,12 @@ class testDartComputingByTS : public QWidget
     Q_OBJECT
 
 public:
-    explicit testDartComputingByTS(QSerialPort *serialPort, QWidget *parent = 0);
-    QSerialPort *serialPort1;
+    explicit testDartComputingByTS(QSerialPort *serialPort, QSerialPort *serialPort2, QWidget *parent = 0);
+    QSerialPort *serialPort1, *serialPort2;
     ~testDartComputingByTS();
 
 private slots:
+    void serialPortReadyRead_Slot();
 
     void on_ConnectUartPushButton_clicked();
 

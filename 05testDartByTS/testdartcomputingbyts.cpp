@@ -25,18 +25,53 @@
 
 const double PI = 3.14159265358979323846264338;
 
-testDartComputingByTS::testDartComputingByTS(QSerialPort *serialPort, QWidget *parent) :
+testDartComputingByTS::testDartComputingByTS(QSerialPort *serialPort, QSerialPort *serialPort2, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::testDartComputingByTS)
 {
     serialPort1 = serialPort;
+    serialPort2 = serialPort2;
     bool visible = true;
     ui->setupUi(this);
-    setEditOnlyNum(ui->setaLineEdit, ui->lLineEdit);
-    setEditOnlyNum(ui->betaLineEdit, ui->deltaXlineEdit);
-    setEditOnlyNum(ui->deltaHlineEdit, ui->f0LineEditInput);
+    setEditOnlyNum(ui->setaLineEdit, ui->f0LineEditInput);
     setEditOnlyNum(ui->mdart1PlusGLineEditInput, ui->mdart2PlusGLineEditInput);
     setEditOnlyNum(ui->Tall1LineEditInput, ui->integralOfF0PlusDxtensionLineEditInput);
+
+    connect(serialPort2, SIGNAL(readyRead()), this, SLOT(serialPortReadyRead_Slot()));
+}
+
+const QString targetCoordSerial = "10,";
+const QString rackLeftBackCoordSerial = "\n30,";
+
+void testDartComputingByTS::serialPortReadyRead_Slot(){
+    if(this->visible)
+        ui->targetCoordTextEdit->append( "visible\n");
+    if (receiveBuff_2.contains(targetCoordSerial))
+        ui->targetCoordTextEdit->append( "targetCoordSerial\n");
+    if(receiveBuff_2.contains(",1"))
+        ui->targetCoordTextEdit->append( ",1\\x04\n");
+    if (receiveBuff_2.contains(rackLeftBackCoordSerial))
+        ui->targetCoordTextEdit->append( "rackLeftBackCoordSerial\n");
+    if(this->visible && ((receiveBuff_2.contains(targetCoordSerial) && receiveBuff_2.contains(",1\n") ) || (receiveBuff_2.contains(rackLeftBackCoordSerial) && receiveBuff_2.contains(",1\n")))){     //stm32 send:   targetCoord: 100/ \n rackLeftBackCoord: -1000;
+        ui->targetCoordTextEdit->append( "Test\n");
+        int targetCoordIndex = receiveBuff_2.lastIndexOf(targetCoordSerial) + targetCoordSerial.length() - 1;
+        int rackLeftBackCoordIndex = receiveBuff_2.lastIndexOf(rackLeftBackCoordSerial) + rackLeftBackCoordSerial.length() - 1;
+        if(targetCoordIndex != targetCoordSerial.length() - 2){
+            QString targetCoord;
+            targetCoord = receiveBuff_2.right(receiveBuff_2.size() - targetCoordIndex - 1);
+            targetCoord.chop(targetCoord.size() - targetCoord.indexOf(",1\n"));
+            ui->targetCoordTextEdit->clear();
+            ui->targetCoordTextEdit->append(targetCoord + "Test\n");
+        }
+        if(rackLeftBackCoordIndex != rackLeftBackCoordSerial.length() - 2){
+            QString rackLeftBackCoord;
+            rackLeftBackCoord = receiveBuff_2.right(receiveBuff_2.size() - rackLeftBackCoordIndex - 1);
+            rackLeftBackCoord.chop(rackLeftBackCoord.size() - rackLeftBackCoord.indexOf(",1\n"));
+            ui->rackLeftBackCoordTextEdit->clear();
+            ui->rackLeftBackCoordTextEdit->append(rackLeftBackCoord);
+        }
+        receiveBuff_2.clear();
+    }
 }
 
 testDartComputingByTS::~testDartComputingByTS()
@@ -68,8 +103,8 @@ void testDartComputingByTS::on_computeXandHPushButton_clicked()
 {
     ui->xLineEdit->clear();
     ui->hLineEdit->clear();
-    ui->xLineEdit->insert(QString::number(ui->lLineEdit->text().toDouble() * qCos(ui->betaLineEdit->text().toDouble() * PI / 180.0) + ui->deltaXlineEdit->text().toDouble() / 1000));
-    ui->hLineEdit->insert(QString::number(ui->lLineEdit->text().toDouble() * qSin(ui->betaLineEdit->text().toDouble() * PI / 180.0) + ui->deltaHlineEdit->text().toDouble() / 1000));
+//    ui->xLineEdit->insert(QString::number(ui->lLineEdit->text().toDouble() * qCos(ui->betaLineEdit->text().toDouble() * PI / 180.0) + ui->deltaXlineEdit->text().toDouble() / 1000));
+//    ui->hLineEdit->insert(QString::number(ui->lLineEdit->text().toDouble() * qSin(ui->betaLineEdit->text().toDouble() * PI / 180.0) + ui->deltaHlineEdit->text().toDouble() / 1000));
 }
 
 void testDartComputingByTS::on_deltaXlineEdit_editingFinished()

@@ -8,6 +8,7 @@
 #include "../2yawAiming/yawaiming.h"
 #include "../3dartsParasComp/dartsparascomputing.h"
 #include "../0testDart/testdartcomputing.h"
+#include "../05testDartByTS/testdartcomputingbyts.h"
 #include "../serial/serial.h"
 #include <QDebug>
 
@@ -83,11 +84,11 @@ void Widget::on_testDartPushButton_clicked()
    testDartPage->show();
 }
 
-void Widget::on_testDartPushButton_2_clicked()
+void Widget::on_testDartByTSPushButton_clicked()
 {
-    testDartComputing *testDartComputingPage = new testDartComputing(serialPort1);
-    testDartComputingPage->setGeometry(this->geometry());
-    testDartComputingPage->show();
+    testDartComputingByTS *testDartComputingByTSPage = new testDartComputingByTS(serialPort1, serialPort2);
+    testDartComputingByTSPage->setGeometry(this->geometry());
+    testDartComputingByTSPage->show();
 
     testDart *testDartPage = new testDart(serialPort1);
     testDartPage->setGeometry(this->geometry());

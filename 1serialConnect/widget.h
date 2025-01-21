@@ -8,7 +8,7 @@
 #include <QString>
 #include "../serial/serial.h"
 
-extern QString receiveBuff;
+extern QString receiveBuff, receiveBuff_2;
 
 namespace Ui {
 class Widget;
@@ -27,7 +27,7 @@ public:
 private slots:
     void on_testDartPushButton_clicked();
 
-    void on_testDartPushButton_2_clicked();
+    void on_testDartByTSPushButton_clicked();
 
     void on_yawAimingPushButton_clicked();
 
