@@ -25,6 +25,19 @@
 
 const double PI = 3.14159265358979323846264338;
 
+
+const QString endSerial = ",-";
+const QString pauseSerial = ",";
+const QString targetCoordSerial = "\n1,";
+const QString rackLeftBackCoordSerial = "\n6,";
+
+struct coord
+{
+    QString x;
+    QString y;
+    QString z;
+};
+
 testDartComputingByTS::testDartComputingByTS(QSerialPort *serialPort, QSerialPort *serialPort2, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::testDartComputingByTS)
@@ -39,16 +52,69 @@ testDartComputingByTS::testDartComputingByTS(QSerialPort *serialPort, QSerialPor
 
     connect(serialPort2, SIGNAL(readyRead()), this, SLOT(serialPortReadyRead_Slot()));
 }
+//
+//void testDartComputingByTS::serialHandle(QString startSerial, coord* point, QLineEdit* xLineEdit, QLineEdit* yLineEdit, QLineEdit* zLineEdit){
+//    int dataStartIndex = receiveBuff_2.lastIndexOf(startSerial) + startSerial.length() - 1;
+//    if(dataStartIndex != startSerial.length() - 2){
+//        point->x = receiveBuff_2.right(receiveBuff_2.size() - dataStartIndex - 1);
+//        point->x.chop(point->x.size() - point->x.indexOf(pauseSerial));
+//        xLineEdit->clear();
+//        xLineEdit->insert(point->x);
+//        point->y = receiveBuff_2.right(receiveBuff_2.size() - dataStartIndex - 1);
+//        point->y.chop(point->y.size() - point->y.indexOf(pauseSerial));
+//        yLineEdit->clear();
+//        yLineEdit->insert(point->y);
+//        point->z = receiveBuff_2.right(receiveBuff_2.size() - dataStartIndex - 1);
+//        point->z.chop(point->z.size() - point->z.indexOf(pauseSerial));
+//        zLineEdit->clear();
+//        zLineEdit->insert(point->x);
+//    }
+//}
+void testDartComputingByTS::serialHandle(QString startSerial, coord* point, QLineEdit* xLineEdit, QLineEdit* yLineEdit, QLineEdit* zLineEdit) {
+    if (!point || !xLineEdit || !yLineEdit || !zLineEdit) {
+        qDebug() << "Error: Null pointer passed to serialHandle";
+        return;
+    }
 
-const QString endSerial = ",-";
-const QString targetCoordSerial = "\n1,";
-const QString rackLeftBackCoordSerial = "\n6,";
+    int dataStartIndex = receiveBuff_2.lastIndexOf(startSerial) + startSerial.length() - 1;
+    if (dataStartIndex == -1 || dataStartIndex == startSerial.length() - 2) {
+        qDebug() << "Error: Invalid startSerial index";
+        return;
+    }
 
-//void serialHandle(QString startSerial, QString endSerial, )
+    // 提取从 dataStartIndex 开始到缓冲区末尾的字符串
+    QString data = receiveBuff_2.right(receiveBuff_2.size() - dataStartIndex - 1);
 
+    // 使用 pauseSerial 分隔数据
+    QStringList parts = data.split(pauseSerial);
+
+    // 确保有足够的部分
+    if (parts.size() < 3) {
+        qDebug() << "Error: Not enough data parts to extract x, y, z";
+        return;
+    }
+
+    // 提取 x, y, z 的值
+    point->x = parts[0].trimmed();  // 第一部分是 x
+    point->y = parts[1].trimmed();  // 第二部分是 y
+    point->z = parts[2].trimmed();  // 第三部分是 z
+
+    // 清空并插入值到对应的 QLineEdit
+    xLineEdit->clear();
+    xLineEdit->insert(point->x);
+
+    yLineEdit->clear();
+    yLineEdit->insert(point->y);
+
+    zLineEdit->clear();
+    zLineEdit->insert(point->z);
+}
 void testDartComputingByTS::serialPortReadyRead_Slot(){
+    coord target;
     if(this->visible && ((receiveBuff_2.contains(targetCoordSerial) && receiveBuff_2.contains(endSerial) ) || (receiveBuff_2.contains(rackLeftBackCoordSerial) && receiveBuff_2.contains(endSerial)))){     //stm32 send:   targetCoord: 100/ \n rackLeftBackCoord: -1000;
-        ui->targetCoordTextEdit->append( "Enter\n");
+        serialHandle(targetCoordSerial, &target, ui->targetCoordXLineEdit, ui->targetCoordYLineEdit, ui->targetCoordZLineEdit);
+        /*
+        ui->targetCoordXLineEdit->insert( "Enter\n");
         int targetCoordIndex = receiveBuff_2.lastIndexOf(targetCoordSerial) + targetCoordSerial.length() - 1;
         int rackLeftBackCoordIndex = receiveBuff_2.lastIndexOf(rackLeftBackCoordSerial) + rackLeftBackCoordSerial.length() - 1;
         if(targetCoordIndex != targetCoordSerial.length() - 2){
@@ -66,6 +132,7 @@ void testDartComputingByTS::serialPortReadyRead_Slot(){
             ui->rackLeftBackCoordTextEdit->append(rackLeftBackCoord);
         }
         receiveBuff_2.clear();
+         */
     }
 }
 

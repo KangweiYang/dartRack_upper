@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QSerialPort>
+#include <qlineedit.h>
 
 namespace Ui {
 class testDartComputingByTS;
@@ -53,6 +54,15 @@ private slots:
     void on_Tall1LineEditInput_editingFinished();
 
 private:
+
+    struct coord
+    {
+        QString x;
+        QString y;
+        QString z;
+    };
+    void serialHandle(QString startSerial, coord* point, QLineEdit* xLineEdit, QLineEdit* yLineEdit, QLineEdit* zLineEdit);
+
     Ui::testDartComputingByTS *ui;
     bool visible = true;
 };
