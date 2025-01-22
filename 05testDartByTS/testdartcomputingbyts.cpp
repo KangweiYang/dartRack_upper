@@ -40,33 +40,28 @@ testDartComputingByTS::testDartComputingByTS(QSerialPort *serialPort, QSerialPor
     connect(serialPort2, SIGNAL(readyRead()), this, SLOT(serialPortReadyRead_Slot()));
 }
 
-const QString targetCoordSerial = "10,";
-const QString rackLeftBackCoordSerial = "\n30,";
+const QString endSerial = ",-";
+const QString targetCoordSerial = "\n1,";
+const QString rackLeftBackCoordSerial = "\n6,";
+
+//void serialHandle(QString startSerial, QString endSerial, )
 
 void testDartComputingByTS::serialPortReadyRead_Slot(){
-    if(this->visible)
-        ui->targetCoordTextEdit->append( "visible\n");
-    if (receiveBuff_2.contains(targetCoordSerial))
-        ui->targetCoordTextEdit->append( "targetCoordSerial\n");
-    if(receiveBuff_2.contains(",1"))
-        ui->targetCoordTextEdit->append( ",1\\x04\n");
-    if (receiveBuff_2.contains(rackLeftBackCoordSerial))
-        ui->targetCoordTextEdit->append( "rackLeftBackCoordSerial\n");
-    if(this->visible && ((receiveBuff_2.contains(targetCoordSerial) && receiveBuff_2.contains(",1\n") ) || (receiveBuff_2.contains(rackLeftBackCoordSerial) && receiveBuff_2.contains(",1\n")))){     //stm32 send:   targetCoord: 100/ \n rackLeftBackCoord: -1000;
-        ui->targetCoordTextEdit->append( "Test\n");
+    if(this->visible && ((receiveBuff_2.contains(targetCoordSerial) && receiveBuff_2.contains(endSerial) ) || (receiveBuff_2.contains(rackLeftBackCoordSerial) && receiveBuff_2.contains(endSerial)))){     //stm32 send:   targetCoord: 100/ \n rackLeftBackCoord: -1000;
+        ui->targetCoordTextEdit->append( "Enter\n");
         int targetCoordIndex = receiveBuff_2.lastIndexOf(targetCoordSerial) + targetCoordSerial.length() - 1;
         int rackLeftBackCoordIndex = receiveBuff_2.lastIndexOf(rackLeftBackCoordSerial) + rackLeftBackCoordSerial.length() - 1;
         if(targetCoordIndex != targetCoordSerial.length() - 2){
             QString targetCoord;
             targetCoord = receiveBuff_2.right(receiveBuff_2.size() - targetCoordIndex - 1);
-            targetCoord.chop(targetCoord.size() - targetCoord.indexOf(",1\n"));
+            targetCoord.chop(targetCoord.size() - targetCoord.indexOf(endSerial));
             ui->targetCoordTextEdit->clear();
-            ui->targetCoordTextEdit->append(targetCoord + "Test\n");
+            ui->targetCoordTextEdit->append(targetCoord);
         }
         if(rackLeftBackCoordIndex != rackLeftBackCoordSerial.length() - 2){
             QString rackLeftBackCoord;
             rackLeftBackCoord = receiveBuff_2.right(receiveBuff_2.size() - rackLeftBackCoordIndex - 1);
-            rackLeftBackCoord.chop(rackLeftBackCoord.size() - rackLeftBackCoord.indexOf(",1\n"));
+            rackLeftBackCoord.chop(rackLeftBackCoord.size() - rackLeftBackCoord.indexOf(endSerial));
             ui->rackLeftBackCoordTextEdit->clear();
             ui->rackLeftBackCoordTextEdit->append(rackLeftBackCoord);
         }
