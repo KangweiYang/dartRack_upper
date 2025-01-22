@@ -159,123 +159,47 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>20</x>
      <y>60</y>
-     <width>1181</width>
+     <width>1171</width>
      <height>121</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <item row="2" column="10">
-     <widget class="QLineEdit" name="leadRightBackCoordYLineEdit"/>
-    </item>
-    <item row="1" column="5">
-     <widget class="QLineEdit" name="rackRightFrontXLineEdit"/>
-    </item>
-    <item row="2" column="3">
-     <widget class="QLineEdit" name="leadLeftBackCoordYLineEdit"/>
-    </item>
-    <item row="0" column="11">
-     <widget class="QLabel" name="setaLabel_10">
+    <item row="1" column="0">
+     <widget class="QLabel" name="setaLabel_12">
       <property name="text">
-       <string>14:飞镖发射点</string>
+       <string>x</string>
       </property>
      </widget>
     </item>
-    <item row="0" column="4">
-     <widget class="QLabel" name="setaLabel_5">
-      <property name="text">
-       <string>8:架右后方</string>
-      </property>
-     </widget>
+    <item row="1" column="3">
+     <widget class="QLineEdit" name="leadLeftBackCoordXLineEdit"/>
     </item>
-    <item row="2" column="1">
-     <widget class="QLineEdit" name="targetCoordYLineEdit"/>
-    </item>
-    <item row="0" column="1">
-     <widget class="QLabel" name="setaLabel_2">
-      <property name="text">
-       <string>1:目标坐标</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="10">
-     <widget class="QLineEdit" name="leadRightBackCoordXLineEdit"/>
-    </item>
-    <item row="3" column="1">
-     <widget class="QLineEdit" name="targetCoordZLineEdit"/>
-    </item>
-    <item row="1" column="8">
-     <widget class="QLineEdit" name="leadRightFrontCoordXLineEdit"/>
-    </item>
-    <item row="0" column="8">
-     <widget class="QLabel" name="setaLabel_9">
-      <property name="text">
-       <string>12:导轨右上</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="5">
-     <widget class="QLineEdit" name="rackRightFrontZLineEdit"/>
-    </item>
-    <item row="2" column="2">
-     <widget class="QLineEdit" name="rackLeftBackCoordYLineEdit"/>
-    </item>
-    <item row="3" column="10">
-     <widget class="QLineEdit" name="leadRightBackCoordZLineEdit"/>
-    </item>
-    <item row="0" column="2">
-     <widget class="QLabel" name="setaLabel_3">
-      <property name="text">
-       <string>6:架左后方</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="6">
-     <widget class="QLineEdit" name="rackLeftFrontYLineEdit"/>
-    </item>
-    <item row="3" column="11">
+    <item row="3" column="12">
      <widget class="QLineEdit" name="leadDartShootCoordZLineEdit"/>
-    </item>
-    <item row="0" column="7">
-     <widget class="QLabel" name="setaLabel_8">
-      <property name="text">
-       <string>11:导轨左上</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="7">
-     <widget class="QLineEdit" name="leadLeftFrontCoordYLineEdit"/>
-    </item>
-    <item row="1" column="11">
-     <widget class="QLineEdit" name="leadDartShootCoordXLineEdit"/>
-    </item>
-    <item row="2" column="0">
-     <widget class="QLabel" name="setaLabel_13">
-      <property name="text">
-       <string>y</string>
-      </property>
-     </widget>
     </item>
     <item row="3" column="3">
      <widget class="QLineEdit" name="leadLeftBackCoordZLineEdit"/>
     </item>
-    <item row="0" column="5">
+    <item row="2" column="1">
+     <widget class="QLineEdit" name="targetCoordYLineEdit"/>
+    </item>
+    <item row="0" column="6">
      <widget class="QLabel" name="setaLabel_6">
       <property name="text">
-       <string>9:架右前方</string>
+       <string>10:架右前方</string>
       </property>
      </widget>
     </item>
-    <item row="0" column="10">
-     <widget class="QLabel" name="setaLabel_11">
-      <property name="text">
-       <string>13:导轨右下</string>
-      </property>
-     </widget>
+    <item row="1" column="1">
+     <widget class="QLineEdit" name="targetCoordXLineEdit"/>
     </item>
-    <item row="2" column="11">
+    <item row="2" column="12">
      <widget class="QLineEdit" name="leadDartShootCoordYLineEdit"/>
+    </item>
+    <item row="1" column="6">
+     <widget class="QLineEdit" name="rackRightFrontCoordXLineEdit"/>
     </item>
     <item row="0" column="3">
      <widget class="QLabel" name="setaLabel_4">
@@ -284,55 +208,24 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="2">
-     <widget class="QLineEdit" name="rackLeftBackCoordXLineEdit"/>
-    </item>
-    <item row="3" column="4">
-     <widget class="QLineEdit" name="rackRightBackZLineEdit"/>
-    </item>
-    <item row="2" column="5">
-     <widget class="QLineEdit" name="rackRightFrontYLineEdit"/>
-    </item>
-    <item row="3" column="7">
-     <widget class="QLineEdit" name="leadLeftFrontCoordZLineEdit"/>
-    </item>
-    <item row="0" column="6">
-     <widget class="QLabel" name="setaLabel_7">
+    <item row="0" column="2">
+     <widget class="QLabel" name="setaLabel_3">
       <property name="text">
-       <string>10:架左前方</string>
+       <string>6:架左后方</string>
       </property>
      </widget>
-    </item>
-    <item row="2" column="4">
-     <widget class="QLineEdit" name="rackRightBackYLineEdit"/>
-    </item>
-    <item row="1" column="6">
-     <widget class="QLineEdit" name="rackLeftFrontXLineEdit"/>
-    </item>
-    <item row="2" column="8">
-     <widget class="QLineEdit" name="leadRightFrontCoordYLineEdit"/>
-    </item>
-    <item row="3" column="6">
-     <widget class="QLineEdit" name="rackLeftFrontZLineEdit"/>
-    </item>
-    <item row="3" column="2">
-     <widget class="QLineEdit" name="rackLeftBackCoordZLineEdit"/>
     </item>
     <item row="3" column="8">
-     <widget class="QLineEdit" name="leadRightFrontCoordZLineEdit"/>
+     <widget class="QLineEdit" name="leadLeftFrontCoordZLineEdit"/>
     </item>
-    <item row="1" column="0">
-     <widget class="QLabel" name="setaLabel_12">
-      <property name="text">
-       <string>x</string>
-      </property>
-     </widget>
+    <item row="2" column="8">
+     <widget class="QLineEdit" name="leadLeftFrontCoordYLineEdit"/>
     </item>
-    <item row="1" column="7">
-     <widget class="QLineEdit" name="leadLeftFrontCoordXLineEdit"/>
+    <item row="2" column="2">
+     <widget class="QLineEdit" name="rackLeftBackCoordYLineEdit"/>
     </item>
-    <item row="1" column="1">
-     <widget class="QLineEdit" name="targetCoordXLineEdit"/>
+    <item row="1" column="12">
+     <widget class="QLineEdit" name="leadDartShootCoordXLineEdit"/>
     </item>
     <item row="3" column="0">
      <widget class="QLabel" name="setaLabel_14">
@@ -341,78 +234,118 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="3">
-     <widget class="QLineEdit" name="leadLeftBackCoordXLineEdit"/>
-    </item>
-    <item row="1" column="4">
-     <widget class="QLineEdit" name="rackRightBackXLineEdit"/>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QWidget" name="layoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>320</y>
-     <width>721</width>
-     <height>60</height>
-    </rect>
-   </property>
-   <layout class="QGridLayout" name="gridLayout_2">
-    <item row="0" column="0">
-     <widget class="QLabel" name="setaLabel">
+    <item row="0" column="12">
+     <widget class="QLabel" name="setaLabel_10">
       <property name="text">
-       <string>θ:当前发射轨道pitch角(度)</string>
+       <string>14:飞镖发射点</string>
       </property>
      </widget>
     </item>
     <item row="0" column="1">
-     <widget class="QLabel" name="xLabel">
+     <widget class="QLabel" name="setaLabel_2">
       <property name="text">
-       <string>x:发射点到目标的水平距离(米)</string>
+       <string>1:目标坐标</string>
       </property>
      </widget>
     </item>
-    <item row="0" column="2">
-     <widget class="QLabel" name="hLabel">
+    <item row="3" column="5">
+     <widget class="QLineEdit" name="rackRightBackCoordZLineEdit"/>
+    </item>
+    <item row="3" column="6">
+     <widget class="QLineEdit" name="rackRightFrontCoordZLineEdit"/>
+    </item>
+    <item row="2" column="5">
+     <widget class="QLineEdit" name="rackRightBackCoordYLineEdit"/>
+    </item>
+    <item row="0" column="8">
+     <widget class="QLabel" name="setaLabel_8">
       <property name="text">
-       <string>h:发射点到目标的竖直距离(米)</string>
+       <string>12:导轨左上</string>
       </property>
      </widget>
     </item>
-    <item row="1" column="0">
-     <widget class="QLineEdit" name="setaLineEdit">
+    <item row="0" column="5">
+     <widget class="QLabel" name="setaLabel_5">
       <property name="text">
-       <string/>
+       <string>9:架右后方</string>
       </property>
      </widget>
     </item>
-    <item row="1" column="1">
-     <widget class="QLineEdit" name="xLineEdit">
-      <property name="text">
-       <string/>
-      </property>
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-     </widget>
+    <item row="2" column="3">
+     <widget class="QLineEdit" name="leadLeftBackCoordYLineEdit"/>
+    </item>
+    <item row="1" column="5">
+     <widget class="QLineEdit" name="rackRightBackCoordXLineEdit"/>
+    </item>
+    <item row="3" column="1">
+     <widget class="QLineEdit" name="targetCoordZLineEdit"/>
     </item>
     <item row="1" column="2">
-     <widget class="QLineEdit" name="hLineEdit">
+     <widget class="QLineEdit" name="rackLeftBackCoordXLineEdit"/>
+    </item>
+    <item row="2" column="6">
+     <widget class="QLineEdit" name="rackRightFrontCoordYLineEdit"/>
+    </item>
+    <item row="3" column="2">
+     <widget class="QLineEdit" name="rackLeftBackCoordZLineEdit"/>
+    </item>
+    <item row="1" column="8">
+     <widget class="QLineEdit" name="leadLeftFrontCoordXLineEdit"/>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="setaLabel_13">
       <property name="text">
-       <string/>
-      </property>
-      <property name="readOnly">
-       <bool>true</bool>
+       <string>y</string>
       </property>
      </widget>
     </item>
-    <item row="1" column="3">
-     <widget class="QPushButton" name="computeXandHPushButton">
+    <item row="0" column="4">
+     <widget class="QLabel" name="setaLabel_11">
       <property name="text">
-       <string>计算θ,x,h</string>
+       <string>8:导轨右下</string>
       </property>
      </widget>
+    </item>
+    <item row="1" column="4">
+     <widget class="QLineEdit" name="leadRightBackCoordXLineEdit"/>
+    </item>
+    <item row="2" column="4">
+     <widget class="QLineEdit" name="leadRightBackCoordYLineEdit"/>
+    </item>
+    <item row="3" column="4">
+     <widget class="QLineEdit" name="leadRightBackCoordZLineEdit"/>
+    </item>
+    <item row="0" column="10">
+     <widget class="QLabel" name="setaLabel_7">
+      <property name="text">
+       <string>13:架左前方</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="10">
+     <widget class="QLineEdit" name="rackLeftFrontCoordXLineEdit"/>
+    </item>
+    <item row="2" column="10">
+     <widget class="QLineEdit" name="rackLeftFrontCoordYLineEdit"/>
+    </item>
+    <item row="3" column="10">
+     <widget class="QLineEdit" name="rackLeftFrontCoordZLineEdit"/>
+    </item>
+    <item row="0" column="7">
+     <widget class="QLabel" name="setaLabel_9">
+      <property name="text">
+       <string>11:导轨右上</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="7">
+     <widget class="QLineEdit" name="leadRightFrontCoordXLineEdit"/>
+    </item>
+    <item row="2" column="7">
+     <widget class="QLineEdit" name="leadRightFrontCoordYLineEdit"/>
+    </item>
+    <item row="3" column="7">
+     <widget class="QLineEdit" name="leadRightFrontCoordZLineEdit"/>
     </item>
    </layout>
   </widget>
@@ -560,9 +493,159 @@
     </item>
    </layout>
   </widget>
+  <widget class="QPushButton" name="computeXandHPushButton">
+   <property name="geometry">
+    <rect>
+     <x>1050</x>
+     <y>220</y>
+     <width>105</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>计算p,r,θ,x,h</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>270</y>
+     <width>1116</width>
+     <height>106</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout_2">
+    <item row="1" column="4">
+     <widget class="QLineEdit" name="psiLineEdit">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="2">
+     <widget class="QLineEdit" name="rollLineEdit"/>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="setaLabel_23">
+      <property name="text">
+       <string>度</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="setaLabel_22">
+      <property name="text">
+       <string>弧度</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="2">
+     <widget class="QLineEdit" name="rollLineEdit_2"/>
+    </item>
+    <item row="2" column="3">
+     <widget class="QLineEdit" name="setaLineEdit_2">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="7">
+     <widget class="QLineEdit" name="hLineEdit">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="6">
+     <widget class="QLabel" name="xLabel">
+      <property name="text">
+       <string>x:发射点到目标的水平距离</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="4">
+     <widget class="QLabel" name="setaLabel_17">
+      <property name="text">
+       <string>ψ:当前发射轨道yaw角(向右转为正)</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="7">
+     <widget class="QLabel" name="hLabel">
+      <property name="text">
+       <string>h:发射点到目标的竖直距离</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QLineEdit" name="pitchLineEdit"/>
+    </item>
+    <item row="1" column="6">
+     <widget class="QLineEdit" name="xLineEdit">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QLabel" name="setaLabel_16">
+      <property name="text">
+       <string>p:底盘pitch角(抬头为正)</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QLineEdit" name="pitchLineEdit_2"/>
+    </item>
+    <item row="2" column="4">
+     <widget class="QLineEdit" name="psiLineEdit_3">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="3">
+     <widget class="QLineEdit" name="setaLineEdit">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="2">
+     <widget class="QLabel" name="setaLabel_15">
+      <property name="text">
+       <string>r:底盘roll角(向右滚转为正)</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="3">
+     <widget class="QLabel" name="setaLabel">
+      <property name="text">
+       <string>θ:当前发射轨道pitch角</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="5">
+     <widget class="QLabel" name="setaLabel_24">
+      <property name="text">
+       <string>米</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
  </widget>
  <tabstops>
-  <tabstop>computeXandHPushButton</tabstop>
   <tabstop>f0LineEditInput</tabstop>
   <tabstop>computeK1PlusXtensionPushButton</tabstop>
   <tabstop>setaLineEdit</tabstop>
