@@ -294,7 +294,7 @@ void testDartComputingByTS::on_computeXandHPushButton_clicked()
                                     (rackFrontDeltaL + rackBackDeltaL)));
     ui->rollLineEdit_2->insert(QString::number(ui->rollLineEdit->text().toDouble() * 180 / PI));
 
-    ui->setaLineEdit->insert(QString::number((ui->leadLeftFrontCoordZLineEdit->text().toDouble() -
+    ui->setaLineEdit->insert(QString::number(qAtan(ui->leadLeftFrontCoordZLineEdit->text().toDouble() -
                                     ui->leadLeftBackCoordZLineEdit->text().toDouble() +
                                     ui->leadRightFrontCoordZLineEdit->text().toDouble() -
                                     ui->leadRightBackCoordZLineEdit->text().toDouble()) /
