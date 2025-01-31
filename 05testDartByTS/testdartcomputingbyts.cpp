@@ -23,9 +23,16 @@
 #include <QtMath>
 #include <QCloseEvent>
 
+#define YAW_TEST_N  100
+
 const double PI = 3.14159265358979323846264338;
 
-
+struct coord
+{
+    QString x;
+    QString y;
+    QString z;
+};
 const QString endSerial = ",-";
 const QString pauseSerial = ",";
 const QString targetCoordSerial = "\n1,";
@@ -39,16 +46,18 @@ const QString leadLeftFrontCoordSerial = "\n12,";
 const QString rackLeftFrontSerial = "\n13,";
 const QString leadDartShootCoordSerial = "\n14,";
 
-struct coord
-{
-    QString x;
-    QString y;
-    QString z;
-};
+// 新加入的16，17，18，19点号：
+const QString rackLBCSerial = "\n16,";
+const QString rackRBCSerial = "\n17,";
+const QString rackRFCSerial = "\n18,";
+const QString rackLFCSerial = "\n19,";
+
+// 新加入的20+4n，21+4n，22+4n，23+4n需要使用其他方法去录入数据
+coord leadLBC[YAW_TEST_N], leadRBC[YAW_TEST_N], leadRFC[YAW_TEST_N], leadLFC[YAW_TEST_N];
 
 testDartComputingByTS::testDartComputingByTS(QSerialPort *serialPort, QSerialPort *serialPort2, QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::testDartComputingByTS)
+        QWidget(parent),
+        ui(new Ui::testDartComputingByTS)
 {
     serialPort1 = serialPort;
     serialPort2 = serialPort2;
@@ -60,24 +69,46 @@ testDartComputingByTS::testDartComputingByTS(QSerialPort *serialPort, QSerialPor
 
     connect(serialPort2, SIGNAL(readyRead()), this, SLOT(serialPortReadyRead_Slot()));
 }
-//
-//void testDartComputingByTS::serialHandle(QString startSerial, coord* point, QLineEdit* xLineEdit, QLineEdit* yLineEdit, QLineEdit* zLineEdit){
-//    int dataStartIndex = receiveBuff_2.lastIndexOf(startSerial) + startSerial.length() - 1;
-//    if(dataStartIndex != startSerial.length() - 2){
-//        point->x = receiveBuff_2.right(receiveBuff_2.size() - dataStartIndex - 1);
-//        point->x.chop(point->x.size() - point->x.indexOf(pauseSerial));
-//        xLineEdit->clear();
-//        xLineEdit->insert(point->x);
-//        point->y = receiveBuff_2.right(receiveBuff_2.size() - dataStartIndex - 1);
-//        point->y.chop(point->y.size() - point->y.indexOf(pauseSerial));
-//        yLineEdit->clear();
-//        yLineEdit->insert(point->y);
-//        point->z = receiveBuff_2.right(receiveBuff_2.size() - dataStartIndex - 1);
-//        point->z.chop(point->z.size() - point->z.indexOf(pauseSerial));
-//        zLineEdit->clear();
-//        zLineEdit->insert(point->x);
-//    }
-//}
+
+void testDartComputingByTS::serialRecord(QString startSerial, QString x, QString y, QString z, QLineEdit* xLineEdit, QLineEdit* yLineEdit, QLineEdit* zLineEdit) {
+    if (!xLineEdit || !yLineEdit || !zLineEdit) {
+        qDebug() << "Error: Null pointer passed to serialHandle";
+        return;
+    }
+
+    int dataStartIndex = receiveBuff_2.lastIndexOf(startSerial) + startSerial.length() - 1;
+    if (dataStartIndex == -1 || dataStartIndex == startSerial.length() - 2) {
+        qDebug() << "Error: Invalid startSerial index";
+        return;
+    }
+
+    // 提取从 dataStartIndex 开始到缓冲区末尾的字符串
+    QString data = receiveBuff_2.right(receiveBuff_2.size() - dataStartIndex - 1);
+
+    // 使用 pauseSerial 分隔数据
+    QStringList parts = data.split(pauseSerial);
+
+    // 确保有足够的部分
+    if (parts.size() < 3) {
+        qDebug() << "Error: Not enough data parts to extract x, y, z";
+        return;
+    }
+
+    // 提取 x, y, z 的值
+    x = parts[0].trimmed();  // 第一部分是 x
+    y = parts[1].trimmed();  // 第二部分是 y
+    z = parts[2].trimmed();  // 第三部分是 z
+
+    // 清空并插入值到对应的 QLineEdit
+    xLineEdit->clear();
+    xLineEdit->insert(x);
+
+    yLineEdit->clear();
+    yLineEdit->insert(y);
+
+    zLineEdit->clear();
+    zLineEdit->insert(z);
+}
 void testDartComputingByTS::serialHandle(QString startSerial, coord* point, QLineEdit* xLineEdit, QLineEdit* yLineEdit, QLineEdit* zLineEdit) {
     if (!point || !xLineEdit || !yLineEdit || !zLineEdit) {
         qDebug() << "Error: Null pointer passed to serialHandle";
@@ -116,7 +147,9 @@ void testDartComputingByTS::serialHandle(QString startSerial, coord* point, QLin
 
     zLineEdit->clear();
     zLineEdit->insert(point->z);
-}void testDartComputingByTS::serialPortReadyRead_Slot() {
+}
+
+void testDartComputingByTS::serialPortReadyRead_Slot() {
     if (!this->visible) {
         return;
     }
@@ -179,6 +212,54 @@ void testDartComputingByTS::serialHandle(QString startSerial, coord* point, QLin
     if (receiveBuff_2.contains(leadDartShootCoordSerial) && receiveBuff_2.contains(endSerial)) {
         coord leadDartShoot;
         serialHandle(leadDartShootCoordSerial, &leadDartShoot, ui->leadDartShootCoordXLineEdit, ui->leadDartShootCoordYLineEdit, ui->leadDartShootCoordZLineEdit);
+    }
+
+    // 检查并处理 rackLBCSerial
+    if (receiveBuff_2.contains(rackLBCSerial) && receiveBuff_2.contains(endSerial)) {
+        coord rackLBC;
+        serialHandle(rackLBCSerial, &rackLBC, ui->rackLBCXLineEdit, ui->rackLBCYLineEdit, ui->rackLBCZLineEdit);
+    }
+
+    // 检查并处理 rackRBCSerial
+    if (receiveBuff_2.contains(rackRBCSerial) && receiveBuff_2.contains(endSerial)) {
+        coord rackRBC;
+        serialHandle(rackRBCSerial, &rackRBC, ui->rackRBCXLineEdit, ui->rackRBCYLineEdit, ui->rackRBCZLineEdit);
+    }
+
+    // 检查并处理 rackRFCSerial
+    if (receiveBuff_2.contains(rackRFCSerial) && receiveBuff_2.contains(endSerial)) {
+        coord rackRFC;
+        serialHandle(rackRFCSerial, &rackRFC, ui->rackRFCXLineEdit, ui->rackRFCYLineEdit, ui->        rackRFCZLineEdit);
+    }
+
+    // 检查并处理 rackLFCSerial
+    if (receiveBuff_2.contains(rackLFCSerial) && receiveBuff_2.contains(endSerial)) {
+        coord rackLFC;
+        serialHandle(rackLFCSerial, &rackLFC, ui->rackLFCXLineEdit, ui->rackLFCYLineEdit, ui->rackLFCZLineEdit);
+    }
+
+    // 处理20+4n, 21+4n, 22+4n, 23+4n的点号
+    for (int n = 0; n < YAW_TEST_N; ++n) {
+        QString leadLBCSerial = QString("\n%1,").arg(20 + 4 * n);
+        QString leadRBCSerial = QString("\n%1,").arg(21 + 4 * n);
+        QString leadRFCSerial = QString("\n%1,").arg(22 + 4 * n);
+        QString leadLFCSerial = QString("\n%1,").arg(23 + 4 * n);
+
+        if (receiveBuff_2.contains(leadLBCSerial) && receiveBuff_2.contains(endSerial)) {
+            serialRecord(leadLBCSerial, leadLBC[n].x, leadLBC[n].y, leadLBC[n].z, ui->leadLBCXLineEdit, ui->leadLBCYLineEdit, ui->leadLBCZLineEdit);
+        }
+
+        if (receiveBuff_2.contains(leadRBCSerial) && receiveBuff_2.contains(endSerial)) {
+            serialRecord(leadRBCSerial, leadRBC[n].x, leadRBC[n].y, leadRBC[n].z, ui->leadRBCXLineEdit, ui->leadRBCYLineEdit, ui->leadRBCZLineEdit);
+        }
+
+        if (receiveBuff_2.contains(leadRFCSerial) && receiveBuff_2.contains(endSerial)) {
+            serialRecord(leadRFCSerial, leadRFC[n].x, leadRFC[n].y, leadRFC[n].z, ui->leadRFCXLineEdit, ui->leadRFCYLineEdit, ui->leadRFCZLineEdit);
+        }
+
+        if (receiveBuff_2.contains(leadLFCSerial) && receiveBuff_2.contains(endSerial)) {
+            serialRecord(leadLFCSerial, leadLFC[n].x, leadLFC[n].y, leadLFC[n].z, ui->leadLFCXLineEdit, ui->leadLFCYLineEdit, ui->leadLFCZLineEdit);
+        }
     }
 }
 /*

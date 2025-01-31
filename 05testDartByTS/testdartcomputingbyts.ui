@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>520</x>
-     <y>410</y>
+     <y>440</y>
      <width>286</width>
      <height>48</height>
     </rect>
@@ -32,7 +32,7 @@
    <property name="geometry">
     <rect>
      <x>12</x>
-     <y>406</y>
+     <y>436</y>
      <width>446</width>
      <height>48</height>
     </rect>
@@ -496,8 +496,8 @@
   <widget class="QPushButton" name="computeXandHPushButton">
    <property name="geometry">
     <rect>
-     <x>1050</x>
-     <y>220</y>
+     <x>1080</x>
+     <y>230</y>
      <width>105</width>
      <height>32</height>
     </rect>
@@ -506,18 +506,18 @@
     <string>计算p,r,θ,x,h</string>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>270</y>
-     <width>1116</width>
-     <height>106</height>
+     <x>30</x>
+     <y>320</y>
+     <width>1850</width>
+     <height>201</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout_2">
-    <item row="1" column="4">
-     <widget class="QLineEdit" name="psiLineEdit">
+    <item row="1" column="6">
+     <widget class="QLineEdit" name="xLineEdit">
       <property name="text">
        <string/>
       </property>
@@ -526,8 +526,42 @@
       </property>
      </widget>
     </item>
+    <item row="2" column="1">
+     <widget class="QLineEdit" name="pitchLineEdit_2"/>
+    </item>
+    <item row="1" column="3">
+     <widget class="QLineEdit" name="setaLineEdit">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="2">
+     <widget class="QLineEdit" name="rollLineEdit_2"/>
+    </item>
+    <item row="0" column="2">
+     <widget class="QLabel" name="setaLabel_15">
+      <property name="text">
+       <string>r:底盘roll角(向右滚转为正)</string>
+      </property>
+     </widget>
+    </item>
     <item row="1" column="2">
      <widget class="QLineEdit" name="rollLineEdit"/>
+    </item>
+    <item row="0" column="1">
+     <widget class="QLabel" name="setaLabel_16">
+      <property name="text">
+       <string>p:底盘pitch角(抬头为正)</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="4">
+     <widget class="QLineEdit" name="psiLineEdit_3">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
     </item>
     <item row="2" column="0">
      <widget class="QLabel" name="setaLabel_23">
@@ -536,20 +570,10 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="0">
-     <widget class="QLabel" name="setaLabel_22">
+    <item row="1" column="5">
+     <widget class="QLabel" name="setaLabel_24">
       <property name="text">
-       <string>弧度</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="2">
-     <widget class="QLineEdit" name="rollLineEdit_2"/>
-    </item>
-    <item row="2" column="3">
-     <widget class="QLineEdit" name="setaLineEdit_2">
-      <property name="text">
-       <string/>
+       <string>米</string>
       </property>
      </widget>
     </item>
@@ -563,10 +587,37 @@
       </property>
      </widget>
     </item>
+    <item row="1" column="1">
+     <widget class="QLineEdit" name="pitchLineEdit"/>
+    </item>
+    <item row="1" column="4">
+     <widget class="QLineEdit" name="psiLineEdit">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
     <item row="0" column="6">
      <widget class="QLabel" name="xLabel">
       <property name="text">
        <string>x:发射点到目标的水平距离</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="setaLabel_22">
+      <property name="text">
+       <string>弧度</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="3">
+     <widget class="QLineEdit" name="setaLineEdit_2">
+      <property name="text">
+       <string/>
       </property>
      </widget>
     </item>
@@ -584,50 +635,6 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="1">
-     <widget class="QLineEdit" name="pitchLineEdit"/>
-    </item>
-    <item row="1" column="6">
-     <widget class="QLineEdit" name="xLineEdit">
-      <property name="text">
-       <string/>
-      </property>
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="1">
-     <widget class="QLabel" name="setaLabel_16">
-      <property name="text">
-       <string>p:底盘pitch角(抬头为正)</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="1">
-     <widget class="QLineEdit" name="pitchLineEdit_2"/>
-    </item>
-    <item row="2" column="4">
-     <widget class="QLineEdit" name="psiLineEdit_3">
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="3">
-     <widget class="QLineEdit" name="setaLineEdit">
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="2">
-     <widget class="QLabel" name="setaLabel_15">
-      <property name="text">
-       <string>r:底盘roll角(向右滚转为正)</string>
-      </property>
-     </widget>
-    </item>
     <item row="0" column="3">
      <widget class="QLabel" name="setaLabel">
       <property name="text">
@@ -635,10 +642,164 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="5">
-     <widget class="QLabel" name="setaLabel_24">
+   </layout>
+  </widget>
+  <widget class="QWidget" name="layoutWidget_2">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>200</y>
+     <width>931</width>
+     <height>121</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout_5">
+    <item row="1" column="8">
+     <widget class="QLineEdit" name="leadLFCXLineEdit"/>
+    </item>
+    <item row="0" column="6">
+     <widget class="QLabel" name="setaLabel_35">
       <property name="text">
-       <string>米</string>
+       <string>21:导轨右下</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QLineEdit" name="rackLBCXLineEdit"/>
+    </item>
+    <item row="1" column="3">
+     <widget class="QLineEdit" name="rackRFCXLineEdit"/>
+    </item>
+    <item row="2" column="4">
+     <widget class="QLineEdit" name="rackLFCYLineEdit"/>
+    </item>
+    <item row="1" column="2">
+     <widget class="QLineEdit" name="rackRBCXLineEdit"/>
+    </item>
+    <item row="1" column="4">
+     <widget class="QLineEdit" name="rackLFCXLineEdit"/>
+    </item>
+    <item row="1" column="7">
+     <widget class="QLineEdit" name="leadRFCXLineEdit"/>
+    </item>
+    <item row="2" column="5">
+     <widget class="QLineEdit" name="leadLBCYLineEdit"/>
+    </item>
+    <item row="1" column="5">
+     <widget class="QLineEdit" name="leadLBCXLineEdit"/>
+    </item>
+    <item row="3" column="1">
+     <widget class="QLineEdit" name="rackLBCZLineEdit"/>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="setaLabel_43">
+      <property name="text">
+       <string>y</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="setaLabel_34">
+      <property name="text">
+       <string>x</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QLineEdit" name="rackLBCYLineEdit"/>
+    </item>
+    <item row="1" column="6">
+     <widget class="QLineEdit" name="leadRBCXLineEdit"/>
+    </item>
+    <item row="0" column="7">
+     <widget class="QLabel" name="setaLabel_46">
+      <property name="text">
+       <string>22:导轨右上</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="4">
+     <widget class="QLabel" name="setaLabel_44">
+      <property name="text">
+       <string>19:架左前方</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="2">
+     <widget class="QLineEdit" name="rackRBCZLineEdit"/>
+    </item>
+    <item row="3" column="8">
+     <widget class="QLineEdit" name="leadLFCZLineEdit"/>
+    </item>
+    <item row="2" column="7">
+     <widget class="QLineEdit" name="leadRFCYLineEdit"/>
+    </item>
+    <item row="3" column="3">
+     <widget class="QLineEdit" name="rackRFCZLineEdit"/>
+    </item>
+    <item row="0" column="2">
+     <widget class="QLabel" name="setaLabel_37">
+      <property name="text">
+       <string>17:架右后方</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="8">
+     <widget class="QLabel" name="setaLabel_41">
+      <property name="text">
+       <string>23:导轨左上</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="8">
+     <widget class="QLineEdit" name="leadLFCYLineEdit"/>
+    </item>
+    <item row="2" column="3">
+     <widget class="QLineEdit" name="rackRFCYLineEdit"/>
+    </item>
+    <item row="3" column="5">
+     <widget class="QLineEdit" name="leadLBCZLineEdit"/>
+    </item>
+    <item row="3" column="7">
+     <widget class="QLineEdit" name="leadRFCZLineEdit"/>
+    </item>
+    <item row="0" column="1">
+     <widget class="QLabel" name="setaLabel_40">
+      <property name="text">
+       <string>16:架左后方</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="6">
+     <widget class="QLineEdit" name="leadRBCZLineEdit"/>
+    </item>
+    <item row="0" column="3">
+     <widget class="QLabel" name="setaLabel_36">
+      <property name="text">
+       <string>18:架右前方</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="2">
+     <widget class="QLineEdit" name="rackRBCYLineEdit"/>
+    </item>
+    <item row="2" column="6">
+     <widget class="QLineEdit" name="leadRBCYLineEdit"/>
+    </item>
+    <item row="0" column="5">
+     <widget class="QLabel" name="setaLabel_42">
+      <property name="text">
+       <string>20:导轨左下</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="4">
+     <widget class="QLineEdit" name="rackLFCZLineEdit"/>
+    </item>
+    <item row="3" column="0">
+     <widget class="QLabel" name="setaLabel_38">
+      <property name="text">
+       <string>z</string>
       </property>
      </widget>
     </item>
