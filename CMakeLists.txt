@@ -8,6 +8,8 @@ set(CMAKE_AUTOUIC ON)
 #set(CMAKE_INCLUDE_CURRENT_DIR ON)
 project(dartRack_upper)
 
+include_directories(${EIGEN3_INCLUDE_DIRS})
+
 add_subdirectory(0testDart)
 add_subdirectory(05testDartByTS)
 add_subdirectory(1serialConnect)
@@ -18,7 +20,7 @@ add_subdirectory(serial)
 add_subdirectory(myComboxBox)
 
 
-
+find_package(Eigen3 CONFIG REQUIRED)
 find_package(Qt6 COMPONENTS
         Core
         Gui
@@ -36,6 +38,7 @@ target_link_libraries(dartRack_upper
         Qt::Gui
         Qt::Widgets
         Qt::SerialPort
+        Eigen3::Eigen
         serial
         serial_connect
         darts_paras_computing

@@ -61,6 +61,20 @@ private:
         QString y;
         QString z;
     };
+    coord target;
+    coord rackLeftBack;
+    coord leadLeftBack;
+    coord leadRightBack;
+    coord rackRightBack;
+    coord rackRightFront;
+    coord leadRightFront;
+    coord leadLeftFront;
+    coord rackLeftFront;
+    coord leadDartShoot;
+    coord rackLBC;
+    coord rackRFC;
+    coord rackRBC;
+    coord rackLFC;
     void serialRecord(QString startSerial, QString x, QString y, QString z, QLineEdit* xLineEdit, QLineEdit* yLineEdit, QLineEdit* zLineEdit);
     void serialHandle(QString startSerial, coord* point, QLineEdit* xLineEdit, QLineEdit* yLineEdit, QLineEdit* zLineEdit);
 
