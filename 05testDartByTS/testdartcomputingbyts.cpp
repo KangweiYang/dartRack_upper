@@ -100,6 +100,7 @@ testDartComputingByTS::testDartComputingByTS(QSerialPort *serialPort, QSerialPor
     setEditOnlyNum(ui->mdart1PlusGLineEditInput, ui->mdart2PlusGLineEditInput);
     setEditOnlyNum(ui->Tall1LineEditInput, ui->integralOfF0PlusDxtensionLineEditInput);
 
+    loadCoordsFromPlainTextEdit();
     connect(serialPort2, SIGNAL(readyRead()), this, SLOT(serialPortReadyRead_Slot()));
 }
 
@@ -196,6 +197,112 @@ coord rackLBC;
 coord rackRFC;
 coord rackRBC;
 coord rackLFC;
+
+void testDartComputingByTS::loadCoordsFromPlainTextEdit() {
+    // 获取 leadYawCoordsDataPlainTextEdit 中的文本
+    QString coordsText = ui->leadYawCoordsDataPlainTextEdit->toPlainText();
+
+    // 使用换行符分割文本，得到每一行的数据
+    QStringList lines = coordsText.split("\n", Qt::SkipEmptyParts);
+
+    // 遍历每一行数据
+    for (const QString& line : lines) {
+        // 使用逗号分割每一行的数据
+        QStringList parts = line.split(",", Qt::SkipEmptyParts);
+
+        // 确保有足够的部分（x, y, z, -）
+        if (parts.size() < 4) {
+            qDebug() << "Error: Invalid data format in leadYawCoordsDataPlainTextEdit";
+            continue;
+        }
+
+        // 提取点号
+        int pointNumber = parts[0].toInt();
+
+        // 提取坐标
+        QString x = parts[1].trimmed();
+        QString y = parts[2].trimmed();
+        QString z = parts[3].trimmed();
+
+        // 根据点号将坐标存储到相应的结构体中
+        if (pointNumber == 16) {
+            rackLBC.x = x;
+            rackLBC.y = y;
+            rackLBC.z = z;
+        } else if (pointNumber == 17) {
+            rackRBC.x = x;
+            rackRBC.y = y;
+            rackRBC.z = z;
+        } else if (pointNumber == 18) {
+            rackLFC.x = x;
+            rackLFC.y = y;
+            rackLFC.z = z;
+        } else if (pointNumber == 19) {
+            rackRFC.x = x;
+            rackRFC.y = y;
+            rackRFC.z = z;
+        } else if (pointNumber >= 20 && pointNumber < 20 + 4 * YAW_TEST_N) {
+            int n = (pointNumber - 20) / 4;
+            int index = (pointNumber - 20) % 4;
+
+            if (index == 0) {
+                leadLBC[n].x = x;
+                leadLBC[n].y = y;
+                leadLBC[n].z = z;
+            } else if (index == 1) {
+                leadRBC[n].x = x;
+                leadRBC[n].y = y;
+                leadRBC[n].z = z;
+            } else if (index == 2) {
+                leadRFC[n].x = x;
+                leadRFC[n].y = y;
+                leadRFC[n].z = z;
+            } else if (index == 3) {
+                leadLFC[n].x = x;
+                leadLFC[n].y = y;
+                leadLFC[n].z = z;
+            }
+        } else {
+            qDebug() << "Error: Invalid point number in leadYawCoordsDataPlainTextEdit";
+        }
+    }
+
+    // 更新 UI 显示
+    ui->rackLBCXLineEdit->setText(rackLBC.x);
+    ui->rackLBCYLineEdit->setText(rackLBC.y);
+    ui->rackLBCZLineEdit->setText(rackLBC.z);
+
+    ui->rackRFCXLineEdit->setText(rackRFC.x);
+    ui->rackRFCYLineEdit->setText(rackRFC.y);
+    ui->rackRFCZLineEdit->setText(rackRFC.z);
+
+    ui->rackRBCXLineEdit->setText(rackRBC.x);
+    ui->rackRBCYLineEdit->setText(rackRBC.y);
+    ui->rackRBCZLineEdit->setText(rackRBC.z);
+
+    ui->rackLFCXLineEdit->setText(rackLFC.x);
+    ui->rackLFCYLineEdit->setText(rackLFC.y);
+    ui->rackLFCZLineEdit->setText(rackLFC.z);
+
+    for (int n = 0; n < 1; ++n) {
+        ui->leadLBCXLineEdit->setText(leadLBC[n].x);
+        ui->leadLBCYLineEdit->setText(leadLBC[n].y);
+        ui->leadLBCZLineEdit->setText(leadLBC[n].z);
+
+        ui->leadRBCXLineEdit->setText(leadRBC[n].x);
+        ui->leadRBCYLineEdit->setText(leadRBC[n].y);
+        ui->leadRBCZLineEdit->setText(leadRBC[n].z);
+
+        ui->leadRFCXLineEdit->setText(leadRFC[n].x);
+        ui->leadRFCYLineEdit->setText(leadRFC[n].y);
+        ui->leadRFCZLineEdit->setText(leadRFC[n].z);
+
+        ui->leadLFCXLineEdit->setText(leadLFC[n].x);
+        ui->leadLFCYLineEdit->setText(leadLFC[n].y);
+        ui->leadLFCZLineEdit->setText(leadLFC[n].z);
+    }
+}
+
 void testDartComputingByTS::serialPortReadyRead_Slot() {
     if (!this->visible) {
         return;
