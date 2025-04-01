@@ -647,48 +647,71 @@ void testDartComputingByTS::on_computeXandHPushButton_clicked()
     rackLFC.y = QString::number(transformedRackLFC.y());
     rackLFC.z = QString::number(transformedRackLFC.z());
 
-    //计算xLineEdit，hLineEdit并更新UI
-    ui->xLineEdit->setText(QString::number(DeltaL(ui->targetCoordXLineEdit, ui->targetCoordYLineEdit,
-                                                  ui->leadDartShootCoordXLineEdit, ui->leadDartShootCoordYLineEdit)));
-    ui->hLineEdit->setText(QString::number(ui->targetCoordZLineEdit->text().toDouble() - ui->leadDartShootCoordZLineEdit->text().toDouble()));
-
-    // 计算 deltaPsi: 目标点与发射点连线与导轨左右边的夹角平均值
-    // 获取目标点和发射点的坐标
-    double targetX = ui->targetCoordXLineEdit->text().toDouble();
-    double targetY = ui->targetCoordYLineEdit->text().toDouble();
-    double dartShootX = ui->leadDartShootCoordXLineEdit->text().toDouble();
-    double dartShootY = ui->leadDartShootCoordYLineEdit->text().toDouble();
-
-    // 目标连线方向向量
-    double targetDirX = targetX - dartShootX;
-    double targetDirY = targetY - dartShootY;
-
-    // 导轨左侧边方向向量 (leadLeftFront - leadLeftBack)
+    //--------------------- 统一计算导轨方向与投影点 ---------------------
+    // 获取导轨左右边端点坐标
     double leadLeftFrontX = ui->leadLeftFrontCoordXLineEdit->text().toDouble();
     double leadLeftFrontY = ui->leadLeftFrontCoordYLineEdit->text().toDouble();
     double leadLeftBackX = ui->leadLeftBackCoordXLineEdit->text().toDouble();
     double leadLeftBackY = ui->leadLeftBackCoordYLineEdit->text().toDouble();
-    double leadLeftDirX = leadLeftFrontX - leadLeftBackX;
-    double leadLeftDirY = leadLeftFrontY - leadLeftBackY;
-
-    // 导轨右侧边方向向量 (leadRightFront - leadRightBack)
     double leadRightFrontX = ui->leadRightFrontCoordXLineEdit->text().toDouble();
     double leadRightFrontY = ui->leadRightFrontCoordYLineEdit->text().toDouble();
     double leadRightBackX = ui->leadRightBackCoordXLineEdit->text().toDouble();
     double leadRightBackY = ui->leadRightBackCoordYLineEdit->text().toDouble();
-    double leadRightDirX = leadRightFrontX - leadRightBackX;
-    double leadRightDirY = leadRightFrontY - leadRightBackY;
 
-    // 计算目标连线与导轨左右边的夹角
-    double angleLeft = qAtan2(targetDirY, targetDirX) - qAtan2(leadLeftDirY, leadLeftDirX);
-    double angleRight = qAtan2(targetDirY, targetDirX) - qAtan2(leadRightDirY, leadRightDirX);
+    // 计算导轨方向向量并归一化
+    Eigen::Vector2d leadLeftDir(leadLeftFrontX - leadLeftBackX, leadLeftFrontY - leadLeftBackY);
+    Eigen::Vector2d leadRightDir(leadRightFrontX - leadRightBackX, leadRightFrontY - leadRightBackY);
+    leadLeftDir.normalize();
+    leadRightDir.normalize();
 
-    // 取平均值作为 deltaPsi（向右转为正）
-    double deltaPsi = -(angleLeft + angleRight) / 2.0;
+    // 计算角平分线方向
+    Eigen::Vector2d bisectorDir;
+    if (leadLeftDir.dot(leadRightDir) < 0.999) {
+        bisectorDir = (leadLeftDir + leadRightDir).normalized();
+    } else {
+        Eigen::Vector2d midDir(
+                (leadLeftFrontX + leadRightFrontX - leadLeftBackX - leadRightBackX) / 2.0,
+                (leadLeftFrontY + leadRightFrontY - leadLeftBackY - leadRightBackY) / 2.0
+        );
+        bisectorDir = midDir.normalized();
+    }
 
-    // 更新到 deltaPsiLineEdit
-    ui->deltaPsiLineEdit->clear();
-    ui->deltaPsiLineEdit->insert(QString::number(deltaPsi));
+    // 计算发射点在导轨中心线上的投影坐标
+    Eigen::Vector2d dartShootPoint(
+            ui->leadDartShootCoordXLineEdit->text().toDouble(),
+            ui->leadDartShootCoordYLineEdit->text().toDouble()
+    );
+    Eigen::Vector2d backMidPoint(
+            (leadLeftBackX + leadRightBackX) / 2.0,
+            (leadLeftBackY + leadRightBackY) / 2.0
+    );
+    Eigen::Vector2d projection = backMidPoint + bisectorDir * (dartShootPoint - backMidPoint).dot(bisectorDir);
+    const double leadMiddleX = projection.x();
+    const double leadMiddleY = projection.y();
+    const double leadMiddleZ = ui->leadDartShootCoordZLineEdit->text().toDouble(); // Z值保持与发射点相同
+
+    // 获取目标点坐标
+    const double targetX = ui->targetCoordXLineEdit->text().toDouble();
+    const double targetY = ui->targetCoordYLineEdit->text().toDouble();
+    const double targetZ = ui->targetCoordZLineEdit->text().toDouble();
+
+    //--------------------- 统一计算 x、h、deltaPsi ---------------------
+    // 计算水平距离x（投影点与目标点）
+    const double dx = targetX - leadMiddleX;
+    const double dy = targetY - leadMiddleY;
+    const double xDistance = sqrt(dx*dx + dy*dy);
+    ui->xLineEdit->setText(QString::number(xDistance));
+
+    // 计算高度差h
+    const double hDifference = targetZ - leadMiddleZ;
+    ui->hLineEdit->setText(QString::number(hDifference));
+
+    // 计算deltaPsi（目标连线方向与导轨边的平均夹角差）
+    Eigen::Vector2d targetDir(dx, dy);  // 复用dx, dy计算结果
+    const double angleLeft = qAtan2(targetDir.y(), targetDir.x()) - qAtan2(leadLeftDir.y(), leadLeftDir.x());
+    const double angleRight = qAtan2(targetDir.y(), targetDir.x()) - qAtan2(leadRightDir.y(), leadRightDir.x());
+    const double deltaPsi = -(angleLeft + angleRight) / 2.0; // 向右转为正
+    ui->deltaPsiLineEdit->setText(QString::number(deltaPsi));
 
     // 更新 UI
     ui->rackLBCXLineEdit->setText(rackLBC.x);
