@@ -39,13 +39,13 @@ const QString endSerial = ",-";
 const QString pauseSerial = ",";
 const QString targetCoordSerial = "\n1,";
 const QString rackLeftBackCoordSerial = "\n6,";
-const QString leadLeftBackCoordSerial = "\n7,";
+const QString rackRightBackSerial = "\n7,";
 const QString leadRightBackCoordSerial = "\n8,";
-const QString rackRightBackSerial = "\n9,";
-const QString rackRightFrontSerial = "\n10,";
-const QString leadRightFrontCoordSerial = "\n11,";
-const QString leadLeftFrontCoordSerial = "\n12,";
-const QString rackLeftFrontSerial = "\n13,";
+const QString leadLeftBackCoordSerial = "\n9,";
+const QString rackLeftFrontSerial = "\n10,";
+const QString rackRightFrontSerial = "\n11,";
+const QString leadRightFrontCoordSerial = "\n12,";
+const QString leadLeftFrontCoordSerial = "\n13,";
 const QString leadDartShootCoordSerial = "\n14,";
 
 // 新加入的16，17，18，19点号：
@@ -197,6 +197,7 @@ coord rackLBC;
 coord rackRFC;
 coord rackRBC;
 coord rackLFC;
+coord deltaPsiLineEdit;
 
 void testDartComputingByTS::loadCoordsFromPlainTextEdit() {
     // 获取 leadYawCoordsDataPlainTextEdit 中的文本
@@ -358,6 +359,7 @@ void testDartComputingByTS::serialPortReadyRead_Slot() {
         serialHandle(leadDartShootCoordSerial, &leadDartShoot, ui->leadDartShootCoordXLineEdit, ui->leadDartShootCoordYLineEdit, ui->leadDartShootCoordZLineEdit);
     }
 
+    //YAW轴数据标定（固定脉冲移动后的点集）应该放在飞镖参数计算的
     // 检查并处理 rackLBCSerial
     if (receiveBuff_2.contains(rackLBCSerial) && receiveBuff_2.contains(endSerial)) {
         serialHandle(rackLBCSerial, &rackLBC, ui->rackLBCXLineEdit, ui->rackLBCYLineEdit, ui->rackLBCZLineEdit);
@@ -506,7 +508,7 @@ void testDartComputingByTS::on_computeXandHPushButton_clicked()
     ui->setaLineEdit->clear();
     ui->setaLineEdit_2->clear();
     ui->psiLineEdit->clear();
-    ui->psiLineEdit_3->clear();
+    ui->psiLineEdit_2->clear();
     ui->xLineEdit->clear();
     ui->hLineEdit->clear();
 
@@ -576,7 +578,7 @@ void testDartComputingByTS::on_computeXandHPushButton_clicked()
 
 // 将结果放入 psiLineEdit
     ui->psiLineEdit->insert(QString::number(leadYaw));
-    ui->psiLineEdit_3->insert(QString::number(leadYaw * 180 / PI));  // 转换为度
+    ui->psiLineEdit_2->insert(QString::number(leadYaw * 180 / PI));  // 转换为度
 //    ui->xLineEdit->insert(QString::number(ui->lLineEdit->text().toDouble() * qCos(ui->betaLineEdit->text().toDouble() * PI / 180.0) + ui->deltaXlineEdit->text().toDouble() / 1000));
 //    ui->hLineEdit->insert(QString::number(ui->lLineEdit->text().toDouble() * qSin(ui->betaLineEdit->text().toDouble() * PI / 180.0) + ui->deltaHlineEdit->text().toDouble() / 1000));
     // 定义源点和目标点
@@ -644,6 +646,50 @@ void testDartComputingByTS::on_computeXandHPushButton_clicked()
     rackLFC.x = QString::number(transformedRackLFC.x());
     rackLFC.y = QString::number(transformedRackLFC.y());
     rackLFC.z = QString::number(transformedRackLFC.z());
+
+    //计算xLineEdit，hLineEdit并更新UI
+    ui->xLineEdit->setText(QString::number(DeltaL(ui->targetCoordXLineEdit, ui->targetCoordYLineEdit,
+                                                  ui->leadDartShootCoordXLineEdit, ui->leadDartShootCoordYLineEdit)));
+    ui->hLineEdit->setText(QString::number(ui->targetCoordZLineEdit->text().toDouble() - ui->leadDartShootCoordZLineEdit->text().toDouble()));
+
+    // 计算 deltaPsi: 目标点与发射点连线与导轨左右边的夹角平均值
+    // 获取目标点和发射点的坐标
+    double targetX = ui->targetCoordXLineEdit->text().toDouble();
+    double targetY = ui->targetCoordYLineEdit->text().toDouble();
+    double dartShootX = ui->leadDartShootCoordXLineEdit->text().toDouble();
+    double dartShootY = ui->leadDartShootCoordYLineEdit->text().toDouble();
+
+    // 目标连线方向向量
+    double targetDirX = targetX - dartShootX;
+    double targetDirY = targetY - dartShootY;
+
+    // 导轨左侧边方向向量 (leadLeftFront - leadLeftBack)
+    double leadLeftFrontX = ui->leadLeftFrontCoordXLineEdit->text().toDouble();
+    double leadLeftFrontY = ui->leadLeftFrontCoordYLineEdit->text().toDouble();
+    double leadLeftBackX = ui->leadLeftBackCoordXLineEdit->text().toDouble();
+    double leadLeftBackY = ui->leadLeftBackCoordYLineEdit->text().toDouble();
+    double leadLeftDirX = leadLeftFrontX - leadLeftBackX;
+    double leadLeftDirY = leadLeftFrontY - leadLeftBackY;
+
+    // 导轨右侧边方向向量 (leadRightFront - leadRightBack)
+    double leadRightFrontX = ui->leadRightFrontCoordXLineEdit->text().toDouble();
+    double leadRightFrontY = ui->leadRightFrontCoordYLineEdit->text().toDouble();
+    double leadRightBackX = ui->leadRightBackCoordXLineEdit->text().toDouble();
+    double leadRightBackY = ui->leadRightBackCoordYLineEdit->text().toDouble();
+    double leadRightDirX = leadRightFrontX - leadRightBackX;
+    double leadRightDirY = leadRightFrontY - leadRightBackY;
+
+    // 计算目标连线与导轨左右边的夹角
+    double angleLeft = qAtan2(targetDirY, targetDirX) - qAtan2(leadLeftDirY, leadLeftDirX);
+    double angleRight = qAtan2(targetDirY, targetDirX) - qAtan2(leadRightDirY, leadRightDirX);
+
+    // 取平均值作为 deltaPsi（向右转为正）
+    double deltaPsi = -(angleLeft + angleRight) / 2.0;
+
+    // 更新到 deltaPsiLineEdit
+    ui->deltaPsiLineEdit->clear();
+    ui->deltaPsiLineEdit->insert(QString::number(deltaPsi));
+
     // 更新 UI
     ui->rackLBCXLineEdit->setText(rackLBC.x);
     ui->rackLBCYLineEdit->setText(rackLBC.y);
