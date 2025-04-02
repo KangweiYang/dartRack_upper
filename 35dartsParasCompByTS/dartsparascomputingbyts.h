@@ -21,11 +21,13 @@ class dartsParasComputingByTS : public QWidget
 public:
     explicit dartsParasComputingByTS(QSerialPort *serialPort, QSerialPort *serialPort2, QWidget *parent = 0);
     ~dartsParasComputingByTS();
-    QSerialPort *serialPort1;
+    QSerialPort *serialPort1, *serialPort2;
     void closeEvent(QCloseEvent *event);
 
 private slots:
     void serialPortReadyRead_Slot();
+
+    void serialPortReadyRead2_Slot();
 
     void on_yawAimingPushButton_clicked();
 

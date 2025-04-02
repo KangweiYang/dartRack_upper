@@ -155,7 +155,6 @@ coord rackLBC;
 coord rackRFC;
 coord rackRBC;
 coord rackLFC;
-coord deltaPsiLineEdit;
 
 void testDartComputingByTS::serialPortReadyRead_Slot() {
     if (!this->visible) {

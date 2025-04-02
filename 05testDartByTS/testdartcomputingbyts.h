@@ -5,6 +5,8 @@
 #include <QSerialPort>
 #include <qlineedit.h>
 
+double DeltaL(QLineEdit* Coord1X, QLineEdit* Coord1Y, QLineEdit* Coord2X, QLineEdit* Coord2Y);
+
 namespace Ui {
 class testDartComputingByTS;
 }

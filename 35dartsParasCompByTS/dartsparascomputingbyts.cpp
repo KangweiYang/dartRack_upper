@@ -43,7 +43,6 @@ coord rackLBC2;
 coord rackRFC2;
 coord rackRBC2;
 coord rackLFC2;
-coord deltaPsiLineEdit2;
 const QString endSerial = ",-";
 const QString pauseSerial = ",";
 const QString targetCoordSerial = "\n1,";
@@ -317,6 +316,68 @@ void dartsParasComputingByTS::serialPortReadyRead_Slot(){
         }
             receiveBuff.clear();
     }
+}
+
+void dartsParasComputingByTS::serialPortReadyRead2_Slot() {
+    // 检查并处理 targetCoordSerial
+    if (receiveBuff_2.contains(targetCoordSerial) && receiveBuff_2.contains(endSerial)) {
+        serialHandle(targetCoordSerial, &target2, ui->targetCoordXLineEdit, ui->targetCoordYLineEdit,
+                     ui->targetCoordZLineEdit);
+    }
+
+    // 检查并处理 rackLeftBackCoordSerial
+    if (receiveBuff_2.contains(rackLeftBackCoordSerial) && receiveBuff_2.contains(endSerial)) {
+        serialHandle(rackLeftBackCoordSerial, &rackLeftBack2, ui->rackLeftBackCoordXLineEdit,
+                     ui->rackLeftBackCoordYLineEdit, ui->rackLeftBackCoordZLineEdit);
+    }
+
+    // 检查并处理 leadLeftBackCoordSerial
+    if (receiveBuff_2.contains(leadLeftBackCoordSerial) && receiveBuff_2.contains(endSerial)) {
+        serialHandle(leadLeftBackCoordSerial, &leadLeftBack2, ui->leadLeftBackCoordXLineEdit,
+                     ui->leadLeftBackCoordYLineEdit, ui->leadLeftBackCoordZLineEdit);
+    }
+
+    // 检查并处理 leadRightBackCoordSerial
+    if (receiveBuff_2.contains(leadRightBackCoordSerial) && receiveBuff_2.contains(endSerial)) {
+        serialHandle(leadRightBackCoordSerial, &leadRightBack2, ui->leadRightBackCoordXLineEdit,
+                     ui->leadRightBackCoordYLineEdit, ui->leadRightBackCoordZLineEdit);
+    }
+
+    // 检查并处理 rackRightBackSerial
+    if (receiveBuff_2.contains(rackRightBackSerial) && receiveBuff_2.contains(endSerial)) {
+        serialHandle(rackRightBackSerial, &rackRightBack2, ui->rackRightBackCoordXLineEdit,
+                     ui->rackRightBackCoordYLineEdit, ui->rackRightBackCoordZLineEdit);
+    }
+
+    // 检查并处理 rackRightFrontSerial
+    if (receiveBuff_2.contains(rackRightFrontSerial) && receiveBuff_2.contains(endSerial)) {
+        serialHandle(rackRightFrontSerial, &rackRightFront2, ui->rackRightFrontCoordXLineEdit,
+                     ui->rackRightFrontCoordYLineEdit, ui->rackRightFrontCoordZLineEdit);
+    }
+
+    // 检查并处理 leadRightFrontCoordSerial
+    if (receiveBuff_2.contains(leadRightFrontCoordSerial) && receiveBuff_2.contains(endSerial)) {
+        serialHandle(leadRightFrontCoordSerial, &leadRightFront2, ui->leadRightFrontCoordXLineEdit,
+                     ui->leadRightFrontCoordYLineEdit, ui->leadRightFrontCoordZLineEdit);
+    }
+
+    // 检查并处理 leadLeftFrontCoordSerial
+    if (receiveBuff_2.contains(leadLeftFrontCoordSerial) && receiveBuff_2.contains(endSerial)) {
+        serialHandle(leadLeftFrontCoordSerial, &leadLeftFront2, ui->leadLeftFrontCoordXLineEdit,
+                     ui->leadLeftFrontCoordYLineEdit, ui->leadLeftFrontCoordZLineEdit);
+    }
+
+    // 检查并处理 rackLeftFrontSerial
+    if (receiveBuff_2.contains(rackLeftFrontSerial) && receiveBuff_2.contains(endSerial)) {
+        serialHandle(rackLeftFrontSerial, &rackLeftFront2, ui->rackLeftFrontCoordXLineEdit,
+                     ui->rackLeftFrontCoordYLineEdit, ui->rackLeftFrontCoordZLineEdit);
+    }
+
+    // 检查并处理 leadDartShootCoordSerial
+    if (receiveBuff_2.contains(leadDartShootCoordSerial) && receiveBuff_2.contains(endSerial)) {
+        serialHandle(leadDartShootCoordSerial, &leadDartShoot2, ui->leadDartShootCoordXLineEdit,
+                     ui->leadDartShootCoordYLineEdit, ui->leadDartShootCoordZLineEdit);
+    }
 
     //YAW轴数据标定（固定脉冲移动后的点集）应该放在飞镖参数计算的
     // 检查并处理 rackLBCSerial
@@ -331,7 +392,7 @@ void dartsParasComputingByTS::serialPortReadyRead_Slot(){
 
     // 检查并处理 rackRFCSerial
     if (receiveBuff_2.contains(rackRFCSerial) && receiveBuff_2.contains(endSerial)) {
-        serialHandle(rackRFCSerial, &rackRFC2, ui->rackRFCXLineEdit, ui->rackRFCYLineEdit, ui->        rackRFCZLineEdit);
+        serialHandle(rackRFCSerial, &rackRFC2, ui->rackRFCXLineEdit, ui->rackRFCYLineEdit, ui->rackRFCZLineEdit);
     }
 
     // 检查并处理 rackLFCSerial
@@ -347,23 +408,26 @@ void dartsParasComputingByTS::serialPortReadyRead_Slot(){
         QString leadLFCSerial = QString("\n%1,").arg(23 + 4 * n);
 
         if (receiveBuff_2.contains(leadLBCSerial) && receiveBuff_2.contains(endSerial)) {
-            serialRecord(leadLBCSerial, leadLBC[n].x, leadLBC[n].y, leadLBC[n].z, ui->leadLBCXLineEdit, ui->leadLBCYLineEdit, ui->leadLBCZLineEdit);
+            serialRecord(leadLBCSerial, leadLBC[n].x, leadLBC[n].y, leadLBC[n].z, ui->leadLBCXLineEdit,
+                         ui->leadLBCYLineEdit, ui->leadLBCZLineEdit);
         }
 
         if (receiveBuff_2.contains(leadRBCSerial) && receiveBuff_2.contains(endSerial)) {
-            serialRecord(leadRBCSerial, leadRBC[n].x, leadRBC[n].y, leadRBC[n].z, ui->leadRBCXLineEdit, ui->leadRBCYLineEdit, ui->leadRBCZLineEdit);
+            serialRecord(leadRBCSerial, leadRBC[n].x, leadRBC[n].y, leadRBC[n].z, ui->leadRBCXLineEdit,
+                         ui->leadRBCYLineEdit, ui->leadRBCZLineEdit);
         }
 
         if (receiveBuff_2.contains(leadRFCSerial) && receiveBuff_2.contains(endSerial)) {
-            serialRecord(leadRFCSerial, leadRFC[n].x, leadRFC[n].y, leadRFC[n].z, ui->leadRFCXLineEdit, ui->leadRFCYLineEdit, ui->leadRFCZLineEdit);
+            serialRecord(leadRFCSerial, leadRFC[n].x, leadRFC[n].y, leadRFC[n].z, ui->leadRFCXLineEdit,
+                         ui->leadRFCYLineEdit, ui->leadRFCZLineEdit);
         }
 
         if (receiveBuff_2.contains(leadLFCSerial) && receiveBuff_2.contains(endSerial)) {
-            serialRecord(leadLFCSerial, leadLFC[n].x, leadLFC[n].y, leadLFC[n].z, ui->leadLFCXLineEdit, ui->leadLFCYLineEdit, ui->leadLFCZLineEdit);
+            serialRecord(leadLFCSerial, leadLFC[n].x, leadLFC[n].y, leadLFC[n].z, ui->leadLFCXLineEdit,
+                         ui->leadLFCYLineEdit, ui->leadLFCZLineEdit);
         }
     }
 }
-
 dartsParasComputingByTS::~dartsParasComputingByTS()
 {
     this->visible = false;
@@ -397,6 +461,155 @@ void dartsParasComputingByTS::on_yawAimingPushButton_clicked()
 
 void dartsParasComputingByTS::on_computeXandHPushButton_clicked()
 {
+
+    ui->pitchLineEdit->clear();
+    ui->pitchLineEdit_2->clear();
+    ui->rollLineEdit->clear();
+    ui->rollLineEdit_2->clear();
+    ui->setaLineEdit->clear();
+    ui->setaLineEdit_2->clear();
+    ui->psiLineEdit->clear();
+    ui->psiLineEdit_2->clear();
+    ui->xLineEdit->clear();
+    ui->hLineEdit->clear();
+
+    // 计算 Rack 的前后左右的 DeltaL
+    double rackLeftDeltaL = DeltaL(ui->rackLeftFrontCoordXLineEdit, ui->rackLeftFrontCoordYLineEdit,
+                                   ui->rackLeftBackCoordXLineEdit, ui->rackLeftBackCoordYLineEdit);
+
+    double rackRightDeltaL = DeltaL(ui->rackRightFrontCoordXLineEdit, ui->rackRightFrontCoordYLineEdit,
+                                    ui->rackRightBackCoordXLineEdit, ui->rackRightBackCoordYLineEdit);
+
+    double rackFrontDeltaL = DeltaL(ui->rackLeftFrontCoordXLineEdit, ui->rackLeftFrontCoordYLineEdit,
+                                    ui->rackRightFrontCoordXLineEdit, ui->rackRightFrontCoordYLineEdit);
+
+    double rackBackDeltaL = DeltaL(ui->rackLeftBackCoordXLineEdit, ui->rackLeftBackCoordYLineEdit,
+                                   ui->rackRightBackCoordXLineEdit, ui->rackRightBackCoordYLineEdit);
+
+// 计算 Lead 的前后左右的 DeltaL
+    double leadLeftDeltaL = DeltaL(ui->leadLeftFrontCoordXLineEdit, ui->leadLeftFrontCoordYLineEdit,
+                                   ui->leadLeftBackCoordXLineEdit, ui->leadLeftBackCoordYLineEdit);
+
+    double leadRightDeltaL = DeltaL(ui->leadRightFrontCoordXLineEdit, ui->leadRightFrontCoordYLineEdit,
+                                    ui->leadRightBackCoordXLineEdit, ui->leadRightBackCoordYLineEdit);
+
+    double leadFrontDeltaL = DeltaL(ui->leadLeftFrontCoordXLineEdit, ui->leadLeftFrontCoordYLineEdit,
+                                    ui->leadRightFrontCoordXLineEdit, ui->leadRightFrontCoordYLineEdit);
+
+    double leadBackDeltaL = DeltaL(ui->leadLeftBackCoordXLineEdit, ui->leadLeftBackCoordYLineEdit,
+                                   ui->leadRightBackCoordXLineEdit, ui->leadRightBackCoordYLineEdit);
+    ui->pitchLineEdit->insert(QString::number(qAtan((ui->rackRightFrontCoordZLineEdit->text().toDouble() -
+                                                     ui->rackRightBackCoordZLineEdit->text().toDouble() +
+                                                     ui->rackLeftFrontCoordZLineEdit->text().toDouble() -
+                                                     ui->rackLeftBackCoordZLineEdit->text().toDouble()) /
+                                                    (rackRightDeltaL + rackLeftDeltaL))));
+    ui->pitchLineEdit_2->insert(QString::number(ui->pitchLineEdit->text().toDouble() * 180 / PI));
+    ui->rollLineEdit->insert(QString::number(qAtan(ui->rackLeftFrontCoordZLineEdit->text().toDouble() -
+                                                   ui->rackRightFrontCoordZLineEdit->text().toDouble() +
+                                                   ui->rackLeftBackCoordZLineEdit->text().toDouble() -
+                                                   ui->rackRightBackCoordZLineEdit->text().toDouble()) /
+                                             (rackFrontDeltaL + rackBackDeltaL)));
+    ui->rollLineEdit_2->insert(QString::number(ui->rollLineEdit->text().toDouble() * 180 / PI));
+
+    ui->setaLineEdit->insert(QString::number(qAtan(ui->leadLeftFrontCoordZLineEdit->text().toDouble() -
+                                                   ui->leadLeftBackCoordZLineEdit->text().toDouble() +
+                                                   ui->leadRightFrontCoordZLineEdit->text().toDouble() -
+                                                   ui->leadRightBackCoordZLineEdit->text().toDouble()) /
+                                             (leadLeftDeltaL + leadRightDeltaL)));
+    ui->setaLineEdit_2->insert(QString::number(ui->setaLineEdit->text().toDouble() * 180 / PI));
+
+    // 计算 leadLeft 边与 rackLeft 边的夹角
+    double leadLeftX = ui->leadLeftFrontCoordXLineEdit->text().toDouble() - ui->leadLeftBackCoordXLineEdit->text().toDouble();
+    double leadLeftY = ui->leadLeftFrontCoordYLineEdit->text().toDouble() - ui->leadLeftBackCoordYLineEdit->text().toDouble();
+    double rackLeftX = ui->rackLeftFrontCoordXLineEdit->text().toDouble() - ui->rackLeftBackCoordXLineEdit->text().toDouble();
+    double rackLeftY = ui->rackLeftFrontCoordYLineEdit->text().toDouble() - ui->rackLeftBackCoordYLineEdit->text().toDouble();
+
+    double leadLeftAngle = qAtan2(leadLeftY, leadLeftX) - qAtan2(rackLeftY, rackLeftX);
+
+// 计算 leadRight 边与 rackRight 边的夹角
+    double leadRightX = ui->leadRightFrontCoordXLineEdit->text().toDouble() - ui->leadRightBackCoordXLineEdit->text().toDouble();
+    double leadRightY = ui->leadRightFrontCoordYLineEdit->text().toDouble() - ui->leadRightBackCoordYLineEdit->text().toDouble();
+    double rackRightX = ui->rackRightFrontCoordXLineEdit->text().toDouble() - ui->rackRightBackCoordXLineEdit->text().toDouble();
+    double rackRightY = ui->rackRightFrontCoordYLineEdit->text().toDouble() - ui->rackRightBackCoordYLineEdit->text().toDouble();
+
+    double leadRightAngle = qAtan2(leadRightY, leadRightX) - qAtan2(rackRightY, rackRightX);
+
+// 计算均值
+    double leadYaw = - (leadLeftAngle + leadRightAngle) / 2.0;  //向右转为正
+
+// 将结果放入 psiLineEdit
+    ui->psiLineEdit->insert(QString::number(leadYaw));
+    ui->psiLineEdit_2->insert(QString::number(leadYaw * 180 / PI));  // 转换为度
+//    ui->xLineEdit->insert(QString::number(ui->lLineEdit->text().toDouble() * qCos(ui->betaLineEdit->text().toDouble() * PI / 180.0) + ui->deltaXlineEdit->text().toDouble() / 1000));
+//    ui->hLineEdit->insert(QString::number(ui->lLineEdit->text().toDouble() * qSin(ui->betaLineEdit->text().toDouble() * PI / 180.0) + ui->deltaHlineEdit->text().toDouble() / 1000));
+
+    //--------------------- 统一计算导轨方向与投影点 ---------------------
+    // 获取导轨左右边端点坐标
+    double leadLeftFrontX = ui->leadLeftFrontCoordXLineEdit->text().toDouble();
+    double leadLeftFrontY = ui->leadLeftFrontCoordYLineEdit->text().toDouble();
+    double leadLeftBackX = ui->leadLeftBackCoordXLineEdit->text().toDouble();
+    double leadLeftBackY = ui->leadLeftBackCoordYLineEdit->text().toDouble();
+    double leadRightFrontX = ui->leadRightFrontCoordXLineEdit->text().toDouble();
+    double leadRightFrontY = ui->leadRightFrontCoordYLineEdit->text().toDouble();
+    double leadRightBackX = ui->leadRightBackCoordXLineEdit->text().toDouble();
+    double leadRightBackY = ui->leadRightBackCoordYLineEdit->text().toDouble();
+
+    // 计算导轨方向向量并归一化
+    Eigen::Vector2d leadLeftDir(leadLeftFrontX - leadLeftBackX, leadLeftFrontY - leadLeftBackY);
+    Eigen::Vector2d leadRightDir(leadRightFrontX - leadRightBackX, leadRightFrontY - leadRightBackY);
+    leadLeftDir.normalize();
+    leadRightDir.normalize();
+
+    // 计算角平分线方向
+    Eigen::Vector2d bisectorDir;
+    if (leadLeftDir.dot(leadRightDir) < 0.999) {
+        bisectorDir = (leadLeftDir + leadRightDir).normalized();
+    } else {
+        Eigen::Vector2d midDir(
+                (leadLeftFrontX + leadRightFrontX - leadLeftBackX - leadRightBackX) / 2.0,
+                (leadLeftFrontY + leadRightFrontY - leadLeftBackY - leadRightBackY) / 2.0
+        );
+        bisectorDir = midDir.normalized();
+    }
+
+    // 计算发射点在导轨中心线上的投影坐标
+    Eigen::Vector2d dartShootPoint(
+            ui->leadDartShootCoordXLineEdit->text().toDouble(),
+            ui->leadDartShootCoordYLineEdit->text().toDouble()
+    );
+    Eigen::Vector2d backMidPoint(
+            (leadLeftBackX + leadRightBackX) / 2.0,
+            (leadLeftBackY + leadRightBackY) / 2.0
+    );
+    Eigen::Vector2d projection = backMidPoint + bisectorDir * (dartShootPoint - backMidPoint).dot(bisectorDir);
+    const double leadMiddleX = projection.x();
+    const double leadMiddleY = projection.y();
+    const double leadMiddleZ = ui->leadDartShootCoordZLineEdit->text().toDouble(); // Z值保持与发射点相同
+
+    // 获取目标点坐标
+    const double targetX = ui->targetCoordXLineEdit->text().toDouble();
+    const double targetY = ui->targetCoordYLineEdit->text().toDouble();
+    const double targetZ = ui->targetCoordZLineEdit->text().toDouble();
+
+    //--------------------- 统一计算 x、h、deltaPsi ---------------------
+    // 计算水平距离x（投影点与目标点）
+    const double dx = targetX - leadMiddleX;
+    const double dy = targetY - leadMiddleY;
+    const double xDistance = sqrt(dx*dx + dy*dy);
+    ui->xLineEdit->setText(QString::number(xDistance));
+
+    // 计算高度差h
+    const double hDifference = targetZ - leadMiddleZ;
+    ui->hLineEdit->setText(QString::number(hDifference));
+
+    // 计算deltaPsi（目标连线方向与导轨边的平均夹角差）
+    Eigen::Vector2d targetDir(dx, dy);  // 复用dx, dy计算结果
+    const double angleLeft = qAtan2(targetDir.y(), targetDir.x()) - qAtan2(leadLeftDir.y(), leadLeftDir.x());
+    const double angleRight = qAtan2(targetDir.y(), targetDir.x()) - qAtan2(leadRightDir.y(), leadRightDir.x());
+    const double deltaPsi = -(angleLeft + angleRight) / 2.0; // 向右转为正
+    ui->deltaPsiLineEdit->setText(QString::number(deltaPsi));
+
+    //yaw轴数据集坐标转换
     // 定义源点和目标点
     std::vector<Eigen::Vector3d> sourcePoints;
     std::vector<Eigen::Vector3d> targetPoints;
