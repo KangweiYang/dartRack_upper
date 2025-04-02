@@ -9,6 +9,7 @@
 #include "../3dartsParasComp/dartsparascomputing.h"
 #include "../0testDart/testdartcomputing.h"
 #include "../05testDartByTS/testdartcomputingbyts.h"
+#include "../35dartsParasCompByTS/dartsparascomputingbyts.h"
 #include "../serial/serial.h"
 #include <QDebug>
 
@@ -109,6 +110,12 @@ void Widget::on_dartsParasComputingPushButton_clicked()
     dartsParasComputingPage->show();
 }
 
+void Widget::on_dartsParasComputingByTSPushButton_clicked()
+{
+    dartsParasComputingByTS *dartsParasComputingByTSPage = new dartsParasComputingByTS(serialPort1, serialPort2);
+    dartsParasComputingByTSPage->setGeometry(this->geometry());
+    dartsParasComputingByTSPage->show();
+}
 void Widget::on_startUartPushButton_clicked(bool checked)
 {
     if(checked == true){

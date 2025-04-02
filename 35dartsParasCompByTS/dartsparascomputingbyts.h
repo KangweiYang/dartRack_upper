@@ -19,7 +19,7 @@ class dartsParasComputingByTS : public QWidget
     Q_OBJECT
 
 public:
-    explicit dartsParasComputingByTS(QSerialPort *serialPort, QWidget *parent = 0);
+    explicit dartsParasComputingByTS(QSerialPort *serialPort, QSerialPort *serialPort2, QWidget *parent = 0);
     ~dartsParasComputingByTS();
     QSerialPort *serialPort1;
     void closeEvent(QCloseEvent *event);
@@ -85,8 +85,32 @@ private slots:
     void on_abortShootPushButton_clicked();
 
 private:
+    struct coord
+    {
+        QString x;
+        QString y;
+        QString z;
+    };
+    coord target2;
+    coord rackLeftBack2;
+    coord leadLeftBack2;
+    coord leadRightBack2;
+    coord rackRightBack2;
+    coord rackRightFront2;
+    coord leadRightFront2;
+    coord leadLeftFront2;
+    coord rackLeftFront2;
+    coord leadDartShoot2;
+    coord rackLBC2;
+    coord rackRFC2;
+    coord rackRBC2;
+    coord rackLFC2;
+    coord deltaPsiLineEdit2;
     Ui::dartsParasComputingByTS *ui;
     bool visible = true;
+    void loadCoordsFromPlainTextEdit();
+    void serialRecord(QString startSerial, QString x, QString y, QString z, QLineEdit* xLineEdit, QLineEdit* yLineEdit, QLineEdit* zLineEdit);
+    void serialHandle(QString startSerial, coord* point, QLineEdit* xLineEdit, QLineEdit* yLineEdit, QLineEdit* zLineEdit);
 };
 
 #endif // DARTSPARASCOMPUTINGBYTS_H

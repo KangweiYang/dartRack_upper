@@ -24,8 +24,6 @@
 #include <QtMath>
 #include <QCloseEvent>
 
-#define YAW_TEST_N  100
-#define TRANSFORM_DEBUG 1
 
 const double PI = 3.14159265358979323846264338;
 
@@ -48,45 +46,6 @@ const QString leadRightFrontCoordSerial = "\n12,";
 const QString leadLeftFrontCoordSerial = "\n13,";
 const QString leadDartShootCoordSerial = "\n14,";
 
-// 新加入的16，17，18，19点号：
-const QString rackLBCSerial = "\n16,";
-const QString rackRBCSerial = "\n17,";
-const QString rackRFCSerial = "\n18,";
-const QString rackLFCSerial = "\n19,";
-
-// 新加入的20+4n，21+4n，22+4n，23+4n需要使用其他方法去录入数据
-coord leadLBC[YAW_TEST_N], leadRBC[YAW_TEST_N], leadRFC[YAW_TEST_N], leadLFC[YAW_TEST_N];
-
-// 计算旋转矩阵和平移向量
-void computeTransformation(const std::vector<Eigen::Vector3d>& sourcePoints, const std::vector<Eigen::Vector3d>& targetPoints, Eigen::Matrix3d& rotation, Eigen::Vector3d& translation) {
-    // 计算源点和目标点的质心
-    Eigen::Vector3d sourceCentroid(0, 0, 0);
-    Eigen::Vector3d targetCentroid(0, 0, 0);
-    for (int i = 0; i < sourcePoints.size(); ++i) {
-        sourceCentroid += sourcePoints[i];
-        targetCentroid += targetPoints[i];
-    }
-    sourceCentroid /= sourcePoints.size();
-    targetCentroid /= targetPoints.size();
-
-    // 计算协方差矩阵
-    Eigen::Matrix3d covariance = Eigen::Matrix3d::Zero();
-    for (int i = 0; i < sourcePoints.size(); ++i) {
-        covariance += (sourcePoints[i] - sourceCentroid) * (targetPoints[i] - targetCentroid).transpose();
-    }
-
-    // 使用SVD分解计算旋转矩阵
-    Eigen::JacobiSVD<Eigen::Matrix3d> svd(covariance, Eigen::ComputeFullU | Eigen::ComputeFullV);
-    rotation = svd.matrixV() * svd.matrixU().transpose();
-
-    // 计算平移向量
-    translation = targetCentroid - rotation * sourceCentroid;
-}
-
-// 应用变换到点
-Eigen::Vector3d applyTransformation(const Eigen::Vector3d& point, const Eigen::Matrix3d& rotation, const Eigen::Vector3d& translation) {
-    return rotation * point + translation;
-}
 
 testDartComputingByTS::testDartComputingByTS(QSerialPort *serialPort, QSerialPort *serialPort2, QWidget *parent) :
         QWidget(parent),
@@ -100,7 +59,6 @@ testDartComputingByTS::testDartComputingByTS(QSerialPort *serialPort, QSerialPor
     setEditOnlyNum(ui->mdart1PlusGLineEditInput, ui->mdart2PlusGLineEditInput);
     setEditOnlyNum(ui->Tall1LineEditInput, ui->integralOfF0PlusDxtensionLineEditInput);
 
-    loadCoordsFromPlainTextEdit();
     connect(serialPort2, SIGNAL(readyRead()), this, SLOT(serialPortReadyRead_Slot()));
 }
 
@@ -199,111 +157,6 @@ coord rackRBC;
 coord rackLFC;
 coord deltaPsiLineEdit;
 
-void testDartComputingByTS::loadCoordsFromPlainTextEdit() {
-    // 获取 leadYawCoordsDataPlainTextEdit 中的文本
-    QString coordsText = ui->leadYawCoordsDataPlainTextEdit->toPlainText();
-
-    // 使用换行符分割文本，得到每一行的数据
-    QStringList lines = coordsText.split("\n", Qt::SkipEmptyParts);
-
-    // 遍历每一行数据
-    for (const QString& line : lines) {
-        // 使用逗号分割每一行的数据
-        QStringList parts = line.split(",", Qt::SkipEmptyParts);
-
-        // 确保有足够的部分（x, y, z, -）
-        if (parts.size() < 4) {
-            qDebug() << "Error: Invalid data format in leadYawCoordsDataPlainTextEdit";
-            continue;
-        }
-
-        // 提取点号
-        int pointNumber = parts[0].toInt();
-
-        // 提取坐标
-        QString x = parts[1].trimmed();
-        QString y = parts[2].trimmed();
-        QString z = parts[3].trimmed();
-
-        // 根据点号将坐标存储到相应的结构体中
-        if (pointNumber == 16) {
-            rackLBC.x = x;
-            rackLBC.y = y;
-            rackLBC.z = z;
-        } else if (pointNumber == 17) {
-            rackRBC.x = x;
-            rackRBC.y = y;
-            rackRBC.z = z;
-        } else if (pointNumber == 18) {
-            rackLFC.x = x;
-            rackLFC.y = y;
-            rackLFC.z = z;
-        } else if (pointNumber == 19) {
-            rackRFC.x = x;
-            rackRFC.y = y;
-            rackRFC.z = z;
-        } else if (pointNumber >= 20 && pointNumber < 20 + 4 * YAW_TEST_N) {
-            int n = (pointNumber - 20) / 4;
-            int index = (pointNumber - 20) % 4;
-
-            if (index == 0) {
-                leadLBC[n].x = x;
-                leadLBC[n].y = y;
-                leadLBC[n].z = z;
-            } else if (index == 1) {
-                leadRBC[n].x = x;
-                leadRBC[n].y = y;
-                leadRBC[n].z = z;
-            } else if (index == 2) {
-                leadRFC[n].x = x;
-                leadRFC[n].y = y;
-                leadRFC[n].z = z;
-            } else if (index == 3) {
-                leadLFC[n].x = x;
-                leadLFC[n].y = y;
-                leadLFC[n].z = z;
-            }
-        } else {
-            qDebug() << "Error: Invalid point number in leadYawCoordsDataPlainTextEdit";
-        }
-    }
-
-    // 更新 UI 显示
-    ui->rackLBCXLineEdit->setText(rackLBC.x);
-    ui->rackLBCYLineEdit->setText(rackLBC.y);
-    ui->rackLBCZLineEdit->setText(rackLBC.z);
-
-    ui->rackRFCXLineEdit->setText(rackRFC.x);
-    ui->rackRFCYLineEdit->setText(rackRFC.y);
-    ui->rackRFCZLineEdit->setText(rackRFC.z);
-
-    ui->rackRBCXLineEdit->setText(rackRBC.x);
-    ui->rackRBCYLineEdit->setText(rackRBC.y);
-    ui->rackRBCZLineEdit->setText(rackRBC.z);
-
-    ui->rackLFCXLineEdit->setText(rackLFC.x);
-    ui->rackLFCYLineEdit->setText(rackLFC.y);
-    ui->rackLFCZLineEdit->setText(rackLFC.z);
-
-    for (int n = 0; n < 1; ++n) {
-        ui->leadLBCXLineEdit->setText(leadLBC[n].x);
-        ui->leadLBCYLineEdit->setText(leadLBC[n].y);
-        ui->leadLBCZLineEdit->setText(leadLBC[n].z);
-
-        ui->leadRBCXLineEdit->setText(leadRBC[n].x);
-        ui->leadRBCYLineEdit->setText(leadRBC[n].y);
-        ui->leadRBCZLineEdit->setText(leadRBC[n].z);
-
-        ui->leadRFCXLineEdit->setText(leadRFC[n].x);
-        ui->leadRFCYLineEdit->setText(leadRFC[n].y);
-        ui->leadRFCZLineEdit->setText(leadRFC[n].z);
-
-        ui->leadLFCXLineEdit->setText(leadLFC[n].x);
-        ui->leadLFCYLineEdit->setText(leadLFC[n].y);
-        ui->leadLFCZLineEdit->setText(leadLFC[n].z);
-    }
-}
-
 void testDartComputingByTS::serialPortReadyRead_Slot() {
     if (!this->visible) {
         return;
@@ -359,50 +212,6 @@ void testDartComputingByTS::serialPortReadyRead_Slot() {
         serialHandle(leadDartShootCoordSerial, &leadDartShoot, ui->leadDartShootCoordXLineEdit, ui->leadDartShootCoordYLineEdit, ui->leadDartShootCoordZLineEdit);
     }
 
-    //YAW轴数据标定（固定脉冲移动后的点集）应该放在飞镖参数计算的
-    // 检查并处理 rackLBCSerial
-    if (receiveBuff_2.contains(rackLBCSerial) && receiveBuff_2.contains(endSerial)) {
-        serialHandle(rackLBCSerial, &rackLBC, ui->rackLBCXLineEdit, ui->rackLBCYLineEdit, ui->rackLBCZLineEdit);
-    }
-
-    // 检查并处理 rackRBCSerial
-    if (receiveBuff_2.contains(rackRBCSerial) && receiveBuff_2.contains(endSerial)) {
-        serialHandle(rackRBCSerial, &rackRBC, ui->rackRBCXLineEdit, ui->rackRBCYLineEdit, ui->rackRBCZLineEdit);
-    }
-
-    // 检查并处理 rackRFCSerial
-    if (receiveBuff_2.contains(rackRFCSerial) && receiveBuff_2.contains(endSerial)) {
-        serialHandle(rackRFCSerial, &rackRFC, ui->rackRFCXLineEdit, ui->rackRFCYLineEdit, ui->        rackRFCZLineEdit);
-    }
-
-    // 检查并处理 rackLFCSerial
-    if (receiveBuff_2.contains(rackLFCSerial) && receiveBuff_2.contains(endSerial)) {
-        serialHandle(rackLFCSerial, &rackLFC, ui->rackLFCXLineEdit, ui->rackLFCYLineEdit, ui->rackLFCZLineEdit);
-    }
-
-    // 处理20+4n, 21+4n, 22+4n, 23+4n的点号
-    for (int n = 0; n < YAW_TEST_N; ++n) {
-        QString leadLBCSerial = QString("\n%1,").arg(20 + 4 * n);
-        QString leadRBCSerial = QString("\n%1,").arg(21 + 4 * n);
-        QString leadRFCSerial = QString("\n%1,").arg(22 + 4 * n);
-        QString leadLFCSerial = QString("\n%1,").arg(23 + 4 * n);
-
-        if (receiveBuff_2.contains(leadLBCSerial) && receiveBuff_2.contains(endSerial)) {
-            serialRecord(leadLBCSerial, leadLBC[n].x, leadLBC[n].y, leadLBC[n].z, ui->leadLBCXLineEdit, ui->leadLBCYLineEdit, ui->leadLBCZLineEdit);
-        }
-
-        if (receiveBuff_2.contains(leadRBCSerial) && receiveBuff_2.contains(endSerial)) {
-            serialRecord(leadRBCSerial, leadRBC[n].x, leadRBC[n].y, leadRBC[n].z, ui->leadRBCXLineEdit, ui->leadRBCYLineEdit, ui->leadRBCZLineEdit);
-        }
-
-        if (receiveBuff_2.contains(leadRFCSerial) && receiveBuff_2.contains(endSerial)) {
-            serialRecord(leadRFCSerial, leadRFC[n].x, leadRFC[n].y, leadRFC[n].z, ui->leadRFCXLineEdit, ui->leadRFCYLineEdit, ui->leadRFCZLineEdit);
-        }
-
-        if (receiveBuff_2.contains(leadLFCSerial) && receiveBuff_2.contains(endSerial)) {
-            serialRecord(leadLFCSerial, leadLFC[n].x, leadLFC[n].y, leadLFC[n].z, ui->leadLFCXLineEdit, ui->leadLFCYLineEdit, ui->leadLFCZLineEdit);
-        }
-    }
 }
 /*
 void testDartComputingByTS::serialPortReadyRead_Slot(){
@@ -581,71 +390,6 @@ void testDartComputingByTS::on_computeXandHPushButton_clicked()
     ui->psiLineEdit_2->insert(QString::number(leadYaw * 180 / PI));  // 转换为度
 //    ui->xLineEdit->insert(QString::number(ui->lLineEdit->text().toDouble() * qCos(ui->betaLineEdit->text().toDouble() * PI / 180.0) + ui->deltaXlineEdit->text().toDouble() / 1000));
 //    ui->hLineEdit->insert(QString::number(ui->lLineEdit->text().toDouble() * qSin(ui->betaLineEdit->text().toDouble() * PI / 180.0) + ui->deltaHlineEdit->text().toDouble() / 1000));
-    // 定义源点和目标点
-    std::vector<Eigen::Vector3d> sourcePoints;
-    std::vector<Eigen::Vector3d> targetPoints;
-
-    // 添加四组对应点
-    sourcePoints.push_back(Eigen::Vector3d(rackLBC.x.toDouble(), rackLBC.y.toDouble(), rackLBC.z.toDouble()));
-    targetPoints.push_back(Eigen::Vector3d(ui->rackLeftBackCoordXLineEdit->text().toDouble(), ui->rackLeftBackCoordYLineEdit->text().toDouble(), ui->rackLeftBackCoordZLineEdit->text().toDouble()));
-
-    sourcePoints.push_back(Eigen::Vector3d(rackRBC.x.toDouble(), rackRBC.y.toDouble(), rackRBC.z.toDouble()));
-    targetPoints.push_back(Eigen::Vector3d(ui->rackRightBackCoordXLineEdit->text().toDouble(), ui->rackRightBackCoordYLineEdit->text().toDouble(), ui->rackRightBackCoordZLineEdit->text().toDouble()));
-
-    sourcePoints.push_back(Eigen::Vector3d(rackRFC.x.toDouble(), rackRFC.y.toDouble(), rackRFC.z.toDouble()));
-    targetPoints.push_back(Eigen::Vector3d(ui->rackRightFrontCoordXLineEdit->text().toDouble(), ui->rackRightFrontCoordYLineEdit->text().toDouble(), ui->rackRightFrontCoordZLineEdit->text().toDouble()));
-
-    sourcePoints.push_back(Eigen::Vector3d(rackLFC.x.toDouble(), rackLFC.y.toDouble(), rackLFC.z.toDouble()));
-    targetPoints.push_back(Eigen::Vector3d(ui->rackLeftFrontCoordXLineEdit->text().toDouble(), ui->rackLeftFrontCoordYLineEdit->text().toDouble(), ui->rackLeftFrontCoordZLineEdit->text().toDouble()));
-
-    // 计算旋转矩阵和平移向量
-    Eigen::Matrix3d rotation;
-    Eigen::Vector3d translation;
-    computeTransformation(sourcePoints, targetPoints, rotation, translation);
-
-    // 应用变换到所有点
-    for (int n = 0; n < YAW_TEST_N; ++n) {
-        Eigen::Vector3d transformedPoint = applyTransformation(Eigen::Vector3d(leadLBC[n].x.toDouble(), leadLBC[n].y.toDouble(), leadLBC[n].z.toDouble()), rotation, translation);
-        leadLBC[n].x = QString::number(transformedPoint.x());
-        leadLBC[n].y = QString::number(transformedPoint.y());
-        leadLBC[n].z = QString::number(transformedPoint.z());
-
-        transformedPoint = applyTransformation(Eigen::Vector3d(leadRBC[n].x.toDouble(), leadRBC[n].y.toDouble(), leadRBC[n].z.toDouble()), rotation, translation);
-        leadRBC[n].x = QString::number(transformedPoint.x());
-        leadRBC[n].y = QString::number(transformedPoint.y());
-        leadRBC[n].z = QString::number(transformedPoint.z());
-
-        transformedPoint = applyTransformation(Eigen::Vector3d(leadRFC[n].x.toDouble(), leadRFC[n].y.toDouble(), leadRFC[n].z.toDouble()), rotation, translation);
-        leadRFC[n].x = QString::number(transformedPoint.x());
-        leadRFC[n].y = QString::number(transformedPoint.y());
-        leadRFC[n].z = QString::number(transformedPoint.z());
-
-        transformedPoint = applyTransformation(Eigen::Vector3d(leadLFC[n].x.toDouble(), leadLFC[n].y.toDouble(), leadLFC[n].z.toDouble()), rotation, translation);
-        leadLFC[n].x = QString::number(transformedPoint.x());
-        leadLFC[n].y = QString::number(transformedPoint.y());
-        leadLFC[n].z = QString::number(transformedPoint.z());
-    }
-
-    // 应用变换到 rackLBC, rackRBC, rackRFC, rackLFC
-    Eigen::Vector3d transformedRackLBC = applyTransformation(Eigen::Vector3d(rackLBC.x.toDouble(), rackLBC.y.toDouble(), rackLBC.z.toDouble()), rotation, translation);
-    rackLBC.x = QString::number(transformedRackLBC.x());
-    rackLBC.y = QString::number(transformedRackLBC.y());
-    rackLBC.z = QString::number(transformedRackLBC.z());
-
-    Eigen::Vector3d transformedRackRBC = applyTransformation(Eigen::Vector3d(rackRBC.x.toDouble(), rackRBC.y.toDouble(), rackRBC.z.toDouble()), rotation, translation);
-    rackRBC.x = QString::number(transformedRackRBC.x());
-    rackRBC.y = QString::number(transformedRackRBC.y());
-    rackRBC.z = QString::number(transformedRackRBC.z());
-
-    Eigen::Vector3d transformedRackRFC = applyTransformation(Eigen::Vector3d(rackRFC.x.toDouble(), rackRFC.y.toDouble(), rackRFC.z.toDouble()), rotation, translation);
-    rackRFC.x = QString::number(transformedRackRFC.x());
-    rackRFC.y = QString::number(transformedRackRFC.y());
-    rackRFC.z = QString::number(transformedRackRFC.z());
-
-    Eigen::Vector3d transformedRackLFC = applyTransformation(Eigen::Vector3d(rackLFC.x.toDouble(), rackLFC.y.toDouble(), rackLFC.z.toDouble()), rotation, translation);
-    rackLFC.x = QString::number(transformedRackLFC.x());
-    rackLFC.y = QString::number(transformedRackLFC.y());
-    rackLFC.z = QString::number(transformedRackLFC.z());
 
     //--------------------- 统一计算导轨方向与投影点 ---------------------
     // 获取导轨左右边端点坐标
@@ -713,38 +457,6 @@ void testDartComputingByTS::on_computeXandHPushButton_clicked()
     const double deltaPsi = -(angleLeft + angleRight) / 2.0; // 向右转为正
     ui->deltaPsiLineEdit->setText(QString::number(deltaPsi));
 
-    // 更新 UI
-    ui->rackLBCXLineEdit->setText(rackLBC.x);
-    ui->rackLBCYLineEdit->setText(rackLBC.y);
-    ui->rackLBCZLineEdit->setText(rackLBC.z);
-
-    ui->rackRBCXLineEdit->setText(rackRBC.x);
-    ui->rackRBCYLineEdit->setText(rackRBC.y);
-    ui->rackRBCZLineEdit->setText(rackRBC.z);
-
-    ui->rackRFCXLineEdit->setText(rackRFC.x);
-    ui->rackRFCYLineEdit->setText(rackRFC.y);
-    ui->rackRFCZLineEdit->setText(rackRFC.z);
-
-    ui->rackLFCXLineEdit->setText(rackLFC.x);
-    ui->rackLFCYLineEdit->setText(rackLFC.y);
-    ui->rackLFCZLineEdit->setText(rackLFC.z);
-
-    ui->leadLBCXLineEdit->setText(leadLBC[0].x);
-    ui->leadLBCYLineEdit->setText(leadLBC[0].y);
-    ui->leadLBCZLineEdit->setText(leadLBC[0].z);
-
-    ui->leadRBCXLineEdit->setText(leadRBC[0].x);
-    ui->leadRBCYLineEdit->setText(leadRBC[0].y);
-    ui->leadRBCZLineEdit->setText(leadRBC[0].z);
-
-    ui->leadRFCXLineEdit->setText(leadRFC[0].x);
-    ui->leadRFCYLineEdit->setText(leadRFC[0].y);
-    ui->leadRFCZLineEdit->setText(leadRFC[0].z);
-
-    ui->leadLFCXLineEdit->setText(leadLFC[0].x);
-    ui->leadLFCYLineEdit->setText(leadLFC[0].y);
-    ui->leadLFCZLineEdit->setText(leadLFC[0].z);
 }
 
 void testDartComputingByTS::on_deltaXlineEdit_editingFinished()

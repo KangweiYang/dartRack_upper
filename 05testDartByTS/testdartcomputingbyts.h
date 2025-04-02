@@ -75,7 +75,6 @@ private:
     coord rackRFC;
     coord rackRBC;
     coord rackLFC;
-    void loadCoordsFromPlainTextEdit();
     void serialRecord(QString startSerial, QString x, QString y, QString z, QLineEdit* xLineEdit, QLineEdit* yLineEdit, QLineEdit* zLineEdit);
     void serialHandle(QString startSerial, coord* point, QLineEdit* xLineEdit, QLineEdit* yLineEdit, QLineEdit* zLineEdit);
 

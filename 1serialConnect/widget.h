@@ -33,6 +33,8 @@ private slots:
 
     void on_dartsParasComputingPushButton_clicked();
 
+    void on_dartsParasComputingByTSPushButton_clicked();
+
     void on_startUartPushButton_clicked(bool checked);
 
     void on_startUartPushButton_2_clicked(bool checked);

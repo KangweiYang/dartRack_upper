@@ -7,6 +7,8 @@ find_package(Qt6 COMPONENTS
         SerialPort
         REQUIRED)
 
+find_package(Eigen3 CONFIG REQUIRED)
+
 target_sources(darts_paras_computing_by_ts
         PRIVATE
         dartsparascomputingbyts.cpp
@@ -23,6 +25,8 @@ target_link_libraries(darts_paras_computing_by_ts
         Qt::Gui
         Qt::Widgets
         Qt::SerialPort
+        Eigen3::Eigen
         my_combox_box
         serial
+        test_dart_by_ts
 )
