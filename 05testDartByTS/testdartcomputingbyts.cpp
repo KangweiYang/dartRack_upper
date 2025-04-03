@@ -319,6 +319,8 @@ void testDartComputingByTS::on_computeXandHPushButton_clicked()
     ui->psiLineEdit_2->clear();
     ui->xLineEdit->clear();
     ui->hLineEdit->clear();
+    ui->deltaPsiLineEdit->clear();
+    ui->deltaPsiLineEdit_2->clear();
 
     // 计算 Rack 的前后左右的 DeltaL
     double rackLeftDeltaL = DeltaL(ui->rackLeftFrontCoordXLineEdit, ui->rackLeftFrontCoordYLineEdit,
@@ -455,6 +457,7 @@ void testDartComputingByTS::on_computeXandHPushButton_clicked()
     const double angleRight = qAtan2(targetDir.y(), targetDir.x()) - qAtan2(leadRightDir.y(), leadRightDir.x());
     const double deltaPsi = -(angleLeft + angleRight) / 2.0; // 向右转为正
     ui->deltaPsiLineEdit->setText(QString::number(deltaPsi));
+    ui->deltaPsiLineEdit_2->insert(QString::number(deltaPsi * 180 / PI));  // 转换为度
 
 }
 

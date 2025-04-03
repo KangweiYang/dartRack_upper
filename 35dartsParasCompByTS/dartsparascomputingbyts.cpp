@@ -39,10 +39,13 @@ coord leadRightFront2;
 coord leadLeftFront2;
 coord rackLeftFront2;
 coord leadDartShoot2;
+coord leadMiddleDartShoot2;
 coord rackLBC2;
 coord rackRFC2;
 coord rackRBC2;
 coord rackLFC2;
+coord leadLBC[YAW_TEST_N], leadRBC[YAW_TEST_N], leadRFC[YAW_TEST_N], leadLFC[YAW_TEST_N];
+
 const QString endSerial = ",-";
 const QString pauseSerial = ",";
 const QString targetCoordSerial = "\n1,";
@@ -60,9 +63,6 @@ const QString rackLBCSerial = "\n16,";
 const QString rackRBCSerial = "\n17,";
 const QString rackRFCSerial = "\n18,";
 const QString rackLFCSerial = "\n19,";
-
-// 新加入的20+4n，21+4n，22+4n，23+4n需要使用其他方法去录入数据
-coord leadLBC[YAW_TEST_N], leadRBC[YAW_TEST_N], leadRFC[YAW_TEST_N], leadLFC[YAW_TEST_N];
 
 void dartsParasComputingByTS::serialRecord(QString startSerial, QString x, QString y, QString z, QLineEdit* xLineEdit, QLineEdit* yLineEdit, QLineEdit* zLineEdit) {
     if (!xLineEdit || !yLineEdit || !zLineEdit) {
@@ -508,9 +508,177 @@ void dartsParasComputingByTS::on_yawAimingPushButton_clicked()
     yawAimingPage->show();
 }
 
+void dartsParasComputingByTS::ui_update(){
+    // 更新 UI
+    // 更新target2相关UI
+    ui->targetCoordXLineEdit->setText(target2.x);
+    ui->targetCoordYLineEdit->setText(target2.y);
+    ui->targetCoordZLineEdit->setText(target2.z);
+
+// 更新rackLeftBack2相关UI
+    ui->rackLeftBackCoordXLineEdit->setText(rackLeftBack2.x);
+    ui->rackLeftBackCoordYLineEdit->setText(rackLeftBack2.y);
+    ui->rackLeftBackCoordZLineEdit->setText(rackLeftBack2.z);
+
+// 更新leadLeftBack2相关UI
+    ui->leadLeftBackCoordXLineEdit->setText(leadLeftBack2.x);
+    ui->leadLeftBackCoordYLineEdit->setText(leadLeftBack2.y);
+    ui->leadLeftBackCoordZLineEdit->setText(leadLeftBack2.z);
+
+// 更新leadRightBack2相关UI
+    ui->leadRightBackCoordXLineEdit->setText(leadRightBack2.x);
+    ui->leadRightBackCoordYLineEdit->setText(leadRightBack2.y);
+    ui->leadRightBackCoordZLineEdit->setText(leadRightBack2.z);
+
+// 更新rackRightBack2相关UI
+    ui->rackRightBackCoordXLineEdit->setText(rackRightBack2.x);
+    ui->rackRightBackCoordYLineEdit->setText(rackRightBack2.y);
+    ui->rackRightBackCoordZLineEdit->setText(rackRightBack2.z);
+
+// 更新rackRightFront2相关UI
+    ui->rackRightFrontCoordXLineEdit->setText(rackRightFront2.x);
+    ui->rackRightFrontCoordYLineEdit->setText(rackRightFront2.y);
+    ui->rackRightFrontCoordZLineEdit->setText(rackRightFront2.z);
+
+// 更新leadRightFront2相关UI
+    ui->leadRightFrontCoordXLineEdit->setText(leadRightFront2.x);
+    ui->leadRightFrontCoordYLineEdit->setText(leadRightFront2.y);
+    ui->leadRightFrontCoordZLineEdit->setText(leadRightFront2.z);
+
+// 更新leadLeftFront2相关UI
+    ui->leadLeftFrontCoordXLineEdit->setText(leadLeftFront2.x);
+    ui->leadLeftFrontCoordYLineEdit->setText(leadLeftFront2.y);
+    ui->leadLeftFrontCoordZLineEdit->setText(leadLeftFront2.z);
+
+// 更新rackLeftFront2相关UI
+    ui->rackLeftFrontCoordXLineEdit->setText(rackLeftFront2.x);
+    ui->rackLeftFrontCoordYLineEdit->setText(rackLeftFront2.y);
+    ui->rackLeftFrontCoordZLineEdit->setText(rackLeftFront2.z);
+
+// 更新leadDartShoot2相关UI
+    ui->leadDartShootCoordXLineEdit->setText(leadDartShoot2.x);
+    ui->leadDartShootCoordYLineEdit->setText(leadDartShoot2.y);
+    ui->leadDartShootCoordZLineEdit->setText(leadDartShoot2.z);
+}
+
+void dartsParasComputingByTS::coord_transform(){
+    //yaw轴数据集坐标转换 -------------------
+    // 定义源点和目标点
+    std::vector<Eigen::Vector3d> sourcePoints;
+    std::vector<Eigen::Vector3d> targetPoints;
+
+    // 添加四组对应点
+    targetPoints.push_back(Eigen::Vector3d(rackLBC2.x.toDouble(), rackLBC2.y.toDouble(), rackLBC2.z.toDouble()));
+    sourcePoints.push_back(Eigen::Vector3d(ui->rackLeftBackCoordXLineEdit->text().toDouble(), ui->rackLeftBackCoordYLineEdit->text().toDouble(), ui->rackLeftBackCoordZLineEdit->text().toDouble()));
+
+    targetPoints.push_back(Eigen::Vector3d(rackRBC2.x.toDouble(), rackRBC2.y.toDouble(), rackRBC2.z.toDouble()));
+    sourcePoints.push_back(Eigen::Vector3d(ui->rackRightBackCoordXLineEdit->text().toDouble(), ui->rackRightBackCoordYLineEdit->text().toDouble(), ui->rackRightBackCoordZLineEdit->text().toDouble()));
+
+    targetPoints.push_back(Eigen::Vector3d(rackRFC2.x.toDouble(), rackRFC2.y.toDouble(), rackRFC2.z.toDouble()));
+    sourcePoints.push_back(Eigen::Vector3d(ui->rackRightFrontCoordXLineEdit->text().toDouble(), ui->rackRightFrontCoordYLineEdit->text().toDouble(), ui->rackRightFrontCoordZLineEdit->text().toDouble()));
+
+    targetPoints.push_back(Eigen::Vector3d(rackLFC2.x.toDouble(), rackLFC2.y.toDouble(), rackLFC2.z.toDouble()));
+    sourcePoints.push_back(Eigen::Vector3d(ui->rackLeftFrontCoordXLineEdit->text().toDouble(), ui->rackLeftFrontCoordYLineEdit->text().toDouble(), ui->rackLeftFrontCoordZLineEdit->text().toDouble()));
+
+    // 计算旋转矩阵和平移向量
+    Eigen::Matrix3d rotation;
+    Eigen::Vector3d translation;
+    computeTransformation(sourcePoints, targetPoints, rotation, translation);
+// target2
+    Eigen::Vector3d transformedTarget2 = applyTransformation(
+            Eigen::Vector3d(target2.x.toDouble(), target2.y.toDouble(), target2.z.toDouble()),
+            rotation, translation
+    );
+    target2.x = QString::number(transformedTarget2.x());
+    target2.y = QString::number(transformedTarget2.y());
+    target2.z = QString::number(transformedTarget2.z());
+
+// rackLeftBack2
+    Eigen::Vector3d transformedRackLeftBack = applyTransformation(
+            Eigen::Vector3d(rackLeftBack2.x.toDouble(), rackLeftBack2.y.toDouble(), rackLeftBack2.z.toDouble()),
+            rotation, translation
+    );
+    rackLeftBack2.x = QString::number(transformedRackLeftBack.x());
+    rackLeftBack2.y = QString::number(transformedRackLeftBack.y());
+    rackLeftBack2.z = QString::number(transformedRackLeftBack.z());
+
+// leadLeftBack2
+    Eigen::Vector3d transformedLeadLeftBack = applyTransformation(
+            Eigen::Vector3d(leadLeftBack2.x.toDouble(), leadLeftBack2.y.toDouble(), leadLeftBack2.z.toDouble()),
+            rotation, translation
+    );
+    leadLeftBack2.x = QString::number(transformedLeadLeftBack.x());
+    leadLeftBack2.y = QString::number(transformedLeadLeftBack.y());
+    leadLeftBack2.z = QString::number(transformedLeadLeftBack.z());
+
+// leadRightBack2
+    Eigen::Vector3d transformedLeadRightBack = applyTransformation(
+            Eigen::Vector3d(leadRightBack2.x.toDouble(), leadRightBack2.y.toDouble(), leadRightBack2.z.toDouble()),
+            rotation, translation
+    );
+    leadRightBack2.x = QString::number(transformedLeadRightBack.x());
+    leadRightBack2.y = QString::number(transformedLeadRightBack.y());
+    leadRightBack2.z = QString::number(transformedLeadRightBack.z());
+
+// rackRightBack2
+    Eigen::Vector3d transformedRackRightBack = applyTransformation(
+            Eigen::Vector3d(rackRightBack2.x.toDouble(), rackRightBack2.y.toDouble(), rackRightBack2.z.toDouble()),
+            rotation, translation
+    );
+    rackRightBack2.x = QString::number(transformedRackRightBack.x());
+    rackRightBack2.y = QString::number(transformedRackRightBack.y());
+    rackRightBack2.z = QString::number(transformedRackRightBack.z());
+
+// rackRightFront2
+    Eigen::Vector3d transformedRackRightFront = applyTransformation(
+            Eigen::Vector3d(rackRightFront2.x.toDouble(), rackRightFront2.y.toDouble(), rackRightFront2.z.toDouble()),
+            rotation, translation
+    );
+    rackRightFront2.x = QString::number(transformedRackRightFront.x());
+    rackRightFront2.y = QString::number(transformedRackRightFront.y());
+    rackRightFront2.z = QString::number(transformedRackRightFront.z());
+
+// leadRightFront2
+    Eigen::Vector3d transformedLeadRightFront = applyTransformation(
+            Eigen::Vector3d(leadRightFront2.x.toDouble(), leadRightFront2.y.toDouble(), leadRightFront2.z.toDouble()),
+            rotation, translation
+    );
+    leadRightFront2.x = QString::number(transformedLeadRightFront.x());
+    leadRightFront2.y = QString::number(transformedLeadRightFront.y());
+    leadRightFront2.z = QString::number(transformedLeadRightFront.z());
+
+// leadLeftFront2
+    Eigen::Vector3d transformedLeadLeftFront = applyTransformation(
+            Eigen::Vector3d(leadLeftFront2.x.toDouble(), leadLeftFront2.y.toDouble(), leadLeftFront2.z.toDouble()),
+            rotation, translation
+    );
+    leadLeftFront2.x = QString::number(transformedLeadLeftFront.x());
+    leadLeftFront2.y = QString::number(transformedLeadLeftFront.y());
+    leadLeftFront2.z = QString::number(transformedLeadLeftFront.z());
+
+// rackLeftFront2
+    Eigen::Vector3d transformedRackLeftFront = applyTransformation(
+            Eigen::Vector3d(rackLeftFront2.x.toDouble(), rackLeftFront2.y.toDouble(), rackLeftFront2.z.toDouble()),
+            rotation, translation
+    );
+    rackLeftFront2.x = QString::number(transformedRackLeftFront.x());
+    rackLeftFront2.y = QString::number(transformedRackLeftFront.y());
+    rackLeftFront2.z = QString::number(transformedRackLeftFront.z());
+
+// leadDartShoot2
+    Eigen::Vector3d transformedLeadDartShoot = applyTransformation(
+            Eigen::Vector3d(leadDartShoot2.x.toDouble(), leadDartShoot2.y.toDouble(), leadDartShoot2.z.toDouble()),
+            rotation, translation
+    );
+    leadDartShoot2.x = QString::number(transformedLeadDartShoot.x());
+    leadDartShoot2.y = QString::number(transformedLeadDartShoot.y());
+    leadDartShoot2.z = QString::number(transformedLeadDartShoot.z());
+}
 
 void dartsParasComputingByTS::on_computeXandHPushButton_clicked()
 {
+    //从控件更新坐标
+    loadCoordsFromPlainTextEdit();
 
     ui->pitchLineEdit->clear();
     ui->pitchLineEdit_2->clear();
@@ -522,6 +690,13 @@ void dartsParasComputingByTS::on_computeXandHPushButton_clicked()
     ui->psiLineEdit_2->clear();
     ui->xLineEdit->clear();
     ui->hLineEdit->clear();
+    ui->deltaPsiLineEdit->clear();
+    ui->deltaPsiLineEdit_2->clear();
+
+    //坐标转换
+    coord_transform();
+    //更新UI
+    ui_update();
 
     // 计算 Rack 的前后左右的 DeltaL
     double rackLeftDeltaL = DeltaL(ui->rackLeftFrontCoordXLineEdit, ui->rackLeftFrontCoordYLineEdit,
@@ -636,6 +811,11 @@ void dartsParasComputingByTS::on_computeXandHPushButton_clicked()
     const double leadMiddleY = projection.y();
     const double leadMiddleZ = ui->leadDartShootCoordZLineEdit->text().toDouble(); // Z值保持与发射点相同
 
+    leadMiddleDartShoot2.x = QString::number(leadMiddleX);
+    leadMiddleDartShoot2.y = QString::number(leadMiddleY);
+    leadMiddleDartShoot2.z = QString::number(leadMiddleZ);
+
+
     // 获取目标点坐标
     const double targetX = ui->targetCoordXLineEdit->text().toDouble();
     const double targetY = ui->targetCoordYLineEdit->text().toDouble();
@@ -658,169 +838,14 @@ void dartsParasComputingByTS::on_computeXandHPushButton_clicked()
     const double angleRight = qAtan2(targetDir.y(), targetDir.x()) - qAtan2(leadRightDir.y(), leadRightDir.x());
     const double deltaPsi = -(angleLeft + angleRight) / 2.0; // 向右转为正
     ui->deltaPsiLineEdit->setText(QString::number(deltaPsi));
-
-    //yaw轴数据集坐标转换 -------------------
-    // 定义源点和目标点
-    std::vector<Eigen::Vector3d> sourcePoints;
-    std::vector<Eigen::Vector3d> targetPoints;
-
-    // 添加四组对应点
-    targetPoints.push_back(Eigen::Vector3d(rackLBC2.x.toDouble(), rackLBC2.y.toDouble(), rackLBC2.z.toDouble()));
-    sourcePoints.push_back(Eigen::Vector3d(ui->rackLeftBackCoordXLineEdit->text().toDouble(), ui->rackLeftBackCoordYLineEdit->text().toDouble(), ui->rackLeftBackCoordZLineEdit->text().toDouble()));
-
-    targetPoints.push_back(Eigen::Vector3d(rackRBC2.x.toDouble(), rackRBC2.y.toDouble(), rackRBC2.z.toDouble()));
-    sourcePoints.push_back(Eigen::Vector3d(ui->rackRightBackCoordXLineEdit->text().toDouble(), ui->rackRightBackCoordYLineEdit->text().toDouble(), ui->rackRightBackCoordZLineEdit->text().toDouble()));
-
-    targetPoints.push_back(Eigen::Vector3d(rackRFC2.x.toDouble(), rackRFC2.y.toDouble(), rackRFC2.z.toDouble()));
-    sourcePoints.push_back(Eigen::Vector3d(ui->rackRightFrontCoordXLineEdit->text().toDouble(), ui->rackRightFrontCoordYLineEdit->text().toDouble(), ui->rackRightFrontCoordZLineEdit->text().toDouble()));
-
-    targetPoints.push_back(Eigen::Vector3d(rackLFC2.x.toDouble(), rackLFC2.y.toDouble(), rackLFC2.z.toDouble()));
-    sourcePoints.push_back(Eigen::Vector3d(ui->rackLeftFrontCoordXLineEdit->text().toDouble(), ui->rackLeftFrontCoordYLineEdit->text().toDouble(), ui->rackLeftFrontCoordZLineEdit->text().toDouble()));
-
-    // 计算旋转矩阵和平移向量
-    Eigen::Matrix3d rotation;
-    Eigen::Vector3d translation;
-    computeTransformation(sourcePoints, targetPoints, rotation, translation);
-// target2
-    Eigen::Vector3d transformedTarget2 = applyTransformation(
-            Eigen::Vector3d(target2.x.toDouble(), target2.y.toDouble(), target2.z.toDouble()),
-            rotation, translation
-    );
-    target2.x = QString::number(transformedTarget2.x());
-    target2.y = QString::number(transformedTarget2.y());
-    target2.z = QString::number(transformedTarget2.z());
-
-// rackLeftBack2
-    Eigen::Vector3d transformedRackLeftBack = applyTransformation(
-            Eigen::Vector3d(rackLeftBack2.x.toDouble(), rackLeftBack2.y.toDouble(), rackLeftBack2.z.toDouble()),
-            rotation, translation
-    );
-    rackLeftBack2.x = QString::number(transformedRackLeftBack.x());
-    rackLeftBack2.y = QString::number(transformedRackLeftBack.y());
-    rackLeftBack2.z = QString::number(transformedRackLeftBack.z());
-
-// leadLeftBack2
-    Eigen::Vector3d transformedLeadLeftBack = applyTransformation(
-            Eigen::Vector3d(leadLeftBack2.x.toDouble(), leadLeftBack2.y.toDouble(), leadLeftBack2.z.toDouble()),
-            rotation, translation
-    );
-    leadLeftBack2.x = QString::number(transformedLeadLeftBack.x());
-    leadLeftBack2.y = QString::number(transformedLeadLeftBack.y());
-    leadLeftBack2.z = QString::number(transformedLeadLeftBack.z());
-
-// leadRightBack2
-    Eigen::Vector3d transformedLeadRightBack = applyTransformation(
-            Eigen::Vector3d(leadRightBack2.x.toDouble(), leadRightBack2.y.toDouble(), leadRightBack2.z.toDouble()),
-            rotation, translation
-    );
-    leadRightBack2.x = QString::number(transformedLeadRightBack.x());
-    leadRightBack2.y = QString::number(transformedLeadRightBack.y());
-    leadRightBack2.z = QString::number(transformedLeadRightBack.z());
-
-// rackRightBack2
-    Eigen::Vector3d transformedRackRightBack = applyTransformation(
-            Eigen::Vector3d(rackRightBack2.x.toDouble(), rackRightBack2.y.toDouble(), rackRightBack2.z.toDouble()),
-            rotation, translation
-    );
-    rackRightBack2.x = QString::number(transformedRackRightBack.x());
-    rackRightBack2.y = QString::number(transformedRackRightBack.y());
-    rackRightBack2.z = QString::number(transformedRackRightBack.z());
-
-// rackRightFront2
-    Eigen::Vector3d transformedRackRightFront = applyTransformation(
-            Eigen::Vector3d(rackRightFront2.x.toDouble(), rackRightFront2.y.toDouble(), rackRightFront2.z.toDouble()),
-            rotation, translation
-    );
-    rackRightFront2.x = QString::number(transformedRackRightFront.x());
-    rackRightFront2.y = QString::number(transformedRackRightFront.y());
-    rackRightFront2.z = QString::number(transformedRackRightFront.z());
-
-// leadRightFront2
-    Eigen::Vector3d transformedLeadRightFront = applyTransformation(
-            Eigen::Vector3d(leadRightFront2.x.toDouble(), leadRightFront2.y.toDouble(), leadRightFront2.z.toDouble()),
-            rotation, translation
-    );
-    leadRightFront2.x = QString::number(transformedLeadRightFront.x());
-    leadRightFront2.y = QString::number(transformedLeadRightFront.y());
-    leadRightFront2.z = QString::number(transformedLeadRightFront.z());
-
-// leadLeftFront2
-    Eigen::Vector3d transformedLeadLeftFront = applyTransformation(
-            Eigen::Vector3d(leadLeftFront2.x.toDouble(), leadLeftFront2.y.toDouble(), leadLeftFront2.z.toDouble()),
-            rotation, translation
-    );
-    leadLeftFront2.x = QString::number(transformedLeadLeftFront.x());
-    leadLeftFront2.y = QString::number(transformedLeadLeftFront.y());
-    leadLeftFront2.z = QString::number(transformedLeadLeftFront.z());
-
-// rackLeftFront2
-    Eigen::Vector3d transformedRackLeftFront = applyTransformation(
-            Eigen::Vector3d(rackLeftFront2.x.toDouble(), rackLeftFront2.y.toDouble(), rackLeftFront2.z.toDouble()),
-            rotation, translation
-    );
-    rackLeftFront2.x = QString::number(transformedRackLeftFront.x());
-    rackLeftFront2.y = QString::number(transformedRackLeftFront.y());
-    rackLeftFront2.z = QString::number(transformedRackLeftFront.z());
-
-// leadDartShoot2
-    Eigen::Vector3d transformedLeadDartShoot = applyTransformation(
-            Eigen::Vector3d(leadDartShoot2.x.toDouble(), leadDartShoot2.y.toDouble(), leadDartShoot2.z.toDouble()),
-            rotation, translation
-    );
-    leadDartShoot2.x = QString::number(transformedLeadDartShoot.x());
-    leadDartShoot2.y = QString::number(transformedLeadDartShoot.y());
-    leadDartShoot2.z = QString::number(transformedLeadDartShoot.z());
+    ui->deltaPsiLineEdit_2->insert(QString::number(deltaPsi * 180 / PI));  // 转换为度
 
     // 更新 UI
-    // 更新target2相关UI
-    ui->targetCoordXLineEdit->setText(target2.x);
-    ui->targetCoordYLineEdit->setText(target2.y);
-    ui->targetCoordZLineEdit->setText(target2.z);
+    ui_update();
 
-// 更新rackLeftBack2相关UI
-    ui->rackLeftBackCoordXLineEdit->setText(rackLeftBack2.x);
-    ui->rackLeftBackCoordYLineEdit->setText(rackLeftBack2.y);
-    ui->rackLeftBackCoordZLineEdit->setText(rackLeftBack2.z);
-
-// 更新leadLeftBack2相关UI
-    ui->leadLeftBackCoordXLineEdit->setText(leadLeftBack2.x);
-    ui->leadLeftBackCoordYLineEdit->setText(leadLeftBack2.y);
-    ui->leadLeftBackCoordZLineEdit->setText(leadLeftBack2.z);
-
-// 更新leadRightBack2相关UI
-    ui->leadRightBackCoordXLineEdit->setText(leadRightBack2.x);
-    ui->leadRightBackCoordYLineEdit->setText(leadRightBack2.y);
-    ui->leadRightBackCoordZLineEdit->setText(leadRightBack2.z);
-
-// 更新rackRightBack2相关UI
-    ui->rackRightBackCoordXLineEdit->setText(rackRightBack2.x);
-    ui->rackRightBackCoordYLineEdit->setText(rackRightBack2.y);
-    ui->rackRightBackCoordZLineEdit->setText(rackRightBack2.z);
-
-// 更新rackRightFront2相关UI
-    ui->rackRightFrontCoordXLineEdit->setText(rackRightFront2.x);
-    ui->rackRightFrontCoordYLineEdit->setText(rackRightFront2.y);
-    ui->rackRightFrontCoordZLineEdit->setText(rackRightFront2.z);
-
-// 更新leadRightFront2相关UI
-    ui->leadRightFrontCoordXLineEdit->setText(leadRightFront2.x);
-    ui->leadRightFrontCoordYLineEdit->setText(leadRightFront2.y);
-    ui->leadRightFrontCoordZLineEdit->setText(leadRightFront2.z);
-
-// 更新leadLeftFront2相关UI
-    ui->leadLeftFrontCoordXLineEdit->setText(leadLeftFront2.x);
-    ui->leadLeftFrontCoordYLineEdit->setText(leadLeftFront2.y);
-    ui->leadLeftFrontCoordZLineEdit->setText(leadLeftFront2.z);
-
-// 更新rackLeftFront2相关UI
-    ui->rackLeftFrontCoordXLineEdit->setText(rackLeftFront2.x);
-    ui->rackLeftFrontCoordYLineEdit->setText(rackLeftFront2.y);
-    ui->rackLeftFrontCoordZLineEdit->setText(rackLeftFront2.z);
-
-// 更新leadDartShoot2相关UI
-    ui->leadDartShootCoordXLineEdit->setText(leadDartShoot2.x);
-    ui->leadDartShootCoordYLineEdit->setText(leadDartShoot2.y);
-    ui->leadDartShootCoordZLineEdit->setText(leadDartShoot2.z);
+    ui->leadMiddleDartShootCoordXLineEdit->setText(leadMiddleDartShoot2.x);
+    ui->leadMiddleDartShootCoordYLineEdit->setText(leadMiddleDartShoot2.y);
+    ui->leadMiddleDartShootCoordZLineEdit->setText(leadMiddleDartShoot2.z);
 
     ui->rackLBCXLineEdit->setText(rackLBC2.x);
     ui->rackLBCYLineEdit->setText(rackLBC2.y);

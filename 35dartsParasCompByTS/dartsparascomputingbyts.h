@@ -103,6 +103,7 @@ private:
     coord leadLeftFront2;
     coord rackLeftFront2;
     coord leadDartShoot2;
+    coord leadMiddleDartShoot2;;
     coord rackLBC2;
     coord rackRFC2;
     coord rackRBC2;
@@ -111,6 +112,8 @@ private:
     Ui::dartsParasComputingByTS *ui;
     bool visible = true;
     void loadCoordsFromPlainTextEdit();
+    void ui_update();
+    void coord_transform();
     void serialRecord(QString startSerial, QString x, QString y, QString z, QLineEdit* xLineEdit, QLineEdit* yLineEdit, QLineEdit* zLineEdit);
     void serialHandle(QString startSerial, coord* point, QLineEdit* xLineEdit, QLineEdit* yLineEdit, QLineEdit* zLineEdit);
 };
