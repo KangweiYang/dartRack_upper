@@ -9,6 +9,7 @@
 #include "../serial/serial.h"
 #include <QCloseEvent>
 #include <QLineEdit>
+#include <Eigen/Dense> // 需要安装Eigen库
 
 namespace Ui {
 class dartsParasComputingByTS;
@@ -116,6 +117,15 @@ private:
     void coord_transform();
     void serialRecord(QString startSerial, QString x, QString y, QString z, QLineEdit* xLineEdit, QLineEdit* yLineEdit, QLineEdit* zLineEdit);
     void serialHandle(QString startSerial, coord* point, QLineEdit* xLineEdit, QLineEdit* yLineEdit, QLineEdit* zLineEdit);
+    struct YawDataPoint {
+        int pulse;       // 对应的脉冲数
+        double angle;    // 实际转动角度（弧度）
+        Eigen::Vector2d center; // 导轨中心坐标
+    };
+    QVector<YawDataPoint> yawDataPoints; // 存储标定数据点
+    void buildYawDataPoints();
+    double calculateDirectedDistance(const Eigen::Vector2d& target, const Eigen::Vector2d& point, double deltaPsi);
+    std::pair<int, double> findOptimalPulse();
 };
 
 #endif // DARTSPARASCOMPUTINGBYTS_H

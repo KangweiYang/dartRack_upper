@@ -7,6 +7,8 @@ find_package(Qt6 COMPONENTS
         SerialPort
         REQUIRED)
 
+find_package(Eigen3 CONFIG REQUIRED)
+
 target_sources(serial_connect
         PRIVATE
         ./widget.cpp
@@ -23,6 +25,7 @@ target_link_libraries(serial_connect
         Qt::Gui
         Qt::Widgets
         Qt::SerialPort
+        Eigen3::Eigen
         my_combox_box
         serial
 )
