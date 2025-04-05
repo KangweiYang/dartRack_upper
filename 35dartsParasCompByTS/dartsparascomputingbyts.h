@@ -11,6 +11,8 @@
 #include <QLineEdit>
 #include <Eigen/Dense> // 需要安装Eigen库
 
+#define YAW_TEST_N  100
+
 namespace Ui {
 class dartsParasComputingByTS;
 }
@@ -24,6 +26,17 @@ public:
     ~dartsParasComputingByTS();
     QSerialPort *serialPort1, *serialPort2;
     void closeEvent(QCloseEvent *event);
+    void computeTransformation(
+            const std::vector<Eigen::Vector3d>& sourcePoints,
+            const std::vector<Eigen::Vector3d>& targetPoints,
+            Eigen::Matrix3d& rotation,
+            Eigen::Vector3d& translation
+    );
+    Eigen::Vector3d applyTransformation(
+            const Eigen::Vector3d& point,
+            const Eigen::Matrix3d& rotation,
+            const Eigen::Vector3d& translation
+    );
 
 private slots:
     void serialPortReadyRead_Slot();
@@ -110,6 +123,7 @@ private:
     coord rackRBC2;
     coord rackLFC2;
     coord deltaPsiLineEdit2;
+    coord leadLBC[YAW_TEST_N], leadRBC[YAW_TEST_N], leadRFC[YAW_TEST_N], leadLFC[YAW_TEST_N], leadMDS[YAW_TEST_N];
     Ui::dartsParasComputingByTS *ui;
     bool visible = true;
     void loadCoordsFromPlainTextEdit();
@@ -125,6 +139,7 @@ private:
     QVector<YawDataPoint> yawDataPoints; // 存储标定数据点
     void buildYawDataPoints();
     double calculateDirectedDistance(const Eigen::Vector2d& target, const Eigen::Vector2d& point, double deltaPsi);
+//    void computeTransformation(const std::vector<Eigen::Vector3d>& sourcePoints, const std::vector<Eigen::Vector3d>& targetPoints, Eigen::Matrix3d& rotation, Eigen::Vector3d& translation);
     std::pair<int, double> findOptimalPulse();
 };
 

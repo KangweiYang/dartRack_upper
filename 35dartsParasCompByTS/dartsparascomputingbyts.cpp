@@ -17,7 +17,6 @@
 #include <QString>
 #include <Eigen/Dense> // 需要安装Eigen库
 
-#define YAW_TEST_N  100
 #define TRANSFORM_DEBUG 1
 
 const double PI = 3.14159265358979323846264338;
@@ -44,7 +43,7 @@ coord rackLBC2;
 coord rackRFC2;
 coord rackRBC2;
 coord rackLFC2;
-coord leadLBC[YAW_TEST_N], leadRBC[YAW_TEST_N], leadRFC[YAW_TEST_N], leadLFC[YAW_TEST_N];
+coord leadLBC[YAW_TEST_N], leadRBC[YAW_TEST_N], leadRFC[YAW_TEST_N], leadLFC[YAW_TEST_N], leadMDS[YAW_TEST_N];
 
 const QString endSerial = ",-";
 const QString pauseSerial = ",";
@@ -64,24 +63,103 @@ const QString rackRBCSerial = "\n17,";
 const QString rackRFCSerial = "\n18,";
 const QString rackLFCSerial = "\n19,";
 
+uint16_t yawTestValidNum = 0;
+
 void dartsParasComputingByTS::buildYawDataPoints() {
     yawDataPoints.clear();
     const int pulseInterval = ui->leadYawIntervalLineEdit->text().toInt();
 
     // 遍历所有标定点
-    for(int n=0; n<YAW_TEST_N; ++n) {
+    qDebug() << yawTestValidNum;
+    for(int n=0; n<yawTestValidNum; ++n) {
         // 计算导轨中心坐标
         Eigen::Vector2d lbc(leadLBC[n].x.toDouble(), leadLBC[n].y.toDouble());
         Eigen::Vector2d rbc(leadRBC[n].x.toDouble(), leadRBC[n].y.toDouble());
         Eigen::Vector2d rfc(leadRFC[n].x.toDouble(), leadRFC[n].y.toDouble());
         Eigen::Vector2d lfc(leadLFC[n].x.toDouble(), leadLFC[n].y.toDouble());
+        Eigen::Vector2d middleLine(lfc.x() - lbc.x() + rfc.x() - rbc.x(), lfc.y() - lbc.y() + rfc.y() - rbc.y());
+        Eigen::Vector2d currentMiddleLine(
+                (leadLeftFront2.x.toDouble() - leadLeftBack2.x.toDouble()) +  // 左前-左后
+                (leadRightFront2.x.toDouble() - leadRightBack2.x.toDouble()), // 右前-右后
 
-        Eigen::Vector2d center = (lbc + rbc + rfc + lfc) / 4.0;
+                (leadLeftFront2.y.toDouble() - leadLeftBack2.y.toDouble()) +
+                (leadRightFront2.y.toDouble() - leadRightBack2.y.toDouble())
+        );
+        // 定义源点和目标点
+        std::vector<Eigen::Vector3d> sourcePoints;
+        std::vector<Eigen::Vector3d> targetPoints;
+
+        coord* sourcePoint1 = &leadRightBack2;
+        coord* targetPoint1 = &leadRBC[n];
+        coord* sourcePoint2 = &leadLeftBack2;
+        coord* targetPoint2 = &leadLBC[n];
+        coord* sourcePoint3 = &leadLeftFront2;
+        coord* targetPoint3 = &leadLFC[n];
+        coord* sourcePoint4 = &leadRightFront2;
+        coord* targetPoint4 = &leadRFC[n];
+
+        // 添加四组对应点
+// 添加四组对应点（注意使用 -> 操作符）
+        sourcePoints.push_back(Eigen::Vector3d(
+                sourcePoint1->x.toDouble(),   // 使用 -> 访问指针成员
+                sourcePoint1->y.toDouble(),
+                sourcePoint1->z.toDouble()
+        ));
+        targetPoints.push_back(Eigen::Vector3d(
+                targetPoint1->x.toDouble(),
+                targetPoint1->y.toDouble(),
+                targetPoint1->z.toDouble()
+        ));
+
+// 其他三组同理添加
+        sourcePoints.push_back(Eigen::Vector3d(
+                sourcePoint2->x.toDouble(),
+                sourcePoint2->y.toDouble(),
+                sourcePoint2->z.toDouble()
+        ));
+        targetPoints.push_back(Eigen::Vector3d(
+                targetPoint2->x.toDouble(),
+                targetPoint2->y.toDouble(),
+                targetPoint2->z.toDouble()
+        ));
+
+        sourcePoints.push_back(Eigen::Vector3d(
+                sourcePoint3->x.toDouble(),
+                sourcePoint3->y.toDouble(),
+                sourcePoint3->z.toDouble()
+        ));
+        targetPoints.push_back(Eigen::Vector3d(
+                targetPoint3->x.toDouble(),
+                targetPoint3->y.toDouble(),
+                targetPoint3->z.toDouble()
+        ));
+
+        sourcePoints.push_back(Eigen::Vector3d(
+                sourcePoint4->x.toDouble(),
+                sourcePoint4->y.toDouble(),
+                sourcePoint4->z.toDouble()
+        ));
+        targetPoints.push_back(Eigen::Vector3d(
+                targetPoint4->x.toDouble(),
+                targetPoint4->y.toDouble(),
+                targetPoint4->z.toDouble()
+        ));
+        // 计算旋转矩阵和平移向量
+        Eigen::Matrix3d rotation;
+        Eigen::Vector3d translation;
+        computeTransformation(sourcePoints, targetPoints, rotation, translation);
+
+        Eigen::Vector3d transformedPoint = applyTransformation(Eigen::Vector3d(leadMiddleDartShoot2.x.toDouble(), leadMiddleDartShoot2.y.toDouble(), leadMiddleDartShoot2.z.toDouble()), rotation, translation);
+        leadMDS[n].x = QString::number(transformedPoint.x());
+        leadMDS[n].y = QString::number(transformedPoint.y());
+        leadMDS[n].z = QString::number(transformedPoint.z());
+        Eigen::Vector2d center(leadMDS[n].x.toDouble(), leadMDS[n].y.toDouble());
 
         // 计算实际转动角度（相对于初始位置）
-        Eigen::Vector2d refDir(1,0); // 假设初始方向为X轴
-        double angle = atan2(center.y() - leadMiddleDartShoot2.y.toDouble(),
-                             center.x() - leadMiddleDartShoot2.x.toDouble());
+        Eigen::Vector2d refDir(rackLFC2.x.toDouble() + rackRFC2.x.toDouble() - rackLBC2.x.toDouble() - rackRBC2.x.toDouble(),
+                               rackLFC2.y.toDouble() + rackRFC2.y.toDouble() - rackLBC2.y.toDouble() - rackRBC2.y.toDouble()); // 假设初始方向为镖架中心直线
+        double angle = atan2(middleLine.y() - currentMiddleLine.y(),
+                             middleLine.x() - currentMiddleLine.x());
 
         yawDataPoints.append({
                                      n * pulseInterval,  // 脉冲数
@@ -96,12 +174,36 @@ double dartsParasComputingByTS::calculateDirectedDistance(
         const Eigen::Vector2d& point,
         double deltaPsi)
 {
-    // 生成过point且与导轨方向成deltaPsi的直线
-    Eigen::Vector2d dir(cos(deltaPsi), sin(deltaPsi)); // 右转为正
+    // 打印输入参数
+    qDebug().nospace() << "[calculateDirectedDistance] 输入参数：\n"
+                       << "├─ 目标点 target: ("
+                       << QString::number(target.x(), 'f', 3) << ", "
+                       << QString::number(target.y(), 'f', 3) << ")\n"
+                       << "├─ 参考点 point: ("
+                       << QString::number(point.x(), 'f', 3) << ", "
+                       << QString::number(point.y(), 'f', 3) << ")\n"
+                       << "└─ 方向角 deltaPsi: "
+                       << QString::number(qRadiansToDegrees(deltaPsi), 'f', 2) << "°";
 
-    // 计算有向距离
+    // 生成方向向量
+    Eigen::Vector2d dir(cos(deltaPsi), sin(deltaPsi));
+    qDebug() << "生成方向向量 dir: ("
+             << QString::number(dir.x(), 'f', 4) << ", "
+             << QString::number(dir.y(), 'f', 4) << ")";
+
+    // 计算向量差
     Eigen::Vector2d vec = target - point;
-    return vec.x()*dir.y() - vec.y()*dir.x(); // 叉乘计算垂直距离
+    qDebug() << "目标相对向量 vec: ("
+             << QString::number(vec.x(), 'f', 3) << ", "
+             << QString::number(vec.y(), 'f', 3) << ")";
+
+    // 计算并打印最终结果
+    const double distance = vec.x() * dir.y() - vec.y() * dir.x();
+    qDebug() << "有向距离计算结果: "
+             << QString::number(distance, 'f', 3)
+             << (distance >= 0 ? " (右侧)" : " (左侧)");
+
+    return distance;
 }
 
 std::pair<int, double> dartsParasComputingByTS::findOptimalPulse() {
@@ -109,15 +211,33 @@ std::pair<int, double> dartsParasComputingByTS::findOptimalPulse() {
             target2.x.toDouble(),
             target2.y.toDouble()
     );
-    double deltaPsi = ui->deltaPsiLineEdit->text().toDouble();
+    double personalDeltaPsi = ui->deltaPsi1LineEdit->text().toDouble();
 
     // 二分法查找最近点
     int left = 0, right = yawDataPoints.size()-1;
     while(left < right) {
         int mid = (left + right)/2;
-        double d1 = calculateDirectedDistance(target, yawDataPoints[mid].center, deltaPsi);
-        double d2 = calculateDirectedDistance(target, yawDataPoints[mid+1].center, deltaPsi);
+        double d1 = calculateDirectedDistance(target, yawDataPoints[mid].center, personalDeltaPsi);
+        double d2 = calculateDirectedDistance(target, yawDataPoints[mid+1].center, personalDeltaPsi);
+        qDebug() << "\n--- Yaw Data Debug ---";
+        qDebug() << "Data size:" << yawDataPoints.size()
+                 << "| Current index:" << mid
+                 << "/" << yawDataPoints.size()-1;
 
+// 第一个中心点坐标（mid）
+        qDebug() << "Center[mid]: ("
+                 << yawDataPoints[mid].center.x()<< ", "
+                 << yawDataPoints[mid].center.y()<< ") "
+                 << "d1:" << d1;
+
+// 第二个中心点坐标（mid+1）
+        qDebug() << "Center[mid+1]: ("
+                 << yawDataPoints[mid+1].center.x() << ", "
+                 << yawDataPoints[mid+1].center.y()<< ") "
+                 << "d2:" << d2;
+
+        qDebug() << "DeltaPsi:" <<personalDeltaPsi * 180/M_PI << "°";
+        qDebug() << "---------------------";
         if(d1*d2 <= 0) { // 符号变化区间
             left = mid;
             break;
@@ -133,9 +253,9 @@ std::pair<int, double> dartsParasComputingByTS::findOptimalPulse() {
     const auto& p1 = yawDataPoints[bestIdx];
     const auto& p2 = yawDataPoints[bestIdx+1];
 
-    double t = (calculateDirectedDistance(target, p1.center, deltaPsi)) /
-               (calculateDirectedDistance(target, p1.center, deltaPsi) -
-                calculateDirectedDistance(target, p2.center, deltaPsi));
+    double t = (calculateDirectedDistance(target, p1.center, personalDeltaPsi)) /
+               (calculateDirectedDistance(target, p1.center, personalDeltaPsi) -
+                calculateDirectedDistance(target, p2.center, personalDeltaPsi));
 
     double optPulse = p1.pulse + t*(p2.pulse - p1.pulse);
     double optAngle = p1.angle + t*(p2.angle - p1.angle);
@@ -222,37 +342,12 @@ void dartsParasComputingByTS::serialHandle(QString startSerial, coord* point, QL
     zLineEdit->insert(point->z);
 }
 
-// 计算旋转矩阵和平移向量
-void computeTransformation(const std::vector<Eigen::Vector3d>& sourcePoints, const std::vector<Eigen::Vector3d>& targetPoints, Eigen::Matrix3d& rotation, Eigen::Vector3d& translation) {
-    // 计算源点和目标点的质心
-    Eigen::Vector3d sourceCentroid(0, 0, 0);
-    Eigen::Vector3d targetCentroid(0, 0, 0);
-    for (int i = 0; i < sourcePoints.size(); ++i) {
-        sourceCentroid += sourcePoints[i];
-        targetCentroid += targetPoints[i];
-    }
-    sourceCentroid /= sourcePoints.size();
-    targetCentroid /= targetPoints.size();
-
-    // 计算协方差矩阵
-    Eigen::Matrix3d covariance = Eigen::Matrix3d::Zero();
-    for (int i = 0; i < sourcePoints.size(); ++i) {
-        covariance += (sourcePoints[i] - sourceCentroid) * (targetPoints[i] - targetCentroid).transpose();
-    }
-
-    // 使用SVD分解计算旋转矩阵
-    Eigen::JacobiSVD<Eigen::Matrix3d> svd(covariance, Eigen::ComputeFullU | Eigen::ComputeFullV);
-    rotation = svd.matrixV() * svd.matrixU().transpose();
-
-    // 计算平移向量
-    translation = targetCentroid - rotation * sourceCentroid;
-}
-
-// 应用变换到点
-Eigen::Vector3d applyTransformation(const Eigen::Vector3d& point, const Eigen::Matrix3d& rotation, const Eigen::Vector3d& translation) {
-    return rotation * point + translation;
-}
-
+/**
+* @brief 从1-14号控件里获取点坐标，再从leadYawCoordsDataPlainTextEdit中获取yaw轴数据集坐标
+* @param None
+* @retval None
+* @bug
+*/
 void dartsParasComputingByTS::loadCoordsFromPlainTextEdit() {
     //获取1-14点号控件里的数据
 // 获取目标点坐标
@@ -371,6 +466,14 @@ void dartsParasComputingByTS::loadCoordsFromPlainTextEdit() {
             qDebug() << "Error: Invalid point number in leadYawCoordsDataPlainTextEdit";
         }
     }
+    //获取有效数据数量
+    for(int n=0; n<YAW_TEST_N; ++n) {
+        if(leadLBC[n].x != ""){
+            yawTestValidNum = n + 1;
+        }
+        else return;
+    }
+
 
     // 更新 UI 显示
     ui->rackLBCXLineEdit->setText(rackLBC2.x);
@@ -408,6 +511,58 @@ void dartsParasComputingByTS::loadCoordsFromPlainTextEdit() {
     }
 }
 
+/**
+* @brief 计算sourcePoints到targetPoints的旋转矩阵和平移向量
+* @param &sourcePoints:原坐标点地址
+* @param &targetPoints:目标坐标点地址
+ * @param &rotation:计算得到的旋转矩阵地址
+ * @param &translation:计算得到的平移矩阵地址
+* @retval None
+* @bug
+*/
+void dartsParasComputingByTS::computeTransformation(const std::vector<Eigen::Vector3d>& sourcePoints, const std::vector<Eigen::Vector3d>& targetPoints, Eigen::Matrix3d& rotation, Eigen::Vector3d& translation) {
+    // 计算源点和目标点的质心
+    Eigen::Vector3d sourceCentroid(0, 0, 0);
+    Eigen::Vector3d targetCentroid(0, 0, 0);
+    for (int i = 0; i < sourcePoints.size(); ++i) {
+        sourceCentroid += sourcePoints[i];
+        targetCentroid += targetPoints[i];
+    }
+    sourceCentroid /= sourcePoints.size();
+    targetCentroid /= targetPoints.size();
+
+    // 计算协方差矩阵
+    Eigen::Matrix3d covariance = Eigen::Matrix3d::Zero();
+    for (int i = 0; i < sourcePoints.size(); ++i) {
+        covariance += (sourcePoints[i] - sourceCentroid) * (targetPoints[i] - targetCentroid).transpose();
+    }
+
+    // 使用SVD分解计算旋转矩阵
+    Eigen::JacobiSVD<Eigen::Matrix3d> svd(covariance, Eigen::ComputeFullU | Eigen::ComputeFullV);
+    rotation = svd.matrixV() * svd.matrixU().transpose();
+
+    // 计算平移向量
+    translation = targetCentroid - rotation * sourceCentroid;
+}
+
+/**
+* @brief 将旋转矩阵和平移矩阵应用变换到点
+* @param &point:原坐标点地址
+ * @param &rotation:的旋转矩阵地址
+ * @param &translation:平移矩阵地址
+* @retval Eigen::Vector3d   变换后的点坐标
+* @bug
+*/
+Eigen::Vector3d dartsParasComputingByTS::applyTransformation(const Eigen::Vector3d& point, const Eigen::Matrix3d& rotation, const Eigen::Vector3d& translation) {
+    return rotation * point + translation;
+}
+
+/**
+* @brief 构造函数
+* @param None
+* @retval None
+* @bug
+*/
 dartsParasComputingByTS::dartsParasComputingByTS(QSerialPort *serialPort, QSerialPort *serialPort2, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::dartsParasComputingByTS)
@@ -530,7 +685,7 @@ void dartsParasComputingByTS::serialPortReadyRead2_Slot() {
     }
 
     // 处理20+4n, 21+4n, 22+4n, 23+4n的点号
-    for (int n = 0; n < YAW_TEST_N; ++n) {
+    for (int n = 0; n < yawTestValidNum; ++n) {
         QString leadLBCSerial = QString("\n%1,").arg(20 + 4 * n);
         QString leadRBCSerial = QString("\n%1,").arg(21 + 4 * n);
         QString leadRFCSerial = QString("\n%1,").arg(22 + 4 * n);
@@ -557,6 +712,13 @@ void dartsParasComputingByTS::serialPortReadyRead2_Slot() {
         }
     }
 }
+
+/**
+* @brief 析构函数
+* @param None
+* @retval None
+* @bug
+*/
 dartsParasComputingByTS::~dartsParasComputingByTS()
 {
     this->visible = false;
@@ -566,7 +728,6 @@ dartsParasComputingByTS::~dartsParasComputingByTS()
 void dartsParasComputingByTS::closeEvent(QCloseEvent *event){
     this->visible = false;
 }
-
 
 void dartsParasComputingByTS::on_testDartPushButton_clicked()
 {
@@ -587,8 +748,13 @@ void dartsParasComputingByTS::on_yawAimingPushButton_clicked()
     yawAimingPage->show();
 }
 
+/**
+* @brief 更新UI
+* @param None
+* @retval None
+* @bug
+*/
 void dartsParasComputingByTS::ui_update(){
-    // 更新 UI
     // 更新target2相关UI
     ui->targetCoordXLineEdit->setText(target2.x);
     ui->targetCoordYLineEdit->setText(target2.y);
@@ -640,8 +806,15 @@ void dartsParasComputingByTS::ui_update(){
     ui->leadDartShootCoordZLineEdit->setText(leadDartShoot2.z);
 }
 
+/**
+* @brief yaw轴数据集坐标转换
+* @param None
+* @retval None
+* @bug
+*/
 void dartsParasComputingByTS::coord_transform(){
-    //yaw轴数据集坐标转换
+    //从控件里更新数据
+    loadCoordsFromPlainTextEdit();
     // 定义源点和目标点
     std::vector<Eigen::Vector3d> sourcePoints;
     std::vector<Eigen::Vector3d> targetPoints;
@@ -665,7 +838,7 @@ void dartsParasComputingByTS::coord_transform(){
     computeTransformation(sourcePoints, targetPoints, rotation, translation);
 
     // 应用变换到所有点
-    for (int n = 0; n < YAW_TEST_N; ++n) {
+    for (int n = 0; n < yawTestValidNum; ++n) {
         Eigen::Vector3d transformedPoint = applyTransformation(Eigen::Vector3d(leadLBC[n].x.toDouble(), leadLBC[n].y.toDouble(), leadLBC[n].z.toDouble()), rotation, translation);
         leadLBC[n].x = QString::number(transformedPoint.x());
         leadLBC[n].y = QString::number(transformedPoint.y());
