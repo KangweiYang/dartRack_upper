@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include <QString>
 #include "../serial/serial.h"
+#include "../main.h"
 #include <QCloseEvent>
 #include <QLineEdit>
 #include <Eigen/Dense> // 需要安装Eigen库
@@ -123,7 +124,13 @@ private:
     coord rackRBC2;
     coord rackLFC2;
     coord deltaPsiLineEdit2;
-    coord leadLBC[YAW_TEST_N], leadRBC[YAW_TEST_N], leadRFC[YAW_TEST_N], leadLFC[YAW_TEST_N], leadMDS[YAW_TEST_N];
+#if LEAD_POINT_NUM == 4
+coord leadLBC[YAW_TEST_N], leadRBC[YAW_TEST_N], leadRFC[YAW_TEST_N], leadLFC[YAW_TEST_N], leadMDS[YAW_TEST_N];
+#endif
+
+#if LEAD_POINT_NUM == 2
+coord leadBC[YAW_TEST_N], leadFC[YAW_TEST_N], leadMDS[YAW_TEST_N];
+#endif
     Ui::dartsParasComputingByTS *ui;
     bool visible = true;
     void loadCoordsFromPlainTextEdit();
@@ -141,6 +148,8 @@ private:
     double calculateDirectedDistance(const Eigen::Vector2d& target, const Eigen::Vector2d& point, double deltaPsi);
 //    void computeTransformation(const std::vector<Eigen::Vector3d>& sourcePoints, const std::vector<Eigen::Vector3d>& targetPoints, Eigen::Matrix3d& rotation, Eigen::Vector3d& translation);
     std::pair<int, double> findOptimalPulse();
+    double convertDMS(const QString &dmsStr);
+    Eigen::Vector3d sphericalToCartesian(double yawDeg, double pitchDeg, double distance);
 };
 
 #endif // DARTSPARASCOMPUTINGBYTS_H

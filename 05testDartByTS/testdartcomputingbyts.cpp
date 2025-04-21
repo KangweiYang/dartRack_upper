@@ -33,18 +33,36 @@ struct coord
     QString y;
     QString z;
 };
+#if LEAD_POINT_NUM == 4
 const QString endSerial = ",-";
 const QString pauseSerial = ",";
 const QString targetCoordSerial = "\n1,";
-const QString rackLeftBackCoordSerial = "\n6,";
-const QString rackRightBackSerial = "\n7,";
-const QString leadRightBackCoordSerial = "\n8,";
-const QString leadLeftBackCoordSerial = "\n9,";
-const QString rackLeftFrontSerial = "\n10,";
-const QString rackRightFrontSerial = "\n11,";
-const QString leadRightFrontCoordSerial = "\n12,";
-const QString leadLeftFrontCoordSerial = "\n13,";
-const QString leadDartShootCoordSerial = "\n14,";
+const QString rackLeftBackCoordSerial = "\n2,";
+const QString rackRightBackSerial = "\n3,";
+const QString leadRightBackCoordSerial = "\n4,";
+const QString leadLeftBackCoordSerial = "\n5,";
+const QString rackLeftFrontSerial = "\n6,";
+const QString rackRightFrontSerial = "\n7,";
+const QString leadRightFrontCoordSerial = "\n8,";
+const QString leadLeftFrontCoordSerial = "\n9,";
+const QString leadDartShootCoordSerial = "\n10,";
+#endif
+
+#if LEAD_POINT_NUM == 2
+const QString endSerial = ",-";
+const QString pauseSerial = ",";
+const QString targetCoordSerial = "\n1,";
+const QString rackLeftBackCoordSerial = "\n2,";
+const QString rackRightBackSerial = "\n3,";
+const QString leadRightBackCoordSerial = "\n4,";
+const QString leadLeftBackCoordSerial = "\n4,";
+const QString rackLeftFrontSerial = "\n5,";
+const QString rackRightFrontSerial = "\n6,";
+const QString leadRightFrontCoordSerial = "\n7,";
+const QString leadLeftFrontCoordSerial = "\n7,";
+const QString leadDartShootCoordSerial = "\n8,";
+#endif
+
 
 
 testDartComputingByTS::testDartComputingByTS(QSerialPort *serialPort, QSerialPort *serialPort2, QWidget *parent) :
@@ -171,15 +189,24 @@ void testDartComputingByTS::serialPortReadyRead_Slot() {
         serialHandle(rackLeftBackCoordSerial, &rackLeftBack, ui->rackLeftBackCoordXLineEdit, ui->rackLeftBackCoordYLineEdit, ui->rackLeftBackCoordZLineEdit);
     }
 
-    // 检查并处理 leadLeftBackCoordSerial
-    if (receiveBuff_2.contains(leadLeftBackCoordSerial) && receiveBuff_2.contains(endSerial)) {
-        serialHandle(leadLeftBackCoordSerial, &leadLeftBack, ui->leadLeftBackCoordXLineEdit, ui->leadLeftBackCoordYLineEdit, ui->leadLeftBackCoordZLineEdit);
-    }
-
     // 检查并处理 leadRightBackCoordSerial
     if (receiveBuff_2.contains(leadRightBackCoordSerial) && receiveBuff_2.contains(endSerial)) {
         serialHandle(leadRightBackCoordSerial, &leadRightBack, ui->leadRightBackCoordXLineEdit, ui->leadRightBackCoordYLineEdit, ui->leadRightBackCoordZLineEdit);
     }
+
+
+    // 检查并处理 leadLeftBackCoordSerial
+#if LEAD_POINT_NUM == 4
+    if (receiveBuff_2.contains(leadLeftBackCoordSerial) && receiveBuff_2.contains(endSerial)) {
+        serialHandle(leadLeftBackCoordSerial, &leadLeftBack, ui->leadLeftBackCoordXLineEdit,
+                     ui->leadLeftBackCoordYLineEdit, ui->leadLeftBackCoordZLineEdit);
+    }
+#endif
+#if LEAD_POINT_NUM == 2
+    leadLeftBack.x = leadRightBack.x;
+    leadLeftBack.y = leadRightBack.y;
+    leadLeftBack.z = leadRightBack.z;
+#endif
 
     // 检查并处理 rackRightBackSerial
     if (receiveBuff_2.contains(rackRightBackSerial) && receiveBuff_2.contains(endSerial)) {
@@ -197,9 +224,17 @@ void testDartComputingByTS::serialPortReadyRead_Slot() {
     }
 
     // 检查并处理 leadLeftFrontCoordSerial
+#if LEAD_POINT_NUM == 4
     if (receiveBuff_2.contains(leadLeftFrontCoordSerial) && receiveBuff_2.contains(endSerial)) {
-        serialHandle(leadLeftFrontCoordSerial, &leadLeftFront, ui->leadLeftFrontCoordXLineEdit, ui->leadLeftFrontCoordYLineEdit, ui->leadLeftFrontCoordZLineEdit);
+        serialHandle(leadLeftFrontCoordSerial, &leadLeftFront, ui->leadLeftFrontCoordXLineEdit,
+                     ui->leadLeftFrontCoordYLineEdit, ui->leadLeftFrontCoordZLineEdit);
     }
+#endif
+#if LEAD_POINT_NUM == 2
+    leadLeftFront.x = leadRightFront.x;
+    leadLeftFront.y = leadRightFront.y;
+    leadLeftFront.z = leadRightFront.z;
+#endif
 
     // 检查并处理 rackLeftFrontSerial
     if (receiveBuff_2.contains(rackLeftFrontSerial) && receiveBuff_2.contains(endSerial)) {
