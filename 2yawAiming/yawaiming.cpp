@@ -56,7 +56,7 @@ void yawAiming::closeEvent(QCloseEvent *event){
 void yawAiming::ChangeTarYawAndSetCurYawZero(QWidget *parent, QSerialPort *serialPort, int yawChange){
     tarYaw += yawChange;
     QSerialPort *serialPort1 = serialPort;
-    SetYaw(this, serialPort1, 1, QString::number(yawChange));
+    SetYaw(this, serialPort1, 5, QString::number(yawChange));
     SetCurYawToZero(this, serialPort1);
     ui->currentYawLineEdit->setText(QString::number(tarYaw));
 }

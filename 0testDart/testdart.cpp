@@ -106,11 +106,11 @@ void testDart::sendAim(QLineEdit *yawEdit, QLineEdit *tensionEdit){
     if(checkSerialOpen(this, serialPort1)){
         if(!yawEdit->text().isEmpty()){
             parasSetted = true;
-            SetYaw(this, serialPort1, 1, yawEdit->text());
+            SetYaw(this, serialPort1, 5, yawEdit->text());
         }
         if(!tensionEdit->text().isEmpty()){
             parasSetted = true;
-            SetTen(this, serialPort1, 1, tensionEdit->text());
+            SetTen(this, serialPort1, 5, tensionEdit->text());
         }
     }
 }
@@ -253,12 +253,12 @@ void testDart::on_shootPushButton_clicked()
 void testDart::on_stopShootPushButton_clicked()
 {
     if(checkSerialOpen(this, serialPort1)){
-        if(shot){
-            shot = false;
+//        if(shot){
+//            shot = false;
             AbortShoot(this, serialPort1);
-        }
-        else{
-            QMessageBox::information(this, "失败", "没在发射啊");
-        }
+//        }
+//        else{
+//            QMessageBox::information(this, "失败", "没在发射啊");
+//        }
     }
 }

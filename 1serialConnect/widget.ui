@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1304</width>
+    <width>1223</width>
     <height>771</height>
    </rect>
   </property>
@@ -217,7 +217,22 @@
        </property>
        <item>
         <property name="text">
+         <string>38400</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
          <string>115200</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>57600</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>19200</string>
         </property>
        </item>
        <item>
@@ -228,6 +243,11 @@
        <item>
         <property name="text">
          <string>4800</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>2400</string>
         </property>
        </item>
       </widget>
@@ -447,7 +467,27 @@
        </item>
        <item>
         <property name="text">
+         <string>2400</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
          <string>4800</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>19200</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>38400</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>57600</string>
         </property>
        </item>
        <item>

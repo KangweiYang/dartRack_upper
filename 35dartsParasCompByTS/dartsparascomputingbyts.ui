@@ -73,7 +73,7 @@
     <item row="3" column="8">
      <widget class="QLineEdit" name="rackLeftFrontCoordZLineEdit">
       <property name="text">
-       <string>-0.0330</string>
+       <string>1.334253</string>
       </property>
      </widget>
     </item>
@@ -94,7 +94,7 @@
     <item row="1" column="9">
      <widget class="QLineEdit" name="rackRightFrontCoordXLineEdit">
       <property name="text">
-       <string>0.7540</string>
+       <string>-0.271217</string>
       </property>
      </widget>
     </item>
@@ -122,7 +122,7 @@
     <item row="1" column="2">
      <widget class="QLineEdit" name="rackLeftBackCoordXLineEdit">
       <property name="text">
-       <string>0.0390</string>
+       <string>-0.598700</string>
       </property>
      </widget>
     </item>
@@ -143,7 +143,7 @@
     <item row="2" column="3">
      <widget class="QLineEdit" name="rackRightBackCoordYLineEdit">
       <property name="text">
-       <string>1.1940</string>
+       <string>-1.781539</string>
       </property>
      </widget>
     </item>
@@ -185,7 +185,7 @@
     <item row="3" column="3">
      <widget class="QLineEdit" name="rackRightBackCoordZLineEdit">
       <property name="text">
-       <string>-0.0280</string>
+       <string>1.330961</string>
       </property>
      </widget>
     </item>
@@ -206,7 +206,7 @@
     <item row="1" column="3">
      <widget class="QLineEdit" name="rackRightBackCoordXLineEdit">
       <property name="text">
-       <string>0.5660</string>
+       <string>-0.072696</string>
       </property>
      </widget>
     </item>
@@ -255,14 +255,14 @@
     <item row="1" column="8">
      <widget class="QLineEdit" name="rackLeftFrontCoordXLineEdit">
       <property name="text">
-       <string>0.2260</string>
+       <string>-0.797940</string>
       </property>
      </widget>
     </item>
     <item row="3" column="2">
      <widget class="QLineEdit" name="rackLeftBackCoordZLineEdit">
       <property name="text">
-       <string>-0.0280</string>
+       <string>1.331647</string>
       </property>
      </widget>
     </item>
@@ -297,7 +297,7 @@
     <item row="2" column="2">
      <widget class="QLineEdit" name="rackLeftBackCoordYLineEdit">
       <property name="text">
-       <string>1.3220</string>
+       <string>-1.645684</string>
       </property>
      </widget>
     </item>
@@ -325,7 +325,7 @@
     <item row="3" column="9">
      <widget class="QLineEdit" name="rackRightFrontCoordZLineEdit">
       <property name="text">
-       <string>-0.0330</string>
+       <string>1.334242</string>
       </property>
      </widget>
     </item>
@@ -339,14 +339,14 @@
     <item row="2" column="9">
      <widget class="QLineEdit" name="rackRightFrontCoordYLineEdit">
       <property name="text">
-       <string>1.9640</string>
+       <string>-2.549184</string>
       </property>
      </widget>
     </item>
     <item row="2" column="8">
      <widget class="QLineEdit" name="rackLeftFrontCoordYLineEdit">
       <property name="text">
-       <string>2.0930</string>
+       <string>-2.413649</string>
       </property>
      </widget>
     </item>
@@ -627,157 +627,89 @@
     </rect>
    </property>
    <property name="plainText">
-    <string>16,0.0390,1.3220,-0.0280,-
-
-17,0.5660,1.1940,-0.0280,-
-
-18,0.7540,1.9640,-0.0330,-
-
-19,0.2260,2.0930,-0.0330,-
-
-20,0.2550,1.4910,0.1760,-
-
-21,0.2920,1.4760,0.1720,-
-
-22,0.5240,2.0000,0.5220,-
-
-23,0.4880,2.0150,0.5250,-
-
-24,0.2570,1.4900,0.1760,-
-
-25,0.2940,1.4760,0.1720,-
-
-26,0.5240,2.0010,0.5220,-
-
-27,0.4870,2.0150,0.5260,-
-
-28,0.2600,1.4890,0.1760,-
-
-29,0.2970,1.4740,0.1740,-
-
-30,0.5230,2.0020,0.5230,-
-
-31,0.4860,2.0150,0.5260,-
-
-32,0.2620,1.4900,0.1750,-
-
-33,0.3000,1.4750,0.1720,-
-
-34,0.5230,2.0020,0.5230,-
-
-35,0.4850,2.0160,0.5260,-
-
-36,0.2650,1.4890,0.1750,-
-
-37,0.3020,1.4750,0.1730,-
-
-38,0.5220,2.0030,0.5230,-
-
-39,0.4850,2.0170,0.5260,-
-
-40,0.2670,1.4880,0.1750,-
-
-41,0.3040,1.4740,0.1720,-
-
-42,0.5210,2.0030,0.5240,-
-
-43,0.4840,2.0170,0.5260,-
-
-44,0.2700,1.4870,0.1760,-
-
-45,0.3070,1.4730,0.1720,-
-46,0.5210,2.0040,0.5240,-
-
-47,0.4830,2.0170,0.5260,-
-
-48,0.2720,1.4860,0.1750,-
-
-49,0.3090,1.4720,0.1730,-
-
-50,0.5200,2.0050,0.5240,-
-51,0.4830,2.0190,0.5260,-
-
-52,0.2750,1.4860,0.1750,-
-
-53,0.3120,1.4710,0.1740,-
-
-54,0.5190,2.0040,0.5250,-
-
-55,0.4820,2.0190,0.5260,-
-56,0.2770,1.4840,0.1760,-
-
-57,0.3150,1.4720,0.1730,-
-
-58,0.5190,2.0060,0.5250,-
-
-59,0.4810,2.0180,0.5270,-
-
-60,0.2800,1.4850,0.1750,-
-61,0.3170,1.4710,0.1730,-
-
-62,0.5180,2.0060,0.5250,-
-
-63,0.4810,2.0190,0.5270,-
-
-64,0.2800,1.4850,0.1750,-
-
-65,0.3170,1.4710,0.1730,-
-
-66,0.5180,2.0060,0.5250,-
-
-67,0.4800,2.0190,0.5270,-
-
-68,0.2820,1.4840,0.1750,-
-
-69,0.3190,1.4700,0.1730,-
-
-70,0.5180,2.0070,0.5250,-
-71,0.4800,2.0200,0.5270,-
-
-72,0.2840,1.4830,0.1750,-
-
-73,0.3220,1.4700,0.1730,-
-
-74,0.5170,2.0080,0.5250,-
-
-75,0.4790,2.0200,0.5270,-
-
-76,0.2870,1.4820,0.1750,-
-
-77,0.3250,1.4700,0.1730,-
-
-78,0.5160,2.0080,0.5260,-
-
-79,0.4780,2.0200,0.5270,-
-
-80,0.2890,1.4820,0.1750,-
-81,0.3270,1.4690,0.1730,-
-
-82,0.5150,2.0080,0.5260,-
-
-83,0.4780,2.0210,0.5270,-
-
-84,0.2920,1.4800,0.1760,-
-
-85,0.3300,1.4680,0.1730,-
-
-86,0.5150,2.0080,0.5260,-
-
-87,0.4770,2.0210,0.5270,-
-
-88,0.2950,1.4800,0.1750,-
-
-89,0.3320,1.4680,0.1740,-
-
-90,0.5150,2.0090,0.5260,-
-
-91,0.4760,2.0220,0.5270,-
-92,0.2970,1.4800,0.1750,-
-93,0.3350,1.4670,0.1740,-
-
-94,0.5140,2.0100,0.5260,-
-
-95,0.4760,2.0220,0.5270,-</string>
+    <string>JOB     1666,
+INST    TKS-300R Ver.1.10C
+
+UNITS   M,D
+SS      16,0.000,-
+SD      250.0031,127.1500,2.200
+SS      17,0.000,-
+SD      267.3948,126.4424,2.225
+SS      18,0.000,-
+SD      263.5537,117.2943,2.890
+
+SS      19,0.000,-
+SD      251.4223,117.4135,2.871
+SS      20,0.000,-
+SD      255.3924,119.5437,2.260
+SS      21,0.000,-
+SD      256.4905,120.0247,2.258
+SS      22,0.000,-
+SD      258.4511,107.0903,2.641
+SS      23,0.000,-
+SD      257.5103,107.0411,2.643
+
+SS      24,0.000,-
+SD      255.4824,119.5500,2.260
+SS      25,0.000,-
+SD      256.5808,120.0220,2.257
+SS      26,0.000,-
+SD      258.4246,107.0750,2.641
+SS      27,0.000,-
+SD      257.4857,107.0329,2.643
+SS      28,0.000,-
+SD      255.5729,119.5530,2.259
+SS      29,0.000,-
+SD      257.0720,120.0210,2.258
+SS      30,0.000,-
+SD      258.4059,107.0654,2.642
+SS      31,0.000,-
+SD      257.4651,107.0243,2.644
+
+SS      32,0.000,-
+SD      256.0616,119.5538,2.261
+
+SS      33,0.000,-
+SD      257.1626,120.0148,2.259
+SS      34,0.000,-
+SD      258.3842,107.0556,2.642
+SS      35,0.000,-
+SD      257.4444,107.0218,2.644
+SS      36,0.000,-
+SD      256.1522,119.5553,2.260
+SS      37,0.000,-
+SD      257.2523,120.0130,2.259
+SS      38,0.000,-
+SD      258.3633,107.0503,2.643
+SS      39,0.000,-
+SD      257.4239,107.0156,2.644
+SS      40,0.000,-
+SD      256.2425,119.5617,2.260
+SS      41,0.000,-
+SD      257.3430,120.0106,2.259
+SS      42,0.000,-
+SD      258.3429,107.0411,2.644
+SS      43,0.000,-
+
+SD      257.4024,107.0129,2.645
+SS      44,0.000,-
+
+SD      256.3323,119.5614,2.260
+SS      45,0.000,-
+SD      257.4324,120.0033,2.258
+SS      46,0.000,-
+SD      258.3216,107.0315,2.644
+SS      47,0.000,-
+SD      257.3801,107.0058,2.645
+SS      48,0.000,-
+
+SD      256.4227,119.5627,2.259
+SS      49,0.000,-
+SD      257.5251,120.0014,2.259
+SS      50,0.000,-
+SD      258.3012,107.0239,2.645
+SS      51,0.000,-
+SD      257.3604,107.0035,2.645</string>
    </property>
   </widget>
   <widget class="QLabel" name="setaLabel_123">
@@ -1409,7 +1341,7 @@
     <item row="1" column="0">
      <widget class="QLabel" name="setaLabel_28">
       <property name="text">
-       <string>弧度</string>
+       <string>度</string>
       </property>
      </widget>
     </item>
@@ -1474,7 +1406,7 @@
     <item row="2" column="0">
      <widget class="QLabel" name="setaLabel_29">
       <property name="text">
-       <string>度</string>
+       <string>弧度</string>
       </property>
      </widget>
     </item>

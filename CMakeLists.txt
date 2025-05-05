@@ -19,7 +19,6 @@ add_subdirectory(35dartsParasCompByTS)
 add_subdirectory(serial)
 add_subdirectory(myComboxBox)
 
-
 find_package(Eigen3 CONFIG REQUIRED)
 find_package(Qt6 COMPONENTS
         Core
