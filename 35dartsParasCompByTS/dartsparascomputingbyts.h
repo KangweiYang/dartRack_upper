@@ -109,6 +109,10 @@ private:
         QString z;
     };
     coord target2;
+    coord referCoord1System1;
+    coord referCoord2System1;
+    coord referCoord1System2;
+    coord referCoord2System2;
     coord rackLeftBack2;
     coord leadLeftBack2;
     coord leadRightBack2;

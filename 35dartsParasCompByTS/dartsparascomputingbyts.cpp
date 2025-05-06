@@ -33,6 +33,10 @@ struct coord
 };
 
 coord target2;
+coord referCoord1System1;
+coord referCoord2System1;
+coord referCoord1System2;
+coord referCoord2System2;
 coord rackLeftBack2;
 coord leadLeftBack2;
 coord leadRightBack2;
@@ -53,12 +57,16 @@ coord leadLBC[YAW_TEST_N], leadRBC[YAW_TEST_N], leadRFC[YAW_TEST_N], leadLFC[YAW
 const QString endSerial = ",-";
 const QString pauseSerial = ",";
 const QString targetCoordSerial = "\n1,";
-const QString rackLeftBackCoordSerial = "\n6,";
-const QString rackRightBackSerial = "\n7,";
+const QString referCoord1System1Serial = "\n2,";
+const QString referCoord2System1Serial = "\n3,";
+const QString referCoord1System2Serial = "\n4,";
+const QString referCoord2System2Serial = "\n5,";
+//const QString rackLeftBackCoordSerial = "\n6,";
+//const QString rackRightBackSerial = "\n7,";
 const QString leadRightBackCoordSerial = "\n8,";
 const QString leadLeftBackCoordSerial = "\n9,";
-const QString rackLeftFrontSerial = "\n10,";
-const QString rackRightFrontSerial = "\n11,";
+//const QString rackLeftFrontSerial = "\n10,";
+//const QString rackRightFrontSerial = "\n11,";
 const QString leadRightFrontCoordSerial = "\n12,";
 const QString leadLeftFrontCoordSerial = "\n13,";
 const QString leadDartShootCoordSerial = "\n14,";
@@ -80,13 +88,14 @@ const QString leadLeftFrontCoordSerial = "\n11,";
 const QString leadDartShootCoordSerial = "\n12,";
 #endif
 
-// 新加入的16，17，18，19点号：
-const QString rackLBCSerial = "\n16,";
-const QString rackRBCSerial = "\n17,";
-const QString rackRFCSerial = "\n18,";
-const QString rackLFCSerial = "\n19,";
-
 uint16_t yawTestValidNum = 0;
+
+/**
+* @brief 将60进制的球坐标角度转换成100进制的角度
+* @param QString 输入字符串（60进制的角度）
+* @retval double 100进制的角度
+* @bug
+*/
 double dartsParasComputingByTS::convertDMS(const QString &dmsStr) {
     QString str = dmsStr;
     str.replace(" ", "");
@@ -112,162 +121,6 @@ Eigen::Vector3d dartsParasComputingByTS::sphericalToCartesian(double yawDeg, dou
     double z = distance * cos(M_PI - pitch);
 
     return Eigen::Vector3d(x, y, z);
-}
-
-void dartsParasComputingByTS::buildYawDataPoints() {
-    yawDataPoints.clear();
-    const int pulseInterval = ui->leadYawIntervalLineEdit->text().toInt();
-
-    // 遍历所有标定点
-    qDebug() << yawTestValidNum;
-    for(int n=0; n<yawTestValidNum; ++n) {
-        // 计算导轨中心坐标
-#if LEAD_POINT_NUM == 4
-        Eigen::Vector2d lbc(leadLBC[n].x.toDouble(), leadLBC[n].y.toDouble());
-        Eigen::Vector2d rbc(leadRBC[n].x.toDouble(), leadRBC[n].y.toDouble());
-        Eigen::Vector2d rfc(leadRFC[n].x.toDouble(), leadRFC[n].y.toDouble());
-        Eigen::Vector2d lfc(leadLFC[n].x.toDouble(), leadLFC[n].y.toDouble());
-        Eigen::Vector2d middleLine(lfc.x() - lbc.x() + rfc.x() - rbc.x(), lfc.y() - lbc.y() + rfc.y() - rbc.y());
-
-        coord* sourcePoint1 = &leadRightBack2;
-        coord* targetPoint1 = &leadLBC[n];
-        coord* sourcePoint2 = &leadLeftBack2;
-        coord* targetPoint2 = &leadRBC[n];
-        coord* sourcePoint3 = &leadLeftFront2;
-        coord* targetPoint3 = &leadRFC[n];
-        coord* sourcePoint4 = &leadRightFront2;
-        coord* targetPoint4 = &leadLFC[n];
-#endif
-#if LEAD_POINT_NUM == 2
-        Eigen::Vector2d bc(leadBC[n].x.toDouble(), leadBC[n].y.toDouble());
-        Eigen::Vector2d fc(leadFC[n].x.toDouble(), leadFC[n].y.toDouble());
-        Eigen::Vector2d middleLine(fc.x() - bc.x() , fc.y() - bc.y());
-
-        coord* sourcePoint1 = &leadRightBack2;
-        coord* targetPoint1 = &leadBC[n];
-        coord* sourcePoint2 = &leadRightFront2;
-        coord* targetPoint2 = &leadFC[n];
-#endif
-        Eigen::Vector2d currentMiddleLine(
-                (leadLeftFront2.x.toDouble() - leadLeftBack2.x.toDouble()) +  // 左前-左后
-                (leadRightFront2.x.toDouble() - leadRightBack2.x.toDouble()), // 右前-右后
-
-                (leadLeftFront2.y.toDouble() - leadLeftBack2.y.toDouble()) +
-                (leadRightFront2.y.toDouble() - leadRightBack2.y.toDouble())
-        );
-        // 定义源点和目标点
-        std::vector<Eigen::Vector3d> sourcePoints;
-        std::vector<Eigen::Vector3d> targetPoints;
-
-
-        // 添加四组对应点
-// 添加四组对应点（注意使用 -> 操作符）
-        sourcePoints.push_back(Eigen::Vector3d(
-                sourcePoint1->x.toDouble(),   // 使用 -> 访问指针成员
-                sourcePoint1->y.toDouble(),
-                sourcePoint1->z.toDouble()
-        ));
-        targetPoints.push_back(Eigen::Vector3d(
-                targetPoint1->x.toDouble(),
-                targetPoint1->y.toDouble(),
-                targetPoint1->z.toDouble()
-        ));
-
-// 其他三组同理添加
-        sourcePoints.push_back(Eigen::Vector3d(
-                sourcePoint2->x.toDouble(),
-                sourcePoint2->y.toDouble(),
-                sourcePoint2->z.toDouble()
-        ));
-        targetPoints.push_back(Eigen::Vector3d(
-                targetPoint2->x.toDouble(),
-                targetPoint2->y.toDouble(),
-                targetPoint2->z.toDouble()
-        ));
-
-#if LEAD_POINT_NUM == 4
-        sourcePoints.push_back(Eigen::Vector3d(
-                sourcePoint3->x.toDouble(),
-                sourcePoint3->y.toDouble(),
-                sourcePoint3->z.toDouble()
-        ));
-        targetPoints.push_back(Eigen::Vector3d(
-                targetPoint3->x.toDouble(),
-                targetPoint3->y.toDouble(),
-                targetPoint3->z.toDouble()
-        ));
-
-        sourcePoints.push_back(Eigen::Vector3d(
-                sourcePoint4->x.toDouble(),
-                sourcePoint4->y.toDouble(),
-                sourcePoint4->z.toDouble()
-        ));
-        targetPoints.push_back(Eigen::Vector3d(
-                targetPoint4->x.toDouble(),
-                targetPoint4->y.toDouble(),
-                targetPoint4->z.toDouble()
-        ));
-#endif
-        // 计算旋转矩阵和平移向量
-        Eigen::Matrix3d rotation;
-        Eigen::Vector3d translation;
-        computeTransformation(sourcePoints, targetPoints, rotation, translation);
-
-        Eigen::Vector3d transformedPoint = applyTransformation(Eigen::Vector3d(leadMiddleDartShoot2.x.toDouble(), leadMiddleDartShoot2.y.toDouble(), leadMiddleDartShoot2.z.toDouble()), rotation, translation);
-        leadMDS[n].x = QString::number(transformedPoint.x());
-        leadMDS[n].y = QString::number(transformedPoint.y());
-        leadMDS[n].z = QString::number(transformedPoint.z());
-        Eigen::Vector2d center(leadMDS[n].x.toDouble(), leadMDS[n].y.toDouble());
-
-        // 计算实际转动角度（相对于初始位置）
-        Eigen::Vector2d refDir(rackLFC2.x.toDouble() + rackRFC2.x.toDouble() - rackLBC2.x.toDouble() - rackRBC2.x.toDouble(),
-                               rackLFC2.y.toDouble() + rackRFC2.y.toDouble() - rackLBC2.y.toDouble() - rackRBC2.y.toDouble()); // 假设初始方向为镖架中心直线
-        double angle = atan2(middleLine.y() - currentMiddleLine.y(),
-                             middleLine.x() - currentMiddleLine.x());
-
-        yawDataPoints.append({
-                                     n * pulseInterval,  // 脉冲数
-                                     angle,              // 实际角度
-                                     center              // 中心坐标
-                             });
-    }
-}
-
-double dartsParasComputingByTS::calculateDirectedDistance(
-        const Eigen::Vector2d& target,
-        const Eigen::Vector2d& point,
-        double deltaPsi)
-{
-    // 打印输入参数
-    qDebug().nospace() << "[calculateDirectedDistance] 输入参数：\n"
-                       << "├─ 目标点 target: ("
-                       << QString::number(target.x(), 'f', 3) << ", "
-                       << QString::number(target.y(), 'f', 3) << ")\n"
-                       << "├─ 参考点 point: ("
-                       << QString::number(point.x(), 'f', 3) << ", "
-                       << QString::number(point.y(), 'f', 3) << ")\n"
-                       << "└─ 方向角 deltaPsi: "
-                       << QString::number(qRadiansToDegrees(deltaPsi), 'f', 2) << "°";
-
-    // 生成方向向量
-    Eigen::Vector2d dir(cos(deltaPsi), sin(deltaPsi));
-    qDebug() << "生成方向向量 dir: ("
-             << QString::number(dir.x(), 'f', 4) << ", "
-             << QString::number(dir.y(), 'f', 4) << ")";
-
-    // 计算向量差
-    Eigen::Vector2d vec = target - point;
-    qDebug() << "目标相对向量 vec: ("
-             << QString::number(vec.x(), 'f', 3) << ", "
-             << QString::number(vec.y(), 'f', 3) << ")";
-
-    // 计算并打印最终结果
-    const double distance = vec.x() * dir.y() - vec.y() * dir.x();
-    qDebug() << "有向距离计算结果: "
-             << QString::number(distance, 'f', 3)
-             << (distance >= 0 ? " (右侧)" : " (左侧)");
-
-    return distance;
 }
 
 /**
@@ -360,258 +213,6 @@ double calculateSignedLinePlaneAngle(
     return angleDeg;
 }
 
-std::pair<int, double> dartsParasComputingByTS::findOptimalPulse() {
-    Eigen::Vector2d target(
-            target2.x.toDouble(),
-            target2.y.toDouble()
-    );
-
-    double personalDeltaPsi = ui->deltaPsi1LineEdit->text().toDouble();
-
-    // 先三角函数算出上下沿斜面移动的点到标注点的距离
-    double L_UpToUpLinerMotionPoint[YAW_TEST_N], L_DownToDownLinerMotionPoint[YAW_TEST_N], leadAngle[YAW_TEST_N], L_LeadUpToMiddlePlane[YAW_TEST_N], L_LeadDownToMiddlePlane[YAW_TEST_N];
-// 转换为Eigen::Vector3d，并重命名为 *_coord
-    Eigen::Vector3d rackLFC2_coord(
-            rackLFC2.x.toDouble(),
-            rackLFC2.y.toDouble(),
-            rackLFC2.z.toDouble()
-    );
-    Eigen::Vector3d rackRFC2_coord(
-            rackRFC2.x.toDouble(),
-            rackRFC2.y.toDouble(),
-            rackRFC2.z.toDouble()
-    );
-    Eigen::Vector3d rackLBC2_coord(
-            rackLBC2.x.toDouble(),
-            rackLBC2.y.toDouble(),
-            rackLBC2.z.toDouble()
-    );
-    Eigen::Vector3d rackRBC2_coord(
-            rackRBC2.x.toDouble(),
-            rackRBC2.y.toDouble(),
-            rackRBC2.z.toDouble()
-    );
-
-// 计算两个中点
-    Eigen::Vector3d midL = (rackLFC2_coord + rackLBC2_coord) / 2.0;
-    Eigen::Vector3d midR = (rackRFC2_coord + rackRBC2_coord) / 2.0;
-    Eigen::Vector3d midF = (rackLFC2_coord + rackRFC2_coord) / 2.0;
-    Eigen::Vector3d midB = (rackLBC2_coord + rackRBC2_coord) / 2.0;
-    qDebug() << "midL" << midL.x() << midL.y() << midL.z();
-    qDebug() << "midR" << midR.x() << midR.y() << midR.z();
-    qDebug() << "rackLFC2_coord" << rackLFC2_coord.x() << rackLFC2_coord.y() << rackLFC2_coord.z();
-    qDebug() << "rackLBC2_coord" << rackLBC2_coord.x() << rackLBC2_coord.y() << rackLBC2_coord.z();
-    qDebug() << "rackRFC2_coord" << rackRFC2_coord.x() << rackRFC2_coord.y() << rackRFC2_coord.z();
-    qDebug() << "rackRBC2_coord" << rackRBC2_coord.x() << rackRBC2_coord.y() << rackRFC2_coord.z();
-// 计算法向量（方向：midL → midR）
-    Eigen::Vector3d planeLRNormal = midL - midR;
-    Eigen::Vector3d planeFBNormal = midF - midB;
-
-// 检查法向量是否为零向量（中点重合）
-    if (planeLRNormal.norm() < 1e-6) {
-        // 错误处理：中点重合，无法定义法向量
-    }
-
-// 定义平面参考点（使用 midL 或 midR）
-    Eigen::Vector3d planePoint = (rackLFC2_coord + rackRFC2_coord)/2;
-
-
-#if LEAD_POINT_NUM == 2
-    for (int i = 0; i < yawTestValidNum; ++i){
-        Eigen::Vector3d leadFrontCoord(leadFC[i].x.toDouble(), leadFC[i].y.toDouble(), leadFC[i].z.toDouble());
-        Eigen::Vector3d leadBackCoord(leadBC[i].x.toDouble(), leadBC[i].y.toDouble(), leadBC[i].z.toDouble());
-
-        Eigen::Vector3d rackMiddleCoord((rackLFC2.x.toDouble() + rackRFC2.x.toDouble())/2,
-                                        (rackLFC2.y.toDouble() + rackRFC2.y.toDouble())/2,
-                                        (rackLFC2.z.toDouble() + rackRFC2.z.toDouble())/2);
-        Eigen::Vector3d leadVector(leadFC[i].x.toDouble() - leadBC[i].x.toDouble(),
-                                   leadFC[i].y.toDouble() - leadBC[i].y.toDouble(),
-                                   leadFC[i].z.toDouble() - leadBC[i].z.toDouble());
-        Eigen::Vector3d rackMiddleVector((rackRFC2.x.toDouble() - rackRBC2.x.toDouble() + rackLFC2.x.toDouble() - rackLBC2.x.toDouble())/2,
-                                         (rackRFC2.y.toDouble() - rackRBC2.y.toDouble() + rackLFC2.y.toDouble() - rackLBC2.y.toDouble())/2,
-                                         (rackRFC2.z.toDouble() - rackRBC2.z.toDouble() + rackLFC2.z.toDouble() - rackLBC2.z.toDouble())/2
-        );
-
-        Eigen::Vector2d lead2dVector(leadVector.x(), leadVector.y());
-        Eigen::Vector2d rackMiddle2dVector(rackMiddleVector.x(), rackMiddleVector.y());
-
-        leadAngle[i] = calculateAngle(lead2dVector, rackMiddle2dVector);    //lead向右为正，单位为度
-
-        qDebug()<<"leadAngle["<<i<<']'<<leadAngle[i];
-
-// 计算点P到平面的有向距离
-        L_LeadUpToMiddlePlane[i] = planeLRNormal.dot(leadFrontCoord - planePoint) / planeLRNormal.norm();
-
-        qDebug()<< "L_LeadUpToMiddlePlane["<<i<<"]"<<L_LeadUpToMiddlePlane[i];
-        Eigen::Vector3d upLinearMotionPoint();
-    }
-#endif
-#if LEAD_POINT_NUM == 4
-    for (int i = 0; i < yawTestValidNum; ++i) {
-        //lead方向向量
-        Eigen::Vector3d leadFrontCoord((leadRFC[i].x.toDouble() + leadLFC[i].x.toDouble()) / 2,
-                                       (leadRFC[i].y.toDouble() + leadLFC[i].y.toDouble()) / 2,
-                                       (leadRFC[i].z.toDouble() + leadLFC[i].z.toDouble()) / 2);
-        Eigen::Vector3d leadBackCoord((leadRBC[i].x.toDouble() + leadLBC[i].x.toDouble()) / 2,
-                                      (leadRBC[i].y.toDouble() + leadLBC[i].y.toDouble()) / 2,
-                                      (leadRBC[i].z.toDouble() + leadLBC[i].z.toDouble()) / 2);
-        Eigen::Vector3d leadVector(
-                leadRFC[i].x.toDouble() - leadRBC[i].x.toDouble() + leadLFC[i].x.toDouble() - leadLBC[i].x.toDouble(),
-                leadRFC[i].y.toDouble() - leadRBC[i].y.toDouble() + leadLFC[i].y.toDouble() - leadLBC[i].y.toDouble(),
-                leadRFC[i].z.toDouble() - leadRBC[i].z.toDouble() + leadLFC[i].z.toDouble() - leadLBC[i].z.toDouble());
-        Eigen::Vector3d rackMiddleVector(
-                rackRFC2.x.toDouble() - rackRBC2.x.toDouble() + rackLFC2.x.toDouble() - rackLBC2.x.toDouble(),
-                rackRFC2.y.toDouble() - rackRBC2.y.toDouble() + rackLFC2.y.toDouble() - rackLBC2.y.toDouble(),
-                rackRFC2.z.toDouble() - rackRBC2.z.toDouble() + rackLFC2.z.toDouble() - rackLBC2.z.toDouble()
-        );
-
-        Eigen::Vector2d lead2dVector(leadVector.x(), leadVector.y());
-        Eigen::Vector2d rackMiddle2dVector(rackMiddleVector.x(), rackMiddleVector.y());
-
-//        leadAngle[i] = calculateAngle(lead2dVector, rackMiddle2dVector);
-
-//        qDebug() << "leadAngle2d[" << i << ']' << leadAngle[i];
-        leadAngle[i] = calculateSignedLinePlaneAngle(leadFrontCoord, leadBackCoord, planeLRNormal);
-
-        qDebug() << "leadAngle3d[" << i << ']' << leadAngle[i];
-        Eigen::Vector2d A((rackRFC2.x.toDouble() + rackLFC2.x.toDouble()) / 2,
-                          (rackRFC2.y.toDouble() + rackLFC2.y.toDouble()) / 2);
-        Eigen::Vector2d P((leadRFC[i].x.toDouble() + leadLFC[i].x.toDouble()) / 2,
-                          (leadRFC[i].y.toDouble() + leadLFC[i].y.toDouble()) / 2);
-
-// 计算点P到平面的有向距离
-        L_LeadUpToMiddlePlane[i] = planeLRNormal.dot(leadFrontCoord - (rackRFC2_coord + rackLFC2_coord + rackRBC2_coord + rackLBC2_coord)/4) / planeLRNormal.norm();
-        L_LeadDownToMiddlePlane[i] = planeFBNormal.dot(leadBackCoord - (rackRFC2_coord + rackLFC2_coord + rackRBC2_coord + rackLBC2_coord)/4) / planeFBNormal.norm();
-        qDebug()<<"L_LeadDownToMiddlePlane["<<i<<"]"<<L_LeadDownToMiddlePlane[i]<<"= planeFBNormal"<<planeFBNormal.x()<<planeFBNormal.y()<<planeFBNormal.z()<<"dot (leadBackCoord"<< leadBackCoord.x()<<leadBackCoord.y()<<leadBackCoord.z()<<"- rackMIDC2_coord"<<(rackRFC2_coord + rackLFC2_coord + rackRBC2_coord + rackLBC2_coord).x()/4<<(rackRFC2_coord + rackLFC2_coord + rackRBC2_coord + rackLBC2_coord).y()/4<< (rackRFC2_coord + rackLFC2_coord + rackRBC2_coord + rackLBC2_coord).z()/4<<") / planeFBNormal.norm()"<<planeLRNormal.norm();
-// 在计算L_LeadUpToMiddlePlane[i]的位置添加调试输出
-//        qDebug().nospace() << "\n[平面距离计算] 第" << i << "组数据：";
-//        qDebug() << "├─ planeLRNormal法向量: ("
-//                 << QString::number(planeLRNormal.x(), 'f', 4) << ", "
-//                 << QString::number(planeLRNormal.y(), 'f', 4) << ", "
-//                 << QString::number(planeLRNormal.z(), 'f', 4) << ")";
-//
-//        qDebug() << "├─ leadFrontCoord坐标: ("
-//                 << QString::number(leadFrontCoord.x(), 'f', 4) << ", "
-//                 << QString::number(leadFrontCoord.y(), 'f', 4) << ", "
-//                 << QString::number(leadFrontCoord.z(), 'f', 4) << ")";
-//
-//        qDebug() << "├─ planePoint平面点: ("
-//                 << planePoint.x() << ", "
-//                 << planePoint.y() << ", "
-//                 << planePoint.z() << ")";
-//
-//// 计算中间量
-//        Eigen::Vector3d diff = leadFrontCoord - planePoint;
-//        double dotProduct = planeLRNormal.dot(diff);
-//        double normalLength = planeLRNormal.norm();
-//
-//        qDebug() << "├─ 坐标差向量diff: ("
-//                 << QString::number(diff.x(), 'f', 4) << ", "
-//                 << QString::number(diff.y(), 'f', 4) << ", "
-//                 << QString::number(diff.z(), 'f', 4) << ")";
-//
-//        qDebug() << "├─ 点积结果: " << QString::number(dotProduct, 'f', 6);
-//        qDebug() << "├─ 法向量模长: " << QString::number(normalLength, 'f', 6);
-//        qDebug() << "└─ 最终距离L_LeadUpToMiddlePlane[" << i << "]: "
-//                 << QString::number(dotProduct/normalLength, 'f', 4);
-//
-//        qDebug() << "L_LeadUpToMiddlePlane[" << i << "]" << L_LeadUpToMiddlePlane[i];
-//
-        //Down调试输出
-
-// 添加详细的调试输出
-        qDebug().nospace() << "\n[平面距离计算] 第" << i << "组数据（DOWN方向）：";
-        qDebug() << "├─ planeFBNormal法向量: ("
-                 << QString::number(planeFBNormal.x(), 'f', 4) << ", "
-                 << QString::number(planeFBNormal.y(), 'f', 4) << ", "
-                 << QString::number(planeFBNormal.z(), 'f', 4) << ")";
-
-        qDebug() << "├─ leadBackCoord坐标: ("
-                 << QString::number(leadBackCoord.x(), 'f', 4) << ", "
-                 << QString::number(leadBackCoord.y(), 'f', 4) << ", "
-                 << QString::number(leadBackCoord.z(), 'f', 4) << ")";
-
-// 计算中间量（保持与UP计算相同的平面点）
-        Eigen::Vector3d planePointDown = (rackRFC2_coord + rackLFC2_coord + rackRBC2_coord + rackLBC2_coord)/4;
-        qDebug() << "├─ planePoint平面点: ("
-                 << QString::number(planePointDown.x(), 'f', 4) << ", "
-                 << QString::number(planePointDown.y(), 'f', 4) << ", "
-                 << QString::number(planePointDown.z(), 'f', 4) << ")";
-
-        Eigen::Vector3d diffDown = leadBackCoord - planePointDown;
-        double dotProductDown = planeFBNormal.dot(diffDown);
-        double normalLengthDown = planeFBNormal.norm();
-
-        qDebug() << "├─ 坐标差向量diffDown: ("
-                 << QString::number(diffDown.x(), 'f', 4) << ", "
-                 << QString::number(diffDown.y(), 'f', 4) << ", "
-                 << QString::number(diffDown.z(), 'f', 4) << ")";
-
-        qDebug() << "├─ 点积结果: " << QString::number(dotProductDown, 'f', 6);
-        qDebug() << "├─ 法向量模长: " << QString::number(normalLengthDown, 'f', 6);
-        qDebug() << "└─ 最终距离L_LeadDownToMiddlePlane[" << i << "]: "
-                 << QString::number(dotProductDown/normalLengthDown, 'f', 4);
-
-        qDebug() << "L_LeadDownToMiddlePlane[" << i << "]" << L_LeadDownToMiddlePlane[i];
-        Eigen::Vector3d upLinearMotionPoint();
-    }
-#endif
-    for (int i = 1; i < yawTestValidNum; ++i){
-        L_UpToUpLinerMotionPoint[i - 1] = (L_LeadUpToMiddlePlane[i - 1] - L_LeadUpToMiddlePlane[i] )/(sin(leadAngle[i - 1] / 180 * M_PI) - sin(leadAngle[i]/ 180 * M_PI));
-        L_DownToDownLinerMotionPoint[i - 1] = (L_LeadDownToMiddlePlane[i - 1] - L_LeadDownToMiddlePlane[i]) / (cos(leadAngle[i - 1] / 180 * M_PI) - cos(leadAngle[i] / 180 * M_PI));
-//        qDebug()<<"L_UpToUpLinerMotionPoint["<<i - 1<<"]"<<L_UpToUpLinerMotionPoint[i - 1]<<"       deltaUp:" << i - 1 << "-" << i << "=" << (L_LeadUpToMiddlePlane[i - 1] - L_LeadUpToMiddlePlane[i] )<<"   deltaLeadAngle = sin("<<leadAngle[i - 1]<<") - sin("<<leadAngle[i]<<") = "<< (sin(leadAngle[i - 1] / 180 * M_PI) - sin(leadAngle[i]/ 180 * M_PI));
-        qDebug()<<"L_DownToDownLinerMotionPoint["<<i - 1<< "]"<<L_DownToDownLinerMotionPoint[i-1]<<"       deltaDown:" << i - 1 << "-" << i << "=" << (L_LeadDownToMiddlePlane[i - 1] - L_LeadDownToMiddlePlane[i] )<<"   deltaLeadAngle = cos("<<leadAngle[i - 1]<<") - cos("<<leadAngle[i]<<") = "<< (cos(leadAngle[i - 1] / 180 * M_PI) - cos(leadAngle[i] / 180 * M_PI));
-    }
-    // 二分法查找最近点
-    int left = 0, right = yawDataPoints.size()-1;
-    while(left < right) {
-        int mid = (left + right)/2;
-        double d1 = calculateDirectedDistance(target, yawDataPoints[mid].center, personalDeltaPsi);
-        double d2 = calculateDirectedDistance(target, yawDataPoints[mid+1].center, personalDeltaPsi);
-        qDebug() << "\n--- Yaw Data Debug ---";
-        qDebug() << "Data size:" << yawDataPoints.size()
-                 << "| Current index:" << mid
-                 << "/" << yawDataPoints.size()-1;
-
-// 第一个中心点坐标（mid）
-        qDebug() << "Center[mid]: ("
-                 << yawDataPoints[mid].center.x()<< ", "
-                 << yawDataPoints[mid].center.y()<< ") "
-                 << "d1:" << d1;
-
-// 第二个中心点坐标（mid+1）
-        qDebug() << "Center[mid+1]: ("
-                 << yawDataPoints[mid+1].center.x() << ", "
-                 << yawDataPoints[mid+1].center.y()<< ") "
-                 << "d2:" << d2;
-
-        qDebug() << "DeltaPsi:" <<personalDeltaPsi * 180/M_PI << "°";
-        qDebug() << "---------------------";
-        if(d1*d2 <= 0) { // 符号变化区间
-            left = mid;
-            break;
-        } else if(d1 < d2) {
-            right = mid;
-        } else {
-            left = mid + 1;
-        }
-    }
-
-    // 线性插值
-    int bestIdx = qBound(0, left, yawDataPoints.size()-2);
-    const auto& p1 = yawDataPoints[bestIdx];
-    const auto& p2 = yawDataPoints[bestIdx+1];
-
-    double t = (calculateDirectedDistance(target, p1.center, personalDeltaPsi)) /
-               (calculateDirectedDistance(target, p1.center, personalDeltaPsi) -
-                calculateDirectedDistance(target, p2.center, personalDeltaPsi));
-
-    double optPulse = p1.pulse + t*(p2.pulse - p1.pulse);
-    double optAngle = p1.angle + t*(p2.angle - p1.angle);
-
-    return {qRound(optPulse), optAngle};
-}
-
 void dartsParasComputingByTS::serialRecord(QString startSerial, QString x, QString y, QString z, QLineEdit* xLineEdit, QLineEdit* yLineEdit, QLineEdit* zLineEdit) {
     if (!xLineEdit || !yLineEdit || !zLineEdit) {
         qDebug() << "Error: Null pointer passed to serialHandle";
@@ -698,300 +299,62 @@ void dartsParasComputingByTS::serialHandle(QString startSerial, coord* point, QL
 * @bug
 */
 void dartsParasComputingByTS::loadCoordsFromPlainTextEdit() {
-
-    // 预处理球坐标数据
-    QString originalBuffer = ui->leadYawCoordsDataPlainTextEdit->toPlainText();
-    qDebug()<<"originalBuffer"<<originalBuffer;
-    QStringList lines = originalBuffer.split(QRegularExpression("\n"), Qt::SkipEmptyParts);
-    QStringList newLines;
-    static int currentSSPoint;
-
-    qDebug()<<"line.size ="<<lines.size();
-    for (int i = 0; i < lines.size(); ++i) {
-        QString line = lines[i].trimmed();
-        if (line.startsWith("SS")) {
-            // 解析点号
-            QStringList parts = line.split(QRegularExpression("\\s+|,"), Qt::SkipEmptyParts);
-            if (parts.size() >= 2) {
-                bool ok;
-                currentSSPoint = parts[1].toInt(&ok);
-                if (!ok) currentSSPoint = -1;
-//                qDebug() << "currentSSPoint" << currentSSPoint;
-            }
-        } else if (line.startsWith("SD")) {
-            if (currentSSPoint != -1) {
-//                qDebug() << "SD handle: currentSSPoint" << currentSSPoint;
-                QStringList parts = line.split(QRegularExpression("\\s+|,"), Qt::SkipEmptyParts);
-//                qDebug() << "SD handle: parts.size" << parts.size();
-                if (parts.size() >= 4) {
-                    // 解析角度和距离
-                    double yaw = convertDMS(parts[1]);
-                    double pitch = convertDMS(parts[2]);
-                    double distance = parts[3].toDouble();
-
-                    // 坐标转换
-                    Eigen::Vector3d xyz = sphericalToCartesian(yaw, pitch, distance);
-
-                    // 生成XYZ数据行（不四舍五入，截断到4位小数）
-                    QString xyzLine = QString("%1,%2,%3,%4,-")
-                            .arg(currentSSPoint)
-                            .arg(QString::number(xyz.x(), 'f', 6))
-                            .arg(QString::number(xyz.y(), 'f', 6))
-                            .arg(QString::number(xyz.z(), 'f', 6));
-                    qDebug() << "xyzLine" << xyzLine;
-
-                    // 根据点号将坐标存储到相应的结构体中
-                    if (currentSSPoint == 16) {
-                        rackLBC2.x = QString::number(xyz.x());
-                        rackLBC2.y = QString::number(xyz.y());
-                        rackLBC2.z = QString::number(xyz.z());
-                    } else if (currentSSPoint == 17) {
-                        rackRBC2.x = QString::number(xyz.x());
-                        rackRBC2.y = QString::number(xyz.y());
-                        rackRBC2.z = QString::number(xyz.z());
-                    } else if (currentSSPoint == 18) {
-                        rackRFC2.x = QString::number(xyz.x());
-                        rackRFC2.y = QString::number(xyz.y());
-                        rackRFC2.z = QString::number(xyz.z());
-                    } else if (currentSSPoint == 19) {
-                        rackLFC2.x = QString::number(xyz.x());
-                        rackLFC2.y = QString::number(xyz.y());
-                        rackLFC2.z = QString::number(xyz.z());
-                    }
-#if LEAD_POINT_NUM == 4
-                    else if (currentSSPoint >= 20 && currentSSPoint < 20 + 4 * YAW_TEST_N) {
-                        int n = (currentSSPoint - 20) / 4;
-                        int index = (currentSSPoint - 20) % 4;
-
-                        if (index == 0) {
-                            leadLBC[n].x = QString::number(xyz.x());
-                            leadLBC[n].y = QString::number(xyz.y());
-                            leadLBC[n].z = QString::number(xyz.z());
-                        } else if (index == 1) {
-                            leadRBC[n].x = QString::number(xyz.x());
-                            leadRBC[n].y = QString::number(xyz.y());
-                            leadRBC[n].z = QString::number(xyz.z());
-                        } else if (index == 2) {
-                            leadRFC[n].x = QString::number(xyz.x());
-                            leadRFC[n].y = QString::number(xyz.y());
-                            leadRFC[n].z = QString::number(xyz.z());
-                        } else if (index == 3) {
-                            leadLFC[n].x = QString::number(xyz.x());
-                            leadLFC[n].y = QString::number(xyz.y());
-                            leadLFC[n].z = QString::number(xyz.z());
-                        }
-                    }
-#endif
-                        newLines.append(xyzLine);
-                    }
-                }
-                currentSSPoint = -1;
-            } else {
-                newLines.append(line); // 保留非球坐标数据
-            }
-        }
-
-        //获取1-14点号控件里的数据
+    //获取1-14点号控件里的数据
 // 获取目标点坐标
-        target2.x = ui->targetCoordXLineEdit->text();
-        target2.y = ui->targetCoordYLineEdit->text();
-        target2.z = ui->targetCoordZLineEdit->text();
+    target2.x = ui->targetCoordXLineEdit->text();
+    target2.y = ui->targetCoordYLineEdit->text();
+    target2.z = ui->targetCoordZLineEdit->text();
 
-// 获取架左后方坐标
-        rackLeftBack2.x = ui->rackLeftBackCoordXLineEdit->text();
-        rackLeftBack2.y = ui->rackLeftBackCoordYLineEdit->text();
-        rackLeftBack2.z = ui->rackLeftBackCoordZLineEdit->text();
+// 从UI控件读取referCoord1System1坐标数据
+    referCoord1System1.x = ui->referCoord1System1XLineEdit->text();
+    referCoord1System1.y = ui->referCoord1System1YLineEdit->text();
+    referCoord1System1.z = ui->referCoord1System1ZLineEdit->text();
+
+// 从UI控件读取referCoord2System1坐标数据
+    referCoord2System1.x = ui->referCoord2System1XLineEdit->text();
+    referCoord2System1.y = ui->referCoord2System1YLineEdit->text();
+    referCoord2System1.z = ui->referCoord2System1ZLineEdit->text();
+
+// 从UI控件读取referCoord1System2坐标数据
+    referCoord1System2.x = ui->referCoord1System2XLineEdit->text();
+    referCoord1System2.y = ui->referCoord1System2YLineEdit->text();
+    referCoord1System2.z = ui->referCoord1System2ZLineEdit->text();
+
+// 从UI控件读取referCoord2System2坐标数据
+    referCoord2System2.x = ui->referCoord2System2XLineEdit->text();
+    referCoord2System2.y = ui->referCoord2System2YLineEdit->text();
+    referCoord2System2.z = ui->referCoord2System2ZLineEdit->text();
 
 // 获取导轨左后方坐标
-        leadLeftBack2.x = ui->leadLeftBackCoordXLineEdit->text();
-        leadLeftBack2.y = ui->leadLeftBackCoordYLineEdit->text();
-        leadLeftBack2.z = ui->leadLeftBackCoordZLineEdit->text();
+    leadLeftBack2.x = ui->leadLeftBackCoordXLineEdit->text();
+    leadLeftBack2.y = ui->leadLeftBackCoordYLineEdit->text();
+    leadLeftBack2.z = ui->leadLeftBackCoordZLineEdit->text();
 
 // 获取导轨右后方坐标
-        leadRightBack2.x = ui->leadRightBackCoordXLineEdit->text();
-        leadRightBack2.y = ui->leadRightBackCoordYLineEdit->text();
-        leadRightBack2.z = ui->leadRightBackCoordZLineEdit->text();
-
-// 获取架右后方坐标
-        rackRightBack2.x = ui->rackRightBackCoordXLineEdit->text();
-        rackRightBack2.y = ui->rackRightBackCoordYLineEdit->text();
-        rackRightBack2.z = ui->rackRightBackCoordZLineEdit->text();
-
-// 获取架右前方坐标
-        rackRightFront2.x = ui->rackRightFrontCoordXLineEdit->text();
-        rackRightFront2.y = ui->rackRightFrontCoordYLineEdit->text();
-        rackRightFront2.z = ui->rackRightFrontCoordZLineEdit->text();
+    leadRightBack2.x = ui->leadRightBackCoordXLineEdit->text();
+    leadRightBack2.y = ui->leadRightBackCoordYLineEdit->text();
+    leadRightBack2.z = ui->leadRightBackCoordZLineEdit->text();
 
 // 获取导轨右前方坐标
-        leadRightFront2.x = ui->leadRightFrontCoordXLineEdit->text();
-        leadRightFront2.y = ui->leadRightFrontCoordYLineEdit->text();
-        leadRightFront2.z = ui->leadRightFrontCoordZLineEdit->text();
+    leadRightFront2.x = ui->leadRightFrontCoordXLineEdit->text();
+    leadRightFront2.y = ui->leadRightFrontCoordYLineEdit->text();
+    leadRightFront2.z = ui->leadRightFrontCoordZLineEdit->text();
 
 // 获取导轨左前方坐标
-        leadLeftFront2.x = ui->leadLeftFrontCoordXLineEdit->text();
-        leadLeftFront2.y = ui->leadLeftFrontCoordYLineEdit->text();
-        leadLeftFront2.z = ui->leadLeftFrontCoordZLineEdit->text();
-
-// 获取架左前方坐标
-        rackLeftFront2.x = ui->rackLeftFrontCoordXLineEdit->text();
-        rackLeftFront2.y = ui->rackLeftFrontCoordYLineEdit->text();
-        rackLeftFront2.z = ui->rackLeftFrontCoordZLineEdit->text();
+    leadLeftFront2.x = ui->leadLeftFrontCoordXLineEdit->text();
+    leadLeftFront2.y = ui->leadLeftFrontCoordYLineEdit->text();
+    leadLeftFront2.z = ui->leadLeftFrontCoordZLineEdit->text();
 
 // 获取飞镖发射点坐标
-        leadDartShoot2.x = ui->leadDartShootCoordXLineEdit->text();
-        leadDartShoot2.y = ui->leadDartShootCoordYLineEdit->text();
-        leadDartShoot2.z = ui->leadDartShootCoordZLineEdit->text();
-        // 获取 leadYawCoordsDataPlainTextEdit 中的文本
-        QString coordsText = ui->leadYawCoordsDataPlainTextEdit->toPlainText();
+    leadDartShoot2.x = ui->leadDartShootCoordXLineEdit->text();
+    leadDartShoot2.y = ui->leadDartShootCoordYLineEdit->text();
+    leadDartShoot2.z = ui->leadDartShootCoordZLineEdit->text();
 
-        // 使用换行符分割文本，得到每一行的数据
-        QStringList lines2 = coordsText.split("\n", Qt::SkipEmptyParts);
+    // 从UI控件读取leadMiddleDartShoot2坐标数据
+    leadMiddleDartShoot2.x = ui->leadMiddleDartShootCoordXLineEdit->text();
+    leadMiddleDartShoot2.y = ui->leadMiddleDartShootCoordYLineEdit->text();
+    leadMiddleDartShoot2.z = ui->leadMiddleDartShootCoordZLineEdit->text();
 
-        // 遍历每一行数据
-        for (const QString &line: lines2) {
-            // 使用逗号分割每一行的数据
-            QStringList parts = line.split(",", Qt::SkipEmptyParts);
-
-            // 确保有足够的部分（x, y, z, -）
-            if (parts.size() < 4) {
-                qDebug() << "Error: Invalid data format in leadYawCoordsDataPlainTextEdit";
-                continue;
-            }
-
-            // 提取点号
-            int pointNumber = parts[0].toInt();
-
-            // 提取坐标
-            QString x = parts[1].trimmed();
-            QString y = parts[2].trimmed();
-            QString z = parts[3].trimmed();
-
-            // 根据点号将坐标存储到相应的结构体中
-            if (pointNumber == 16) {
-                rackLBC2.x = x;
-                rackLBC2.y = y;
-                rackLBC2.z = z;
-            } else if (pointNumber == 17) {
-                rackRBC2.x = x;
-                rackRBC2.y = y;
-                rackRBC2.z = z;
-            } else if (pointNumber == 18) {
-                rackRFC2.x = x;
-                rackRFC2.y = y;
-                rackRFC2.z = z;
-            } else if (pointNumber == 19) {
-                rackLFC2.x = x;
-                rackLFC2.y = y;
-                rackLFC2.z = z;
-            }
-#if LEAD_POINT_NUM == 4
-            else if (pointNumber >= 20 && pointNumber < 20 + 4 * YAW_TEST_N) {
-                int n = (pointNumber - 20) / 4;
-                int index = (pointNumber - 20) % 4;
-
-                if (index == 0) {
-                    leadLBC[n].x = x;
-                    leadLBC[n].y = y;
-                    leadLBC[n].z = z;
-                } else if (index == 1) {
-                    leadRBC[n].x = x;
-                    leadRBC[n].y = y;
-                    leadRBC[n].z = z;
-                } else if (index == 2) {
-                    leadRFC[n].x = x;
-                    leadRFC[n].y = y;
-                    leadRFC[n].z = z;
-                } else if (index == 3) {
-                    leadLFC[n].x = x;
-                    leadLFC[n].y = y;
-                    leadLFC[n].z = z;
-                }
-#endif
-#if LEAD_POINT_NUM == 2
-                } else if (pointNumber >= 20 && pointNumber < 20 + 2 * YAW_TEST_N) {
-                int n = (pointNumber - 20) / 2;
-                int index = (pointNumber - 20) % 2;
-
-                if (index == 0) {
-                    leadBC[n].x = x;
-                    leadBC[n].y = y;
-                    leadBC[n].z = z;
-                } else if (index == 1) {
-                    leadFC[n].x = x;
-                    leadFC[n].y = y;
-                    leadFC[n].z = z;
-                }
-#endif
-            } else {
-                qDebug() << "Error: Invalid point number in leadYawCoordsDataPlainTextEdit";
-            }
-        }
-        //获取有效数据数量
-        for (int n = 0; n < YAW_TEST_N; ++n) {
-#if LEAD_POINT_NUM == 4
-            if (leadLFC[n].x != "") {
-#endif
-#if LEAD_POINT_NUM == 2
-                if(leadBC[n].x != ""){
-#endif
-                yawTestValidNum = n + 1;
-            } else return;
-        }
-
-
-        // 更新 UI 显示
-        ui->rackLBCXLineEdit->setText(rackLBC2.x);
-        ui->rackLBCYLineEdit->setText(rackLBC2.y);
-        ui->rackLBCZLineEdit->setText(rackLBC2.z);
-
-        ui->rackRFCXLineEdit->setText(rackRFC2.x);
-        ui->rackRFCYLineEdit->setText(rackRFC2.y);
-        ui->rackRFCZLineEdit->setText(rackRFC2.z);
-
-        ui->rackRBCXLineEdit->setText(rackRBC2.x);
-        ui->rackRBCYLineEdit->setText(rackRBC2.y);
-        ui->rackRBCZLineEdit->setText(rackRBC2.z);
-
-        ui->rackLFCXLineEdit->setText(rackLFC2.x);
-        ui->rackLFCYLineEdit->setText(rackLFC2.y);
-        ui->rackLFCZLineEdit->setText(rackLFC2.z);
-
-        for (int n = 0; n < 1; ++n) {
-#if LEAD_POINT_NUM == 4
-            ui->leadLBCXLineEdit->setText(leadLBC[n].x);
-            ui->leadLBCYLineEdit->setText(leadLBC[n].y);
-            ui->leadLBCZLineEdit->setText(leadLBC[n].z);
-
-            ui->leadRBCXLineEdit->setText(leadRBC[n].x);
-            ui->leadRBCYLineEdit->setText(leadRBC[n].y);
-            ui->leadRBCZLineEdit->setText(leadRBC[n].z);
-
-            ui->leadRFCXLineEdit->setText(leadRFC[n].x);
-            ui->leadRFCYLineEdit->setText(leadRFC[n].y);
-            ui->leadRFCZLineEdit->setText(leadRFC[n].z);
-
-            ui->leadLFCXLineEdit->setText(leadLFC[n].x);
-            ui->leadLFCYLineEdit->setText(leadLFC[n].y);
-            ui->leadLFCZLineEdit->setText(leadLFC[n].z);
-#endif
-#if LEAD_POINT_NUM == 2
-            ui->leadLBCXLineEdit->setText(leadBC[n].x);
-            ui->leadLBCYLineEdit->setText(leadBC[n].y);
-            ui->leadLBCZLineEdit->setText(leadBC[n].z);
-
-            ui->leadRBCXLineEdit->setText(leadBC[n].x);
-            ui->leadRBCYLineEdit->setText(leadBC[n].y);
-            ui->leadRBCZLineEdit->setText(leadBC[n].z);
-
-            ui->leadRFCXLineEdit->setText(leadFC[n].x);
-            ui->leadRFCYLineEdit->setText(leadFC[n].y);
-            ui->leadRFCZLineEdit->setText(leadFC[n].z);
-
-            ui->leadLFCXLineEdit->setText(leadFC[n].x);
-            ui->leadLFCYLineEdit->setText(leadFC[n].y);
-            ui->leadLFCZLineEdit->setText(leadFC[n].z);
-#endif
-        }
 }
 
 /**
@@ -1164,16 +527,24 @@ void dartsParasComputingByTS::serialPortReadyRead2_Slot() {
         serialHandle(targetCoordSerial, &target2, ui->targetCoordXLineEdit, ui->targetCoordYLineEdit,
                      ui->targetCoordZLineEdit);
     }
-    // 检查并处理 targetCoordSerial
-    if (receiveBuff_2.contains(targetCoordSerial) && receiveBuff_2.contains(endSerial)) {
-        serialHandle(targetCoordSerial, &target2, ui->targetCoordXLineEdit, ui->targetCoordYLineEdit,
-                     ui->targetCoordZLineEdit);
+    if (receiveBuff_2.contains(referCoord1System1Serial) && receiveBuff_2.contains(endSerial)) {
+        serialHandle(referCoord1System1Serial, &referCoord1System1, ui->referCoord1System1XLineEdit,
+                     ui->referCoord1System1YLineEdit, ui->referCoord1System1ZLineEdit);
     }
 
-    // 检查并处理 rackLeftBackCoordSerial
-    if (receiveBuff_2.contains(rackLeftBackCoordSerial) && receiveBuff_2.contains(endSerial)) {
-        serialHandle(rackLeftBackCoordSerial, &rackLeftBack2, ui->rackLeftBackCoordXLineEdit,
-                     ui->rackLeftBackCoordYLineEdit, ui->rackLeftBackCoordZLineEdit);
+    if (receiveBuff_2.contains(referCoord2System1Serial) && receiveBuff_2.contains(endSerial)) {
+        serialHandle(referCoord2System1Serial, &referCoord2System1, ui->referCoord2System1XLineEdit,
+                     ui->referCoord2System1YLineEdit, ui->referCoord2System1ZLineEdit);
+    }
+
+    if (receiveBuff_2.contains(referCoord1System2Serial) && receiveBuff_2.contains(endSerial)) {
+        serialHandle(referCoord1System2Serial, &referCoord1System2, ui->referCoord1System2XLineEdit,
+                     ui->referCoord1System2YLineEdit, ui->referCoord1System2ZLineEdit);
+    }
+
+    if (receiveBuff_2.contains(referCoord2System2Serial) && receiveBuff_2.contains(endSerial)) {
+        serialHandle(referCoord2System2Serial, &referCoord2System2, ui->referCoord2System2XLineEdit,
+                     ui->referCoord2System2YLineEdit, ui->referCoord2System2ZLineEdit);
     }
 
     // 检查并处理 leadRightBackCoordSerial
@@ -1196,18 +567,6 @@ void dartsParasComputingByTS::serialPortReadyRead2_Slot() {
 #endif
 
 
-    // 检查并处理 rackRightBackSerial
-    if (receiveBuff_2.contains(rackRightBackSerial) && receiveBuff_2.contains(endSerial)) {
-        serialHandle(rackRightBackSerial, &rackRightBack2, ui->rackRightBackCoordXLineEdit,
-                     ui->rackRightBackCoordYLineEdit, ui->rackRightBackCoordZLineEdit);
-    }
-
-    // 检查并处理 rackRightFrontSerial
-    if (receiveBuff_2.contains(rackRightFrontSerial) && receiveBuff_2.contains(endSerial)) {
-        serialHandle(rackRightFrontSerial, &rackRightFront2, ui->rackRightFrontCoordXLineEdit,
-                     ui->rackRightFrontCoordYLineEdit, ui->rackRightFrontCoordZLineEdit);
-    }
-
     // 检查并处理 leadRightFrontCoordSerial
     if (receiveBuff_2.contains(leadRightFrontCoordSerial) && receiveBuff_2.contains(endSerial)) {
         serialHandle(leadRightFrontCoordSerial, &leadRightFront2, ui->leadRightFrontCoordXLineEdit,
@@ -1227,87 +586,11 @@ void dartsParasComputingByTS::serialPortReadyRead2_Slot() {
     leadLeftFront2.z = leadRightFront2.z;
 #endif
 
-
-    // 检查并处理 rackLeftFrontSerial
-    if (receiveBuff_2.contains(rackLeftFrontSerial) && receiveBuff_2.contains(endSerial)) {
-        serialHandle(rackLeftFrontSerial, &rackLeftFront2, ui->rackLeftFrontCoordXLineEdit,
-                     ui->rackLeftFrontCoordYLineEdit, ui->rackLeftFrontCoordZLineEdit);
-    }
-
     // 检查并处理 leadDartShootCoordSerial
     if (receiveBuff_2.contains(leadDartShootCoordSerial) && receiveBuff_2.contains(endSerial)) {
         serialHandle(leadDartShootCoordSerial, &leadDartShoot2, ui->leadDartShootCoordXLineEdit,
                      ui->leadDartShootCoordYLineEdit, ui->leadDartShootCoordZLineEdit);
     }
-
-    //YAW轴数据标定（固定脉冲移动后的点集）应该放在飞镖参数计算的
-    // 检查并处理 rackLBCSerial
-    if (receiveBuff_2.contains(rackLBCSerial) && receiveBuff_2.contains(endSerial)) {
-        serialHandle(rackLBCSerial, &rackLBC2, ui->rackLBCXLineEdit, ui->rackLBCYLineEdit, ui->rackLBCZLineEdit);
-    }
-
-    // 检查并处理 rackRBCSerial
-    if (receiveBuff_2.contains(rackRBCSerial) && receiveBuff_2.contains(endSerial)) {
-        serialHandle(rackRBCSerial, &rackRBC2, ui->rackRBCXLineEdit, ui->rackRBCYLineEdit, ui->rackRBCZLineEdit);
-    }
-
-    // 检查并处理 rackRFCSerial
-    if (receiveBuff_2.contains(rackRFCSerial) && receiveBuff_2.contains(endSerial)) {
-        serialHandle(rackRFCSerial, &rackRFC2, ui->rackRFCXLineEdit, ui->rackRFCYLineEdit, ui->rackRFCZLineEdit);
-    }
-
-    // 检查并处理 rackLFCSerial
-    if (receiveBuff_2.contains(rackLFCSerial) && receiveBuff_2.contains(endSerial)) {
-        serialHandle(rackLFCSerial, &rackLFC2, ui->rackLFCXLineEdit, ui->rackLFCYLineEdit, ui->rackLFCZLineEdit);
-    }
-
-#if LEAD_POINT_NUM == 4
-    // 处理20+4n, 21+4n, 22+4n, 23+4n的点号
-    for (int n = 0; n < yawTestValidNum; ++n) {
-        QString leadLBCSerial = QString("\n%1,").arg(20 + 4 * n);
-        QString leadRBCSerial = QString("\n%1,").arg(21 + 4 * n);
-        QString leadRFCSerial = QString("\n%1,").arg(22 + 4 * n);
-        QString leadLFCSerial = QString("\n%1,").arg(23 + 4 * n);
-
-        if (receiveBuff_2.contains(leadLBCSerial) && receiveBuff_2.contains(endSerial)) {
-            serialRecord(leadLBCSerial, leadLBC[n].x, leadLBC[n].y, leadLBC[n].z, ui->leadLBCXLineEdit,
-                         ui->leadLBCYLineEdit, ui->leadLBCZLineEdit);
-        }
-
-        if (receiveBuff_2.contains(leadRBCSerial) && receiveBuff_2.contains(endSerial)) {
-            serialRecord(leadRBCSerial, leadRBC[n].x, leadRBC[n].y, leadRBC[n].z, ui->leadRBCXLineEdit,
-                         ui->leadRBCYLineEdit, ui->leadRBCZLineEdit);
-        }
-
-        if (receiveBuff_2.contains(leadRFCSerial) && receiveBuff_2.contains(endSerial)) {
-            serialRecord(leadRFCSerial, leadRFC[n].x, leadRFC[n].y, leadRFC[n].z, ui->leadRFCXLineEdit,
-                         ui->leadRFCYLineEdit, ui->leadRFCZLineEdit);
-        }
-
-        if (receiveBuff_2.contains(leadLFCSerial) && receiveBuff_2.contains(endSerial)) {
-            serialRecord(leadLFCSerial, leadLFC[n].x, leadLFC[n].y, leadLFC[n].z, ui->leadLFCXLineEdit,
-                         ui->leadLFCYLineEdit, ui->leadLFCZLineEdit);
-        }
-    }
-#endif
-
-#if LEAD_POINT_NUM == 2
-    // 处理20+2n, 21+2n的点号
-    for (int n = 0; n < yawTestValidNum; ++n) {
-        QString leadBCSerial = QString("\n%1,").arg(20 + 2 * n);
-        QString leadFCSerial = QString("\n%1,").arg(21 + 2 * n);
-
-        if (receiveBuff_2.contains(leadBCSerial) && receiveBuff_2.contains(endSerial)) {
-            serialRecord(leadBCSerial, leadBC[n].x, leadBC[n].y, leadBC[n].z, ui->leadLBCXLineEdit,
-                         ui->leadLBCYLineEdit, ui->leadLBCZLineEdit);
-        }
-
-        if (receiveBuff_2.contains(leadFCSerial) && receiveBuff_2.contains(endSerial)) {
-            serialRecord(leadFCSerial, leadFC[n].x, leadFC[n].y, leadFC[n].z, ui->leadRFCXLineEdit,
-                         ui->leadRFCYLineEdit, ui->leadRFCZLineEdit);
-        }
-    }
-#endif
 }
 
 /**
@@ -1357,10 +640,25 @@ void dartsParasComputingByTS::ui_update(){
     ui->targetCoordYLineEdit->setText(target2.y);
     ui->targetCoordZLineEdit->setText(target2.z);
 
-// 更新rackLeftBack2相关UI
-    ui->rackLeftBackCoordXLineEdit->setText(rackLeftBack2.x);
-    ui->rackLeftBackCoordYLineEdit->setText(rackLeftBack2.y);
-    ui->rackLeftBackCoordZLineEdit->setText(rackLeftBack2.z);
+    // 更新referCoord1System1相关UI
+    ui->referCoord1System1XLineEdit->setText(referCoord1System1.x);
+    ui->referCoord1System1YLineEdit->setText(referCoord1System1.y);
+    ui->referCoord1System1ZLineEdit->setText(referCoord1System1.z);
+
+    // 更新referCoord2System1相关UI
+    ui->referCoord2System1XLineEdit->setText(referCoord2System1.x);
+    ui->referCoord2System1YLineEdit->setText(referCoord2System1.y);
+    ui->referCoord2System1ZLineEdit->setText(referCoord2System1.z);
+
+    // 更新referCoord1System2相关UI
+    ui->referCoord1System2XLineEdit->setText(referCoord1System2.x);
+    ui->referCoord1System2YLineEdit->setText(referCoord1System2.y);
+    ui->referCoord1System2ZLineEdit->setText(referCoord1System2.z);
+
+    // 更新referCoord2System2相关UI
+    ui->referCoord2System2XLineEdit->setText(referCoord2System2.x);
+    ui->referCoord2System2YLineEdit->setText(referCoord2System2.y);
+    ui->referCoord2System2ZLineEdit->setText(referCoord2System2.z);
 
 // 更新leadLeftBack2相关UI
     ui->leadLeftBackCoordXLineEdit->setText(leadLeftBack2.x);
@@ -1372,16 +670,6 @@ void dartsParasComputingByTS::ui_update(){
     ui->leadRightBackCoordYLineEdit->setText(leadRightBack2.y);
     ui->leadRightBackCoordZLineEdit->setText(leadRightBack2.z);
 
-// 更新rackRightBack2相关UI
-    ui->rackRightBackCoordXLineEdit->setText(rackRightBack2.x);
-    ui->rackRightBackCoordYLineEdit->setText(rackRightBack2.y);
-    ui->rackRightBackCoordZLineEdit->setText(rackRightBack2.z);
-
-// 更新rackRightFront2相关UI
-    ui->rackRightFrontCoordXLineEdit->setText(rackRightFront2.x);
-    ui->rackRightFrontCoordYLineEdit->setText(rackRightFront2.y);
-    ui->rackRightFrontCoordZLineEdit->setText(rackRightFront2.z);
-
 // 更新leadRightFront2相关UI
     ui->leadRightFrontCoordXLineEdit->setText(leadRightFront2.x);
     ui->leadRightFrontCoordYLineEdit->setText(leadRightFront2.y);
@@ -1392,15 +680,10 @@ void dartsParasComputingByTS::ui_update(){
     ui->leadLeftFrontCoordYLineEdit->setText(leadLeftFront2.y);
     ui->leadLeftFrontCoordZLineEdit->setText(leadLeftFront2.z);
 
-// 更新rackLeftFront2相关UI
-    ui->rackLeftFrontCoordXLineEdit->setText(rackLeftFront2.x);
-    ui->rackLeftFrontCoordYLineEdit->setText(rackLeftFront2.y);
-    ui->rackLeftFrontCoordZLineEdit->setText(rackLeftFront2.z);
-
-// 更新leadDartShoot2相关UI
-    ui->leadDartShootCoordXLineEdit->setText(leadDartShoot2.x);
-    ui->leadDartShootCoordYLineEdit->setText(leadDartShoot2.y);
-    ui->leadDartShootCoordZLineEdit->setText(leadDartShoot2.z);
+// 更新leadMiddleDartShoot2相关UI
+    ui->leadMiddleDartShootCoordXLineEdit->setText(leadMiddleDartShoot2.x);
+    ui->leadMiddleDartShootCoordYLineEdit->setText(leadMiddleDartShoot2.y);
+    ui->leadMiddleDartShootCoordZLineEdit->setText(leadMiddleDartShoot2.z);
 }
 
 /**
@@ -1408,128 +691,110 @@ void dartsParasComputingByTS::ui_update(){
 * @param None
 * @retval None
 * @bug
-*/
-void dartsParasComputingByTS::coord_transform(){
-    //从控件里更新数据
+*/void dartsParasComputingByTS::coord_transform() {
+    // 从控件里更新数据
     loadCoordsFromPlainTextEdit();
-    // 定义源点和目标点
+
+    // 定义源点和目标点（使用referCoord1System1和referCoord2System1作为源点）
     std::vector<Eigen::Vector3d> sourcePoints;
     std::vector<Eigen::Vector3d> targetPoints;
 
-    // 添加四组对应点
-    sourcePoints.push_back(Eigen::Vector3d(rackRBC2.x.toDouble(), rackRBC2.y.toDouble(), rackRBC2.z.toDouble()));
-    targetPoints.push_back(Eigen::Vector3d(ui->rackRightBackCoordXLineEdit->text().toDouble(), ui->rackRightBackCoordYLineEdit->text().toDouble(), ui->rackRightBackCoordZLineEdit->text().toDouble()));
+    // 添加两组对应点
+    sourcePoints.push_back(Eigen::Vector3d(
+            referCoord1System1.x.toDouble(),
+            referCoord1System1.y.toDouble(),
+            referCoord1System1.z.toDouble()));
+    targetPoints.push_back(Eigen::Vector3d(
+            referCoord1System2.x.toDouble(),
+            referCoord1System2.y.toDouble(),
+            referCoord1System2.z.toDouble()));
 
-    sourcePoints.push_back(Eigen::Vector3d(rackLBC2.x.toDouble(), rackLBC2.y.toDouble(), rackLBC2.z.toDouble()));
-    targetPoints.push_back(Eigen::Vector3d(ui->rackLeftBackCoordXLineEdit->text().toDouble(), ui->rackLeftBackCoordYLineEdit->text().toDouble(), ui->rackLeftBackCoordZLineEdit->text().toDouble()));
+    sourcePoints.push_back(Eigen::Vector3d(
+            referCoord2System1.x.toDouble(),
+            referCoord2System1.y.toDouble(),
+            referCoord2System1.z.toDouble()));
+    targetPoints.push_back(Eigen::Vector3d(
+            referCoord2System2.x.toDouble(),
+            referCoord2System2.y.toDouble(),
+            referCoord2System2.z.toDouble()));
 
-    sourcePoints.push_back(Eigen::Vector3d(rackRFC2.x.toDouble(), rackRFC2.y.toDouble(), rackRFC2.z.toDouble()));
-    targetPoints.push_back(Eigen::Vector3d(ui->rackRightFrontCoordXLineEdit->text().toDouble(), ui->rackRightFrontCoordYLineEdit->text().toDouble(), ui->rackRightFrontCoordZLineEdit->text().toDouble()));
-
-    sourcePoints.push_back(Eigen::Vector3d(rackLFC2.x.toDouble(), rackLFC2.y.toDouble(), rackLFC2.z.toDouble()));
-    targetPoints.push_back(Eigen::Vector3d(ui->rackLeftFrontCoordXLineEdit->text().toDouble(), ui->rackLeftFrontCoordYLineEdit->text().toDouble(), ui->rackLeftFrontCoordZLineEdit->text().toDouble()));
-
-    // 计算旋转矩阵和平移向量
-    Eigen::Matrix3d rotation;
-    Eigen::Vector3d translation;
-    computeTransformation(sourcePoints, targetPoints, rotation, translation);
-
-#if LEAD_POINT_NUM == 4
-    // 应用变换到所有点
-    for (int n = 0; n < yawTestValidNum; ++n) {
-        Eigen::Vector3d transformedPoint = applyTransformation(Eigen::Vector3d(leadLBC[n].x.toDouble(), leadLBC[n].y.toDouble(), leadLBC[n].z.toDouble()), rotation, translation);
-        leadLBC[n].x = QString::number(transformedPoint.x());
-        leadLBC[n].y = QString::number(transformedPoint.y());
-        leadLBC[n].z = QString::number(transformedPoint.z());
-
-        transformedPoint = applyTransformation(Eigen::Vector3d(leadRBC[n].x.toDouble(), leadRBC[n].y.toDouble(), leadRBC[n].z.toDouble()), rotation, translation);
-        leadRBC[n].x = QString::number(transformedPoint.x());
-        leadRBC[n].y = QString::number(transformedPoint.y());
-        leadRBC[n].z = QString::number(transformedPoint.z());
-
-        transformedPoint = applyTransformation(Eigen::Vector3d(leadRFC[n].x.toDouble(), leadRFC[n].y.toDouble(), leadRFC[n].z.toDouble()), rotation, translation);
-        leadRFC[n].x = QString::number(transformedPoint.x());
-        leadRFC[n].y = QString::number(transformedPoint.y());
-        leadRFC[n].z = QString::number(transformedPoint.z());
-
-        transformedPoint = applyTransformation(Eigen::Vector3d(leadLFC[n].x.toDouble(), leadLFC[n].y.toDouble(), leadLFC[n].z.toDouble()), rotation, translation);
-        leadLFC[n].x = QString::number(transformedPoint.x());
-        leadLFC[n].y = QString::number(transformedPoint.y());
-        leadLFC[n].z = QString::number(transformedPoint.z());
+    // 检查点对数量是否足够
+    if (sourcePoints.size() < 2) {
+        ui->xLineEdit->setText("警告：需要至少2组对应点");
+        return;
     }
 
-    // 应用变换到 rackLBC2, rackRBC2, rackRFC2, rackLFC2
-    Eigen::Vector3d transformedRackLBC = applyTransformation(Eigen::Vector3d(rackLBC2.x.toDouble(), rackLBC2.y.toDouble(), rackLBC2.z.toDouble()), rotation, translation);
-    rackLBC2.x = QString::number(transformedRackLBC.x());
-    rackLBC2.y = QString::number(transformedRackLBC.y());
-    rackLBC2.z = QString::number(transformedRackLBC.z());
+    // ==================== 计算平移 ====================
+    // 计算质心（包含z轴）
+    Eigen::Vector3d sourceCentroid = Eigen::Vector3d::Zero();
+    Eigen::Vector3d targetCentroid = Eigen::Vector3d::Zero();
+    for (size_t i = 0; i < sourcePoints.size(); ++i) {
+        sourceCentroid += sourcePoints[i];
+        targetCentroid += targetPoints[i];
+    }
+    sourceCentroid /= sourcePoints.size();
+    targetCentroid /= targetPoints.size();
 
-    Eigen::Vector3d transformedRackRBC = applyTransformation(Eigen::Vector3d(rackRBC2.x.toDouble(), rackRBC2.y.toDouble(), rackRBC2.z.toDouble()), rotation, translation);
-    rackRBC2.x = QString::number(transformedRackRBC.x());
-    rackRBC2.y = QString::number(transformedRackRBC.y());
-    rackRBC2.z = QString::number(transformedRackRBC.z());
+    // 最终平移向量（直接取质心差）
+    Eigen::Vector3d translation = targetCentroid - sourceCentroid;
 
-    Eigen::Vector3d transformedRackRFC = applyTransformation(Eigen::Vector3d(rackRFC2.x.toDouble(), rackRFC2.y.toDouble(), rackRFC2.z.toDouble()), rotation, translation);
-    rackRFC2.x = QString::number(transformedRackRFC.x());
-    rackRFC2.y = QString::number(transformedRackRFC.y());
-    rackRFC2.z = QString::number(transformedRackRFC.z());
+    // ==================== 计算旋转（仅xy平面） ====================
+    // 去质心坐标（仅xy平面）
+    Eigen::Matrix2d sourceXY, targetXY;
+    sourceXY.resize(2, sourcePoints.size());
+    targetXY.resize(2, targetPoints.size());
 
-    Eigen::Vector3d transformedRackLFC = applyTransformation(Eigen::Vector3d(rackLFC2.x.toDouble(), rackLFC2.y.toDouble(), rackLFC2.z.toDouble()), rotation, translation);
-    rackLFC2.x = QString::number(transformedRackLFC.x());
-    rackLFC2.y = QString::number(transformedRackLFC.y());
-    rackLFC2.z = QString::number(transformedRackLFC.z());
-#endif
-
-#if LEAD_POINT_NUM == 2
-    // 应用变换到所有点
-    for (int n = 0; n < yawTestValidNum; ++n) {
-        Eigen::Vector3d transformedPoint = applyTransformation(Eigen::Vector3d(leadBC[n].x.toDouble(), leadBC[n].y.toDouble(), leadBC[n].z.toDouble()), rotation, translation);
-        leadBC[n].x = QString::number(transformedPoint.x());
-        leadBC[n].y = QString::number(transformedPoint.y());
-        leadBC[n].z = QString::number(transformedPoint.z());
-
-        transformedPoint = applyTransformation(Eigen::Vector3d(leadBC[n].x.toDouble(), leadBC[n].y.toDouble(), leadBC[n].z.toDouble()), rotation, translation);
-        leadBC[n].x = QString::number(transformedPoint.x());
-        leadBC[n].y = QString::number(transformedPoint.y());
-        leadBC[n].z = QString::number(transformedPoint.z());
+    for (size_t i = 0; i < sourcePoints.size(); ++i) {
+        sourceXY.col(i) = sourcePoints[i].head<2>() - sourceCentroid.head<2>();
+        targetXY.col(i) = targetPoints[i].head<2>() - targetCentroid.head<2>();
     }
 
-    // 应用变换到 rackLBC2, rackRBC2, rackRFC2, rackLFC2
-    Eigen::Vector3d transformedRackLBC = applyTransformation(Eigen::Vector3d(rackLBC2.x.toDouble(), rackLBC2.y.toDouble(), rackLBC2.z.toDouble()), rotation, translation);
-    rackLBC2.x = QString::number(transformedRackLBC.x());
-    rackLBC2.y = QString::number(transformedRackLBC.y());
-    rackLBC2.z = QString::number(transformedRackLBC.z());
+    // 计算协方差矩阵（仅xy平面）
+    Eigen::Matrix2d covariance = sourceXY * targetXY.transpose();
 
-    Eigen::Vector3d transformedRackRBC = applyTransformation(Eigen::Vector3d(rackRBC2.x.toDouble(), rackRBC2.y.toDouble(), rackRBC2.z.toDouble()), rotation, translation);
-    rackRBC2.x = QString::number(transformedRackRBC.x());
-    rackRBC2.y = QString::number(transformedRackRBC.y());
-    rackRBC2.z = QString::number(transformedRackRBC.z());
+    // SVD分解
+    Eigen::JacobiSVD<Eigen::Matrix2d> svd(covariance, Eigen::ComputeFullU | Eigen::ComputeFullV);
+    Eigen::Matrix2d U = svd.matrixU();
+    Eigen::Matrix2d V = svd.matrixV();
 
-    Eigen::Vector3d transformedRackRFC = applyTransformation(Eigen::Vector3d(rackRFC2.x.toDouble(), rackRFC2.y.toDouble(), rackRFC2.z.toDouble()), rotation, translation);
-    rackRFC2.x = QString::number(transformedRackRFC.x());
-    rackRFC2.y = QString::number(transformedRackRFC.y());
-    rackRFC2.z = QString::number(transformedRackRFC.z());
+    // 计算xy平面旋转矩阵
+    Eigen::Matrix2d R_xy = V * U.transpose();
 
-    Eigen::Vector3d transformedRackLFC = applyTransformation(Eigen::Vector3d(rackLFC2.x.toDouble(), rackLFC2.y.toDouble(), rackLFC2.z.toDouble()), rotation, translation);
-    rackLFC2.x = QString::number(transformedRackLFC.x());
-    rackLFC2.y = QString::number(transformedRackLFC.y());
-    rackLFC2.z = QString::number(transformedRackLFC.z());
-#endif
+    // 处理反射情况（行列式为负时给出警告）
+    if (R_xy.determinant() < 0) {
+        ui->xLineEdit->setText("警告：检测到反射变换，可能有多解");
+        V.col(1) *= -1;
+        R_xy = V * U.transpose();
+    }
+
+    // 构造完整3D旋转矩阵（z轴旋转）
+    Eigen::Matrix3d rotation = Eigen::Matrix3d::Identity();
+    rotation.block<2,2>(0,0) = R_xy;  // 仅xy平面旋转
+
+    // ==================== 应用变换 ====================
+    auto transformPoint = [&](const coord& src) -> coord {
+        Eigen::Vector3d srcVec(src.x.toDouble(), src.y.toDouble(), src.z.toDouble());
+        Eigen::Vector3d dstVec = rotation * srcVec + translation;
+        return {
+                QString::number(dstVec.x()),
+                QString::number(dstVec.y()),
+                QString::number(dstVec.z())
+        };
+    };
+
+    // 变换所有相关坐标点
+    target2 = transformPoint(target2);
+
+    // 更新UI
+    ui_update();
 }
-
 void dartsParasComputingByTS::on_computeXandHPushButton_clicked()
 {
     //从控件更新坐标
     loadCoordsFromPlainTextEdit();
 
-    ui->pitchLineEdit->clear();
-    ui->pitchLineEdit_2->clear();
-    ui->rollLineEdit->clear();
-    ui->rollLineEdit_2->clear();
     ui->setaLineEdit->clear();
     ui->setaLineEdit_2->clear();
-    ui->psiLineEdit->clear();
-    ui->psiLineEdit_2->clear();
     ui->xLineEdit->clear();
     ui->hLineEdit->clear();
     ui->deltaPsiLineEdit->clear();
@@ -1539,20 +804,6 @@ void dartsParasComputingByTS::on_computeXandHPushButton_clicked()
     coord_transform();
     //更新UI
     ui_update();
-
-    // 计算 Rack 的前后左右的 DeltaL
-    double rackLeftDeltaL = DeltaL(ui->rackLeftFrontCoordXLineEdit, ui->rackLeftFrontCoordYLineEdit,
-                                   ui->rackLeftBackCoordXLineEdit, ui->rackLeftBackCoordYLineEdit);
-
-    double rackRightDeltaL = DeltaL(ui->rackRightFrontCoordXLineEdit, ui->rackRightFrontCoordYLineEdit,
-                                    ui->rackRightBackCoordXLineEdit, ui->rackRightBackCoordYLineEdit);
-
-    double rackFrontDeltaL = DeltaL(ui->rackLeftFrontCoordXLineEdit, ui->rackLeftFrontCoordYLineEdit,
-                                    ui->rackRightFrontCoordXLineEdit, ui->rackRightFrontCoordYLineEdit);
-
-    double rackBackDeltaL = DeltaL(ui->rackLeftBackCoordXLineEdit, ui->rackLeftBackCoordYLineEdit,
-                                   ui->rackRightBackCoordXLineEdit, ui->rackRightBackCoordYLineEdit);
-
 // 计算 Lead 的前后左右的 DeltaL
     double leadLeftDeltaL = DeltaL(ui->leadLeftFrontCoordXLineEdit, ui->leadLeftFrontCoordYLineEdit,
                                    ui->leadLeftBackCoordXLineEdit, ui->leadLeftBackCoordYLineEdit);
@@ -1565,18 +816,6 @@ void dartsParasComputingByTS::on_computeXandHPushButton_clicked()
 
     double leadBackDeltaL = DeltaL(ui->leadLeftBackCoordXLineEdit, ui->leadLeftBackCoordYLineEdit,
                                    ui->leadRightBackCoordXLineEdit, ui->leadRightBackCoordYLineEdit);
-    ui->pitchLineEdit_2->insert(QString::number(qAtan((ui->rackRightFrontCoordZLineEdit->text().toDouble() -
-                                                     ui->rackRightBackCoordZLineEdit->text().toDouble() +
-                                                     ui->rackLeftFrontCoordZLineEdit->text().toDouble() -
-                                                     ui->rackLeftBackCoordZLineEdit->text().toDouble()) /
-                                                    (rackRightDeltaL + rackLeftDeltaL))));
-    ui->pitchLineEdit->insert(QString::number(ui->pitchLineEdit_2->text().toDouble() * 180 / PI));
-    ui->rollLineEdit_2->insert(QString::number(qAtan(ui->rackLeftFrontCoordZLineEdit->text().toDouble() -
-                                                   ui->rackRightFrontCoordZLineEdit->text().toDouble() +
-                                                   ui->rackLeftBackCoordZLineEdit->text().toDouble() -
-                                                   ui->rackRightBackCoordZLineEdit->text().toDouble()) /
-                                             (rackFrontDeltaL + rackBackDeltaL)));
-    ui->rollLineEdit->insert(QString::number(ui->rollLineEdit_2->text().toDouble() * 180 / PI));
 
     ui->setaLineEdit_2->insert(QString::number(qAtan(ui->leadLeftFrontCoordZLineEdit->text().toDouble() -
                                                    ui->leadLeftBackCoordZLineEdit->text().toDouble() +
@@ -1585,28 +824,6 @@ void dartsParasComputingByTS::on_computeXandHPushButton_clicked()
                                              (leadLeftDeltaL + leadRightDeltaL)));
     ui->setaLineEdit->insert(QString::number(ui->setaLineEdit_2->text().toDouble() * 180 / PI));
 
-    // 计算 leadLeft 边与 rackLeft 边的夹角
-    double leadLeftX = ui->leadLeftFrontCoordXLineEdit->text().toDouble() - ui->leadLeftBackCoordXLineEdit->text().toDouble();
-    double leadLeftY = ui->leadLeftFrontCoordYLineEdit->text().toDouble() - ui->leadLeftBackCoordYLineEdit->text().toDouble();
-    double rackLeftX = ui->rackLeftFrontCoordXLineEdit->text().toDouble() - ui->rackLeftBackCoordXLineEdit->text().toDouble();
-    double rackLeftY = ui->rackLeftFrontCoordYLineEdit->text().toDouble() - ui->rackLeftBackCoordYLineEdit->text().toDouble();
-
-    double leadLeftAngle = qAtan2(leadLeftY, leadLeftX) - qAtan2(rackLeftY, rackLeftX);
-
-// 计算 leadRight 边与 rackRight 边的夹角
-    double leadRightX = ui->leadRightFrontCoordXLineEdit->text().toDouble() - ui->leadRightBackCoordXLineEdit->text().toDouble();
-    double leadRightY = ui->leadRightFrontCoordYLineEdit->text().toDouble() - ui->leadRightBackCoordYLineEdit->text().toDouble();
-    double rackRightX = ui->rackRightFrontCoordXLineEdit->text().toDouble() - ui->rackRightBackCoordXLineEdit->text().toDouble();
-    double rackRightY = ui->rackRightFrontCoordYLineEdit->text().toDouble() - ui->rackRightBackCoordYLineEdit->text().toDouble();
-
-    double leadRightAngle = qAtan2(leadRightY, leadRightX) - qAtan2(rackRightY, rackRightX);
-
-// 计算均值
-    double leadYaw = - (leadLeftAngle + leadRightAngle) / 2.0;  //向右转为正
-
-// 将结果放入 psiLineEdit
-    ui->psiLineEdit_2->insert(QString::number(leadYaw));
-    ui->psiLineEdit->insert(QString::number(leadYaw * 180 / PI));  // 转换为度
 //    ui->xLineEdit->insert(QString::number(ui->lLineEdit->text().toDouble() * qCos(ui->betaLineEdit->text().toDouble() * PI / 180.0) + ui->deltaXlineEdit->text().toDouble() / 1000));
 //    ui->hLineEdit->insert(QString::number(ui->lLineEdit->text().toDouble() * qSin(ui->betaLineEdit->text().toDouble() * PI / 180.0) + ui->deltaHlineEdit->text().toDouble() / 1000));
 
@@ -1653,11 +870,6 @@ void dartsParasComputingByTS::on_computeXandHPushButton_clicked()
     const double leadMiddleY = projection.y();
     const double leadMiddleZ = ui->leadDartShootCoordZLineEdit->text().toDouble(); // Z值保持与发射点相同
 
-    leadMiddleDartShoot2.x = QString::number(leadMiddleX);
-    leadMiddleDartShoot2.y = QString::number(leadMiddleY);
-    leadMiddleDartShoot2.z = QString::number(leadMiddleZ);
-
-
     // 获取目标点坐标
     const double targetX = ui->targetCoordXLineEdit->text().toDouble();
     const double targetY = ui->targetCoordYLineEdit->text().toDouble();
@@ -1688,49 +900,6 @@ void dartsParasComputingByTS::on_computeXandHPushButton_clicked()
     ui->leadMiddleDartShootCoordXLineEdit->setText(leadMiddleDartShoot2.x);
     ui->leadMiddleDartShootCoordYLineEdit->setText(leadMiddleDartShoot2.y);
     ui->leadMiddleDartShootCoordZLineEdit->setText(leadMiddleDartShoot2.z);
-
-    ui->rackLBCXLineEdit->setText(rackLBC2.x);
-    ui->rackLBCYLineEdit->setText(rackLBC2.y);
-    ui->rackLBCZLineEdit->setText(rackLBC2.z);
-
-    ui->rackRBCXLineEdit->setText(rackRBC2.x);
-    ui->rackRBCYLineEdit->setText(rackRBC2.y);
-    ui->rackRBCZLineEdit->setText(rackRBC2.z);
-
-    ui->rackRFCXLineEdit->setText(rackRFC2.x);
-    ui->rackRFCYLineEdit->setText(rackRFC2.y);
-    ui->rackRFCZLineEdit->setText(rackRFC2.z);
-
-    ui->rackLFCXLineEdit->setText(rackLFC2.x);
-    ui->rackLFCYLineEdit->setText(rackLFC2.y);
-    ui->rackLFCZLineEdit->setText(rackLFC2.z);
-
-#if LEAD_POINT_NUM == 4
-    ui->leadLBCXLineEdit->setText(leadLBC[0].x);
-    ui->leadLBCYLineEdit->setText(leadLBC[0].y);
-    ui->leadLBCZLineEdit->setText(leadLBC[0].z);
-
-    ui->leadRBCXLineEdit->setText(leadRBC[0].x);
-    ui->leadRBCYLineEdit->setText(leadRBC[0].y);
-    ui->leadRBCZLineEdit->setText(leadRBC[0].z);
-
-    ui->leadRFCXLineEdit->setText(leadRFC[0].x);
-    ui->leadRFCYLineEdit->setText(leadRFC[0].y);
-    ui->leadRFCZLineEdit->setText(leadRFC[0].z);
-
-    ui->leadLFCXLineEdit->setText(leadLFC[0].x);
-    ui->leadLFCYLineEdit->setText(leadLFC[0].y);
-    ui->leadLFCZLineEdit->setText(leadLFC[0].z);
-#endif
-#if LEAD_POINT_NUM == 2
-    ui->leadRFCXLineEdit->setText(leadFC[0].x);
-    ui->leadRFCYLineEdit->setText(leadFC[0].y);
-    ui->leadRFCZLineEdit->setText(leadFC[0].z);
-
-    ui->leadRBCXLineEdit->setText(leadBC[0].x);
-    ui->leadRBCYLineEdit->setText(leadBC[0].y);
-    ui->leadRBCZLineEdit->setText(leadBC[0].z);
-#endif
 }
 
 
@@ -1762,14 +931,8 @@ void dartsParasComputingByTS::on_deltaHlineEdit_editingFinished()
 
 void dartsParasComputingByTS::on_computeTall1PushButton_clicked()
 {
-    // 重建标定数据
-    buildYawDataPoints();
-
-    // 计算最优脉冲和角度
-    auto [pulse, angle] = findOptimalPulse();
-
     // 更新界面显示
-    ui->yaw1LineEdit->setText(QString::number(pulse));
+    ui->yaw1LineEdit->setText(ui->deltaPsi1LineEdit->text());
     ui->Tall1LineEditOutput->clear();
     ui->Tall1LineEditOutput->insert(QString::number(ui->f0LineEditInput->text().toDouble() + (((ui->mdart1PlusGLineEditInput->text().toDouble() + ui->mLauncherPlusGLineEditInput->text().toDouble()) / 1000 * ui->xLineEdit->text().toDouble() * ui->xLineEdit->text().toDouble() /( 4 * qCos(ui->setaLineEdit->text().toDouble() * PI / 180.0) * qCos(ui->setaLineEdit->text().toDouble() * PI / 180.0) * (ui->xLineEdit->text().toDouble() * qTan(ui->setaLineEdit->text().toDouble() * PI / 180.0) - ui->hLineEdit->text().toDouble()))) - ui->integralOfF0PlusDxtensionLineEditInput->text().toDouble()) / ui->k1PlusXtensionLineEditInput->text().toDouble()));
 }
