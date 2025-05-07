@@ -46,7 +46,6 @@ coord leadRightFront2;
 coord leadLeftFront2;
 coord rackLeftFront2;
 coord leadDartShoot2;
-coord leadMiddleDartShoot2;
 coord rackLBC2;
 coord rackRFC2;
 coord rackRBC2;
@@ -349,12 +348,6 @@ void dartsParasComputingByTS::loadCoordsFromPlainTextEdit() {
     leadDartShoot2.x = ui->leadDartShootCoordXLineEdit->text();
     leadDartShoot2.y = ui->leadDartShootCoordYLineEdit->text();
     leadDartShoot2.z = ui->leadDartShootCoordZLineEdit->text();
-
-    // 从UI控件读取leadMiddleDartShoot2坐标数据
-    leadMiddleDartShoot2.x = ui->leadMiddleDartShootCoordXLineEdit->text();
-    leadMiddleDartShoot2.y = ui->leadMiddleDartShootCoordYLineEdit->text();
-    leadMiddleDartShoot2.z = ui->leadMiddleDartShootCoordZLineEdit->text();
-
 }
 
 /**
@@ -680,10 +673,10 @@ void dartsParasComputingByTS::ui_update(){
     ui->leadLeftFrontCoordYLineEdit->setText(leadLeftFront2.y);
     ui->leadLeftFrontCoordZLineEdit->setText(leadLeftFront2.z);
 
-// 更新leadMiddleDartShoot2相关UI
-    ui->leadMiddleDartShootCoordXLineEdit->setText(leadMiddleDartShoot2.x);
-    ui->leadMiddleDartShootCoordYLineEdit->setText(leadMiddleDartShoot2.y);
-    ui->leadMiddleDartShootCoordZLineEdit->setText(leadMiddleDartShoot2.z);
+// 更新leadDartShoot2相关UI
+    ui->leadDartShootCoordXLineEdit->setText(leadDartShoot2.x);
+    ui->leadDartShootCoordYLineEdit->setText(leadDartShoot2.y);
+    ui->leadDartShootCoordZLineEdit->setText(leadDartShoot2.z);
 }
 
 /**
@@ -897,9 +890,9 @@ void dartsParasComputingByTS::on_computeXandHPushButton_clicked()
     // 更新 UI
     ui_update();
 
-    ui->leadMiddleDartShootCoordXLineEdit->setText(leadMiddleDartShoot2.x);
-    ui->leadMiddleDartShootCoordYLineEdit->setText(leadMiddleDartShoot2.y);
-    ui->leadMiddleDartShootCoordZLineEdit->setText(leadMiddleDartShoot2.z);
+    ui->leadDartShootCoordXLineEdit->setText(leadDartShoot2.x);
+    ui->leadDartShootCoordYLineEdit->setText(leadDartShoot2.y);
+    ui->leadDartShootCoordZLineEdit->setText(leadDartShoot2.z);
 }
 
 
@@ -1039,9 +1032,19 @@ void dartsParasComputingByTS::on_sendAllParasPushButton_clicked()
     this->on_sendFourthDartParasPushButton_clicked();
 }
 
+/**
+* @brief 模拟裁判系统闸门开启的串口数据，使用时需要把TS设备串口拔掉、接入主控板上的裁判系统接收串口，波特率需要调整到115200
+* @param None
+* @retval None
+* @bug 
+*/
 void dartsParasComputingByTS::on_shootPushButton_clicked()
 {
-    ShootTwoDarts(this, serialPort1);
+//    ShootTwoDarts(this, serialPort1);
+
+    Serial *serial = new Serial(this);
+    serial->setLineEdits(ui->target_change_timeLineEdit, ui->latest_lauch_cmd_timeLineEdit, ui->dart_target_LineEdit);
+    serial->JudgeDartShootSimu(this, serialPort2);
 }
 
 void dartsParasComputingByTS::on_abortShootPushButton_clicked()
