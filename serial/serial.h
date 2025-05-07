@@ -5,70 +5,45 @@
 #include <QSerialPortInfo>
 #include <QSerialPort>
 #include <QMessageBox>
-#include <QByteArray>
-#include <QLineEdit>
 #include <QString>
-#include <QObject>
-#include <QSerialPort>
 #include <QTimer>
-#include <QTime>
 
-class QLineEdit;
-class QWidget;
+// CRC校验函数
+uint8_t Get_CRC8_Check_Sum(uint8_t *pchMessage, uint32_t dwLength, uint8_t ucCRC8);
+uint16_t Get_CRC16_Check_Sum(uint8_t *pchMessage, uint32_t dwLength, uint16_t wCRC);
 
 bool checkSerialOpen(QWidget *parent, QSerialPort *serialPort);
+
 void SetYaw(QWidget *parent, QSerialPort *serialPort, int channel, QString yaw);
+
 void SetTen(QWidget *parent, QSerialPort *serialPort, int channel, QString tension);
+
 void TestShoot(QWidget *parent, QSerialPort *serialPort);
+
 void AbortShoot(QWidget *parent, QSerialPort *serialPort);
+
 void SetCurYawToZero(QWidget *parent, QSerialPort *serialPort);
+
 void ResetFeed(QWidget *parent, QSerialPort *serialPort);
+
 void SonicRangeTest(QWidget *parent, QSerialPort *serialPort);
+
 void SonicRangeTestSetParas(QWidget *parent, QSerialPort *serialPort, QString tarRange);
+
 void ShootTwoDarts(QWidget *parent, QSerialPort *serialPort);
-void JudgeDartShootSimu(QWidget *parent, QSerialPort *serialPort);
 
-class Serial : public QObject
+quint8 calculateCRC8(const QByteArray &data);
+
+quint16 calculateCRC16(const QByteArray &data);
+
+class serial : public QSerialPort
 {
-    Q_OBJECT
 public:
-    explicit Serial(QObject *parent = nullptr);
+    serial();
 
-    bool checkSerialOpen(QWidget *parent, QSerialPort *serialPort);
-    void JudgeDartShootSimu(QWidget *parent, QSerialPort *serialPort);
+    QSerialPort *serialPort1;
 
-    // 设置UI控件指针
-    void setLineEdits(QLineEdit *targetChange, QLineEdit *latestLaunch, QLineEdit *dartTarget) {
-        target_change_timeLineEdit = targetChange;
-        latest_lauch_cmd_timeLineEdit = latestLaunch;
-        dart_target_LineEdit = dartTarget;
-    }
 
-private:
-    QSerialPort *serialPort;  // 当前使用的串口
-
-    // 定时器和状态变量
-    QTimer *hz3Timer;
-    QTimer *hz1Timer;
-    bool isSimulating;
-    QTime simulationStartTime;
-    int currentCountdown;
-
-    // UI控件指针
-    QLineEdit *target_change_timeLineEdit;
-    QLineEdit *latest_lauch_cmd_timeLineEdit;
-    QLineEdit *dart_target_LineEdit;
-
-    // CRC计算函数
-    quint8 calculateCRC8(const QByteArray &data);
-    quint16 calculateCRC16(const QByteArray &data);
-
-    // 数据包发送函数
-    void send3HzPacket();
-    void send1HzPacket();
-
-    // 模拟控制函数
-    void startSimulation();
-    void stopSimulation();
 };
-#endif
+
+#endif // SERIAL_H

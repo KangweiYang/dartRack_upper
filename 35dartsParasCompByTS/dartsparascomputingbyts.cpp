@@ -46,6 +46,7 @@ coord leadRightFront2;
 coord leadLeftFront2;
 coord rackLeftFront2;
 coord leadDartShoot2;
+coord leadMiddleDartShoot2;
 coord rackLBC2;
 coord rackRFC2;
 coord rackRBC2;
@@ -439,6 +440,16 @@ dartsParasComputingByTS::dartsParasComputingByTS(QSerialPort *serialPort, QSeria
     connect(serialPort1, SIGNAL(readyRead()), this, SLOT(serialPortReadyRead_Slot()));
 
     connect(serialPort2, SIGNAL(readyRead()), this, SLOT(serialPortReadyRead2_Slot()));
+
+    timer3Hz = new QTimer(this);
+    timer1Hz = new QTimer(this);
+    isSending = false;
+    seq3Hz = 0;
+    seq1Hz = 0;
+    busyMessage = nullptr;
+
+    connect(timer3Hz, &QTimer::timeout, this, &dartsParasComputingByTS::send3HzPacket);
+    connect(timer1Hz, &QTimer::timeout, this, &dartsParasComputingByTS::send1HzPacket);
 }
 
 void dartsParasComputingByTS::serialPortReadyRead_Slot(){
@@ -595,6 +606,8 @@ void dartsParasComputingByTS::serialPortReadyRead2_Slot() {
 dartsParasComputingByTS::~dartsParasComputingByTS()
 {
     this->visible = false;
+    timer3Hz->stop();
+    timer1Hz->stop();
     delete ui;
 }
 
@@ -673,10 +686,10 @@ void dartsParasComputingByTS::ui_update(){
     ui->leadLeftFrontCoordYLineEdit->setText(leadLeftFront2.y);
     ui->leadLeftFrontCoordZLineEdit->setText(leadLeftFront2.z);
 
-// 更新leadDartShoot2相关UI
-    ui->leadDartShootCoordXLineEdit->setText(leadDartShoot2.x);
-    ui->leadDartShootCoordYLineEdit->setText(leadDartShoot2.y);
-    ui->leadDartShootCoordZLineEdit->setText(leadDartShoot2.z);
+// 更新leadMiddleDartShoot2相关UI
+    ui->leadDartShootCoordXLineEdit->setText(leadMiddleDartShoot2.x);
+    ui->leadDartShootCoordYLineEdit->setText(leadMiddleDartShoot2.y);
+    ui->leadDartShootCoordZLineEdit->setText(leadMiddleDartShoot2.z);
 }
 
 /**
@@ -890,9 +903,9 @@ void dartsParasComputingByTS::on_computeXandHPushButton_clicked()
     // 更新 UI
     ui_update();
 
-    ui->leadDartShootCoordXLineEdit->setText(leadDartShoot2.x);
-    ui->leadDartShootCoordYLineEdit->setText(leadDartShoot2.y);
-    ui->leadDartShootCoordZLineEdit->setText(leadDartShoot2.z);
+    ui->leadDartShootCoordXLineEdit->setText(leadMiddleDartShoot2.x);
+    ui->leadDartShootCoordYLineEdit->setText(leadMiddleDartShoot2.y);
+    ui->leadDartShootCoordZLineEdit->setText(leadMiddleDartShoot2.z);
 }
 
 
@@ -1031,22 +1044,174 @@ void dartsParasComputingByTS::on_sendAllParasPushButton_clicked()
     this->on_sendThirdDartParasPushButton_clicked();
     this->on_sendFourthDartParasPushButton_clicked();
 }
-
-/**
-* @brief 模拟裁判系统闸门开启的串口数据，使用时需要把TS设备串口拔掉、接入主控板上的裁判系统接收串口，波特率需要调整到115200
-* @param None
-* @retval None
-* @bug 
-*/
-void dartsParasComputingByTS::on_shootPushButton_clicked()
+void dartsParasComputingByTS::send3HzPacket()
 {
-//    ShootTwoDarts(this, serialPort1);
+    const int elapsed = shootTimer.elapsed();
+    quint8 stateByte = 0x00;
 
-    Serial *serial = new Serial(this);
-    serial->setLineEdits(ui->target_change_timeLineEdit, ui->latest_lauch_cmd_timeLineEdit, ui->dart_target_LineEdit);
-    serial->JudgeDartShootSimu(this, serialPort2);
+    // 状态判断逻辑
+    if (elapsed < 3000) { // 前3秒
+        stateByte = 0x02;
+    } else if (elapsed < 10000) { // 3-10秒（7秒）
+        stateByte = 0x02;
+    } else if (elapsed < 30000) { // 10-30秒（20秒）
+        stateByte = 0x00;
+    } else if (elapsed < 37000) { // 30-37秒（7秒）
+        stateByte = 0x02;
+    } else { // 37秒后
+        stateByte = 0x01;
+    }
+
+    // 构建数据包
+    QByteArray packet;
+    packet.append(0xA5);
+    packet.append(0x06);
+    packet.append((char)0x00);
+    packet.append(seq3Hz++);
+
+    // 计算帧头CRC
+    QByteArray header = packet.left(4);
+    packet.append(calculateHeaderCRC(header));
+
+    // 添加数据部分
+    packet.append(0x0A);
+    packet.append(stateByte);
+    packet.append(0x02);
+    packet.append((char)0x00);
+    packet.append((char)0x00);
+
+    // 添加两个16位参数（小端序）
+    packet.append(targetChangeTime & 0xFF);
+    packet.append(targetChangeTime >> 8);
+    packet.append(latestLaunchCmdTime & 0xFF);
+    packet.append(latestLaunchCmdTime >> 8);
+
+    // 计算整包CRC
+    quint16 crc = calculatePacketCRC(packet);
+    packet.append(crc & 0xFF);
+    packet.append(crc >> 8);
+
+    // 发送数据（示例使用虚拟串口）
+    if (serialPort1 && serialPort1->isOpen()) {
+        serialPort1->write(packet);
+    }
+
+    // 超过总时间停止
+    if (elapsed >= 52000) { // 3+7+20+7+15=52秒
+        timer3Hz->stop();
+        isSending = false;
+    }
+}
+quint8 dartsParasComputingByTS::calculateHeaderCRC(const QByteArray &data)
+{
+    // 简化的CRC8计算示例
+    quint8 crc = 0;
+    for (char c : data) {
+        crc ^= c;
+        for (int i = 0; i < 8; i++) {
+            crc = (crc & 0x80) ? (crc << 1) ^ 0x07 : (crc << 1);
+        }
+    }
+    return crc;
 }
 
+quint16 dartsParasComputingByTS::calculatePacketCRC(const QByteArray &data)
+{
+    // CRC16-CCITT计算
+    quint16 crc = 0xFFFF;
+    for (char c : data) {
+        crc ^= (quint8)c << 8;
+        for (int i = 0; i < 8; i++) {
+            crc = crc & 0x8000 ? (crc << 1) ^ 0x1021 : crc << 1;
+        }
+    }
+    return crc;
+}
+void dartsParasComputingByTS::send1HzPacket()
+{
+    const int elapsed = shootTimer.elapsed();
+    quint8 stateByte = 0x00;
+    quint8 countdown = 0;
+
+    // 状态判断逻辑
+    if (elapsed < 3000) {
+        stateByte = 0x00;
+    } else if (elapsed < 10000) {
+        stateByte = 0x00;
+    } else if (elapsed < 30000) { // 倒计时20秒
+        int remaining = 30 - (elapsed/1000);
+        countdown = qBound(0, remaining, 20);
+    } else if (elapsed < 37000) {
+        stateByte = 0x00;
+    } else {
+        stateByte = 0x00;
+    }
+
+    // 构建数据包
+    QByteArray packet;
+    packet.append(0xA5);
+    packet.append(0x03);
+    packet.append((char)0x00);
+    packet.append(seq1Hz++);
+
+    // 计算帧头CRC
+    QByteArray header = packet.left(4);
+    packet.append(calculateHeaderCRC(header));
+
+    // 添加数据部分
+    packet.append(stateByte);
+    packet.append(countdown);
+
+    // 添加目标参数（高2位）
+    packet.append(dartTarget << 6);
+
+    // 计算整包CRC
+    quint16 crc = calculatePacketCRC(packet);
+    packet.append(crc & 0xFF);
+    packet.append(crc >> 8);
+
+    // 发送数据
+    if (serialPort1 && serialPort1->isOpen()) {
+        serialPort1->write(packet);
+    }
+}
+void dartsParasComputingByTS::on_shootPushButton_clicked()
+{
+    if (isSending) {
+        // 显示1秒自动关闭的提示
+        if (!busyMessage) {
+            busyMessage = new QMessageBox(this);
+            busyMessage->setText("串口忙，操作不可抢占");
+            busyMessage->setWindowModality(Qt::NonModal);
+            busyMessage->show();
+
+            // 1秒后自动关闭
+            QTimer::singleShot(1000, this, [this]() {
+                if (busyMessage) {
+                    busyMessage->deleteLater();
+                    busyMessage = nullptr;
+                }
+            });
+        }
+        return;
+    }
+
+    // 初始化发送状态
+    isSending = true;
+    shootStartTime = 0;
+    seq3Hz = 0;
+    seq1Hz = 0;
+
+    // 从控件获取参数
+    targetChangeTime = ui->target_change_timeLineEdit->text().toUShort();
+    latestLaunchCmdTime = ui->latest_lauch_cmd_timeLineEdit->text().toUShort();
+    dartTarget = ui->dart_target_LineEdit->text().toUShort() & 0x03; // 只取低2位
+
+    // 启动定时器
+    timer3Hz->start(333); // ≈3Hz
+    timer1Hz->start(1000); // 1Hz
+    shootTimer.start();
+}
 void dartsParasComputingByTS::on_abortShootPushButton_clicked()
 {
     AbortShoot(this, serialPort1);

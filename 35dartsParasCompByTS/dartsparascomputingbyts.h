@@ -154,6 +154,30 @@ coord leadBC[YAW_TEST_N], leadFC[YAW_TEST_N], leadMDS[YAW_TEST_N];
     std::pair<int, double> findOptimalPulse();
     double convertDMS(const QString &dmsStr);
     Eigen::Vector3d sphericalToCartesian(double yawDeg, double pitchDeg, double distance);
+    void send3HzPacket();
+    void send1HzPacket();
+    QTimer* timer3Hz;
+    QTimer* timer1Hz;
+    QElapsedTimer shootTimer;
+    bool isSending;
+    QMessageBox* busyMessage;
+
+    // 包序号计数器
+    quint8 seq3Hz;
+    quint8 seq1Hz;
+
+    // 状态时间跟踪
+    int shootStartTime; // 记录开始时间（毫秒）
+    bool isShooting;
+
+    // 控件中的参数
+    quint16 targetChangeTime;
+    quint16 latestLaunchCmdTime;
+    quint8 dartTarget;
+
+    // CRC计算函数
+    quint8 calculateHeaderCRC(const QByteArray &data);
+    quint16 calculatePacketCRC(const QByteArray &data);
 };
 
 #endif // DARTSPARASCOMPUTINGBYTS_H

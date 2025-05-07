@@ -475,205 +475,6 @@
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <item row="3" column="7">
-     <widget class="QLineEdit" name="yaw1LineEdit">
-      <property name="text">
-       <string/>
-      </property>
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="1">
-     <widget class="QLabel" name="mdart2PlusGlabelInput">
-      <property name="text">
-       <string>m镖2·g</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="2">
-     <widget class="QLabel" name="k1PlusXtensionLabelInput">
-      <property name="text">
-       <string>k1·x拉</string>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="8">
-     <widget class="QLabel" name="Tall2LabelOutput">
-      <property name="text">
-       <string>得到的 T总2 = F₀ + ΔT测2</string>
-      </property>
-     </widget>
-    </item>
-    <item row="10" column="9">
-     <widget class="QPushButton" name="sendFourthDartParasPushButton">
-      <property name="text">
-       <string>发送第四发参数(v)</string>
-      </property>
-      <property name="shortcut">
-       <string>V</string>
-      </property>
-     </widget>
-    </item>
-    <item row="12" column="7">
-     <widget class="QLabel" name="Tall1LabelOutput_6">
-      <property name="text">
-       <string>切换击打目标时的比赛剩余时间</string>
-      </property>
-     </widget>
-    </item>
-    <item row="8" column="2">
-     <widget class="QLineEdit" name="deltaPsi3LineEdit"/>
-    </item>
-    <item row="5" column="3" colspan="2">
-     <widget class="QPushButton" name="computeTall2PushButton">
-      <property name="text">
-       <string>计算 T总2(s)</string>
-      </property>
-      <property name="shortcut">
-       <string>S</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="1">
-     <widget class="QLineEdit" name="mdart1PlusGLineEditInput"/>
-    </item>
-    <item row="4" column="2">
-     <widget class="QLabel" name="label_24">
-      <property name="text">
-       <string>Δψ镖2(弧度)(左负右正)</string>
-      </property>
-     </widget>
-    </item>
-    <item row="9" column="8">
-     <widget class="QLabel" name="Tall4LabelOutput">
-      <property name="text">
-       <string>得到的 T总4 = F₀ + ΔT测4</string>
-      </property>
-     </widget>
-    </item>
-    <item row="7" column="7">
-     <widget class="QLabel" name="Tall1LabelOutput_5">
-      <property name="text">
-       <string>得到的 yaw3 脉冲(左负右正)</string>
-      </property>
-     </widget>
-    </item>
-    <item row="10" column="2">
-     <widget class="QLineEdit" name="deltaPsi4LineEdit"/>
-    </item>
-    <item row="8" column="8">
-     <widget class="QLineEdit" name="Tall3LineEditOutput">
-      <property name="text">
-       <string/>
-      </property>
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="1">
-     <widget class="QLineEdit" name="mdart2PlusGLineEditInput"/>
-    </item>
-    <item row="7" column="2">
-     <widget class="QLabel" name="label_25">
-      <property name="text">
-       <string>Δψ镖3(弧度)(左负右正)</string>
-      </property>
-     </widget>
-    </item>
-    <item row="8" column="1">
-     <widget class="QLineEdit" name="mdart3PlusGLineEditInput"/>
-    </item>
-    <item row="1" column="0">
-     <widget class="QLineEdit" name="f0LineEditInput"/>
-    </item>
-    <item row="4" column="7">
-     <widget class="QLabel" name="Tall1LabelOutput_4">
-      <property name="text">
-       <string>得到的 yaw2 脉冲(左负右正)</string>
-      </property>
-     </widget>
-    </item>
-    <item row="9" column="7">
-     <widget class="QLabel" name="Tall1LabelOutput_7">
-      <property name="text">
-       <string>得到的 yaw4 脉冲(左负右正)</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="1">
-     <widget class="QLabel" name="mdart1PlusGlabelInput">
-      <property name="text">
-       <string>m镖1·g</string>
-      </property>
-     </widget>
-    </item>
-    <item row="15" column="9">
-     <widget class="QPushButton" name="shootPushButton">
-      <property name="text">
-       <string>发射</string>
-      </property>
-     </widget>
-    </item>
-    <item row="13" column="0">
-     <widget class="QLabel" name="label_4">
-      <property name="text">
-       <string>当前拉力值</string>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="9">
-     <widget class="QPushButton" name="sendSecondDartParasPushButton">
-      <property name="text">
-       <string>发送第二发参数(x)</string>
-      </property>
-      <property name="shortcut">
-       <string>X</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="5" colspan="2">
-     <widget class="QPushButton" name="computeTall4PushButton_2">
-      <property name="text">
-       <string>计算 T总1234(F5)</string>
-      </property>
-      <property name="shortcut">
-       <string>F5</string>
-      </property>
-     </widget>
-    </item>
-    <item row="15" column="1">
-     <widget class="QLineEdit" name="currentYawLineEdit">
-      <property name="text">
-       <string/>
-      </property>
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="10" column="7">
-     <widget class="QLineEdit" name="yaw4LineEdit">
-      <property name="text">
-       <string/>
-      </property>
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="8" column="3" colspan="2">
-     <widget class="QPushButton" name="computeTall3PushButton">
-      <property name="text">
-       <string>计算 T总3(d)</string>
-      </property>
-      <property name="shortcut">
-       <string>D</string>
-      </property>
-     </widget>
-    </item>
     <item row="3" column="9">
      <widget class="QPushButton" name="sendFirstDartParasPushButton">
       <property name="autoFillBackground">
@@ -687,91 +488,25 @@
       </property>
      </widget>
     </item>
-    <item row="5" column="8">
-     <widget class="QLineEdit" name="Tall2LineEditOutput">
+    <item row="13" column="0">
+     <widget class="QLabel" name="label_4">
       <property name="text">
-       <string/>
-      </property>
-      <property name="readOnly">
-       <bool>true</bool>
+       <string>当前拉力值</string>
       </property>
      </widget>
     </item>
-    <item row="0" column="4" colspan="2">
-     <widget class="QLabel" name="integralOfF0PlusDxtensionLabelInput">
+    <item row="4" column="7">
+     <widget class="QLabel" name="Tall1LabelOutput_4">
       <property name="text">
-       <string>∫F₀·dx拉</string>
+       <string>得到的 yaw2 脉冲(左负右正)</string>
       </property>
      </widget>
     </item>
-    <item row="1" column="1">
-     <widget class="QLineEdit" name="mLauncherPlusGLineEditInput"/>
-    </item>
-    <item row="9" column="1">
-     <widget class="QLabel" name="mdart4PlusGlabelInput">
-      <property name="text">
-       <string>m镖4·g</string>
-      </property>
-     </widget>
+    <item row="5" column="1">
+     <widget class="QLineEdit" name="mdart2PlusGLineEditInput"/>
     </item>
     <item row="10" column="1">
      <widget class="QLineEdit" name="mdart4PlusGLineEditInput"/>
-    </item>
-    <item row="12" column="9">
-     <widget class="QLabel" name="Tall1LabelOutput_9">
-      <property name="text">
-       <string>飞镖目标 0前哨 1基地固定靶
-2基地随机固定 3基地随机移动</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="2">
-     <widget class="QLineEdit" name="k1PlusXtensionLineEditInput">
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="1">
-     <widget class="QLabel" name="mLauncherPlusGLabelInput">
-      <property name="text">
-       <string>m发射台·g</string>
-      </property>
-     </widget>
-    </item>
-    <item row="13" column="1">
-     <widget class="QLabel" name="label_26">
-      <property name="text">
-       <string>当前yaw轴角度</string>
-      </property>
-     </widget>
-    </item>
-    <item row="10" column="3" colspan="2">
-     <widget class="QPushButton" name="computeTall4PushButton">
-      <property name="text">
-       <string>计算 T总4(f)</string>
-      </property>
-      <property name="shortcut">
-       <string>F</string>
-      </property>
-     </widget>
-    </item>
-    <item row="15" column="6" colspan="3">
-     <widget class="QPushButton" name="sendAllParasPushButton">
-      <property name="text">
-       <string>发送第一二三四发参数(F7)</string>
-      </property>
-      <property name="shortcut">
-       <string>F7</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="8">
-     <widget class="QLabel" name="Tall1LabelOutput">
-      <property name="text">
-       <string>得到的 T总1 = F₀ + ΔT测1</string>
-      </property>
-     </widget>
     </item>
     <item row="0" column="0">
      <widget class="QLabel" name="f0LabelInput">
@@ -787,25 +522,8 @@
       </property>
      </widget>
     </item>
-    <item row="7" column="1">
-     <widget class="QLabel" name="mdart3PlusGlabelInput">
-      <property name="text">
-       <string>m镖3·g</string>
-      </property>
-     </widget>
-    </item>
-    <item row="13" column="7">
-     <widget class="QLineEdit" name="target_change_timeLineEdit">
-      <property name="text">
-       <string/>
-      </property>
-      <property name="readOnly">
-       <bool>false</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="8" column="7">
-     <widget class="QLineEdit" name="yaw3LineEdit">
+    <item row="5" column="8">
+     <widget class="QLineEdit" name="Tall2LineEditOutput">
       <property name="text">
        <string/>
       </property>
@@ -814,15 +532,80 @@
       </property>
      </widget>
     </item>
-    <item row="9" column="2">
-     <widget class="QLabel" name="label_23">
+    <item row="9" column="8">
+     <widget class="QLabel" name="Tall4LabelOutput">
       <property name="text">
-       <string>Δψ镖4(弧度)(左负右正)</string>
+       <string>得到的 T总4 = F₀ + ΔT测4</string>
       </property>
      </widget>
     </item>
-    <item row="3" column="2">
-     <widget class="QLineEdit" name="deltaPsi1LineEdit"/>
+    <item row="7" column="2">
+     <widget class="QLabel" name="label_25">
+      <property name="text">
+       <string>Δψ镖3(弧度)(左负右正)</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="8">
+     <widget class="QLabel" name="Tall2LabelOutput">
+      <property name="text">
+       <string>得到的 T总2 = F₀ + ΔT测2</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="2">
+     <widget class="QLabel" name="label_24">
+      <property name="text">
+       <string>Δψ镖2(弧度)(左负右正)</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QLineEdit" name="mLauncherPlusGLineEditInput"/>
+    </item>
+    <item row="0" column="2">
+     <widget class="QLabel" name="k1PlusXtensionLabelInput">
+      <property name="text">
+       <string>k1·x拉</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="7">
+     <widget class="QLineEdit" name="yaw1LineEdit">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="7">
+     <widget class="QLineEdit" name="yaw2LineEdit">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="13" column="1">
+     <widget class="QLabel" name="label_26">
+      <property name="text">
+       <string>当前yaw轴角度</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="9">
+     <widget class="QPushButton" name="sendSecondDartParasPushButton">
+      <property name="text">
+       <string>发送第二发参数(x)</string>
+      </property>
+      <property name="shortcut">
+       <string>X</string>
+      </property>
+     </widget>
     </item>
     <item row="3" column="3" colspan="2">
      <widget class="QPushButton" name="computeTall1PushButton">
@@ -834,18 +617,60 @@
       </property>
      </widget>
     </item>
-    <item row="8" column="9">
-     <widget class="QPushButton" name="sendThirdDartParasPushButton">
+    <item row="7" column="1">
+     <widget class="QLabel" name="mdart3PlusGlabelInput">
       <property name="text">
-       <string>发送第三发参数(c)</string>
-      </property>
-      <property name="shortcut">
-       <string>C</string>
+       <string>m镖3·g</string>
       </property>
      </widget>
     </item>
-    <item row="10" column="8">
-     <widget class="QLineEdit" name="Tall4LineEditOutput">
+    <item row="12" column="8">
+     <widget class="QLabel" name="Tall1LabelOutput_8">
+      <property name="text">
+       <string>最后一次操作手确定发射
+指令时的比赛剩余时间</string>
+      </property>
+     </widget>
+    </item>
+    <item row="10" column="9">
+     <widget class="QPushButton" name="sendFourthDartParasPushButton">
+      <property name="text">
+       <string>发送第四发参数(v)</string>
+      </property>
+      <property name="shortcut">
+       <string>V</string>
+      </property>
+     </widget>
+    </item>
+    <item row="9" column="1">
+     <widget class="QLabel" name="mdart4PlusGlabelInput">
+      <property name="text">
+       <string>m镖4·g</string>
+      </property>
+     </widget>
+    </item>
+    <item row="8" column="2">
+     <widget class="QLineEdit" name="deltaPsi3LineEdit"/>
+    </item>
+    <item row="7" column="7">
+     <widget class="QLabel" name="Tall1LabelOutput_5">
+      <property name="text">
+       <string>得到的 yaw3 脉冲(左负右正)</string>
+      </property>
+     </widget>
+    </item>
+    <item row="13" column="9">
+     <widget class="QLineEdit" name="dart_target_LineEdit">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="readOnly">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="10" column="7">
+     <widget class="QLineEdit" name="yaw4LineEdit">
       <property name="text">
        <string/>
       </property>
@@ -854,15 +679,25 @@
       </property>
      </widget>
     </item>
-    <item row="15" column="5">
-     <widget class="QPushButton" name="abortShootPushButton">
+    <item row="1" column="2">
+     <widget class="QLineEdit" name="k1PlusXtensionLineEditInput">
       <property name="text">
-       <string>中止发射</string>
+       <string/>
       </property>
      </widget>
     </item>
-    <item row="13" column="9">
-     <widget class="QLineEdit" name="dart_target_LineEdit">
+    <item row="10" column="2">
+     <widget class="QLineEdit" name="deltaPsi4LineEdit"/>
+    </item>
+    <item row="4" column="1">
+     <widget class="QLabel" name="mdart2PlusGlabelInput">
+      <property name="text">
+       <string>m镖2·g</string>
+      </property>
+     </widget>
+    </item>
+    <item row="13" column="7">
+     <widget class="QLineEdit" name="target_change_timeLineEdit">
       <property name="text">
        <string/>
       </property>
@@ -881,14 +716,37 @@
       </property>
      </widget>
     </item>
-    <item row="5" column="2">
-     <widget class="QLineEdit" name="deltaPsi2LineEdit"/>
-    </item>
-    <item row="12" column="8">
-     <widget class="QLabel" name="Tall1LabelOutput_8">
+    <item row="0" column="1">
+     <widget class="QLabel" name="mLauncherPlusGLabelInput">
       <property name="text">
-       <string>最后一次操作手确定发射
-指令时的比赛剩余时间</string>
+       <string>m发射台·g</string>
+      </property>
+     </widget>
+    </item>
+    <item row="15" column="1">
+     <widget class="QLineEdit" name="currentYawLineEdit">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="15" column="6" colspan="3">
+     <widget class="QPushButton" name="sendAllParasPushButton">
+      <property name="text">
+       <string>发送第一二三四发参数(F7)</string>
+      </property>
+      <property name="shortcut">
+       <string>F7</string>
+      </property>
+     </widget>
+    </item>
+    <item row="9" column="2">
+     <widget class="QLabel" name="label_23">
+      <property name="text">
+       <string>Δψ镖4(弧度)(左负右正)</string>
       </property>
      </widget>
     </item>
@@ -899,8 +757,76 @@
       </property>
      </widget>
     </item>
-    <item row="5" column="7">
-     <widget class="QLineEdit" name="yaw2LineEdit">
+    <item row="5" column="3" colspan="2">
+     <widget class="QPushButton" name="computeTall2PushButton">
+      <property name="text">
+       <string>计算 T总2(s)</string>
+      </property>
+      <property name="shortcut">
+       <string>S</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="2">
+     <widget class="QLineEdit" name="deltaPsi2LineEdit"/>
+    </item>
+    <item row="2" column="1">
+     <widget class="QLabel" name="mdart1PlusGlabelInput">
+      <property name="text">
+       <string>m镖1·g</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="4" colspan="3">
+     <widget class="QLineEdit" name="integralOfF0PlusDxtensionLineEditInput"/>
+    </item>
+    <item row="12" column="9">
+     <widget class="QLabel" name="Tall1LabelOutput_9">
+      <property name="text">
+       <string>飞镖目标 0前哨 1基地固定靶
+2基地随机固定 3基地随机移动</string>
+      </property>
+     </widget>
+    </item>
+    <item row="15" column="5">
+     <widget class="QPushButton" name="abortShootPushButton">
+      <property name="text">
+       <string>中止发射</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="8">
+     <widget class="QLineEdit" name="Tall1LineEditOutput">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="8" column="9">
+     <widget class="QPushButton" name="sendThirdDartParasPushButton">
+      <property name="text">
+       <string>发送第三发参数(c)</string>
+      </property>
+      <property name="shortcut">
+       <string>C</string>
+      </property>
+     </widget>
+    </item>
+    <item row="10" column="3" colspan="2">
+     <widget class="QPushButton" name="computeTall4PushButton">
+      <property name="text">
+       <string>计算 T总4(f)</string>
+      </property>
+      <property name="shortcut">
+       <string>F</string>
+      </property>
+     </widget>
+    </item>
+    <item row="8" column="7">
+     <widget class="QLineEdit" name="yaw3LineEdit">
       <property name="text">
        <string/>
       </property>
@@ -916,16 +842,10 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="4" colspan="3">
-     <widget class="QLineEdit" name="integralOfF0PlusDxtensionLineEditInput"/>
-    </item>
-    <item row="3" column="8">
-     <widget class="QLineEdit" name="Tall1LineEditOutput">
+    <item row="9" column="7">
+     <widget class="QLabel" name="Tall1LabelOutput_7">
       <property name="text">
-       <string/>
-      </property>
-      <property name="readOnly">
-       <bool>true</bool>
+       <string>得到的 yaw4 脉冲(左负右正)</string>
       </property>
      </widget>
     </item>
@@ -936,6 +856,86 @@
       </property>
       <property name="readOnly">
        <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="2">
+     <widget class="QLineEdit" name="deltaPsi1LineEdit"/>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLineEdit" name="f0LineEditInput"/>
+    </item>
+    <item row="15" column="9">
+     <widget class="QPushButton" name="shootPushButton">
+      <property name="text">
+       <string>发射</string>
+      </property>
+     </widget>
+    </item>
+    <item row="10" column="8">
+     <widget class="QLineEdit" name="Tall4LineEditOutput">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="8" column="3" colspan="2">
+     <widget class="QPushButton" name="computeTall3PushButton">
+      <property name="text">
+       <string>计算 T总3(d)</string>
+      </property>
+      <property name="shortcut">
+       <string>D</string>
+      </property>
+     </widget>
+    </item>
+    <item row="8" column="1">
+     <widget class="QLineEdit" name="mdart3PlusGLineEditInput"/>
+    </item>
+    <item row="8" column="8">
+     <widget class="QLineEdit" name="Tall3LineEditOutput">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QLineEdit" name="mdart1PlusGLineEditInput"/>
+    </item>
+    <item row="3" column="5" colspan="2">
+     <widget class="QPushButton" name="computeTall4PushButton_2">
+      <property name="text">
+       <string>计算 T总1234(F5)</string>
+      </property>
+      <property name="shortcut">
+       <string>F5</string>
+      </property>
+     </widget>
+    </item>
+    <item row="12" column="7">
+     <widget class="QLabel" name="Tall1LabelOutput_6">
+      <property name="text">
+       <string>切换击打目标时的比赛剩余时间</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="8">
+     <widget class="QLabel" name="Tall1LabelOutput">
+      <property name="text">
+       <string>得到的 T总1 = F₀ + ΔT测1</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="4" colspan="2">
+     <widget class="QLabel" name="integralOfF0PlusDxtensionLabelInput">
+      <property name="text">
+       <string>∫F₀·dx拉</string>
       </property>
      </widget>
     </item>
