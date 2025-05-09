@@ -33,19 +33,54 @@ struct coord
     QString y;
     QString z;
 };
+struct SphereCoord {
+    QString yawDMS;  // 度分秒格式
+    QString pitchDMS;
+    QString distance;
+};
+coord target;
+coord leadLeftBack;
+coord leadRightBack;
+coord leadRightFront;
+coord leadLeftFront;
+coord leadDartShoot;
+coord rackLeftBack;
+coord rackRightBack;
+coord rackRightFront;
+coord rackLeftFront;
+coord rackLeftBackSystem2;
+coord rackRightBackSystem2;
+coord rackRightFrontSystem2;
+coord rackLeftFrontSystem2;
+SphereCoord rackLeftBackDMSSystem2;
+SphereCoord rackRightBackDMSSystem2;
+SphereCoord rackRightFrontDMSSystem2;
+SphereCoord rackLeftFrontDMSSystem2;
+coord rackLBC;
+coord rackRFC;
+coord rackRBC;
+coord rackLFC;
 #if LEAD_POINT_NUM == 4
 const QString endSerial = ",-";
 const QString pauseSerial = ",";
 const QString targetCoordSerial = "\n1,";
-const QString rackLeftBackCoordSerial = "\n2,";
-const QString rackRightBackSerial = "\n3,";
-const QString leadRightBackCoordSerial = "\n4,";
-const QString leadLeftBackCoordSerial = "\n5,";
-const QString rackLeftFrontSerial = "\n6,";
-const QString rackRightFrontSerial = "\n7,";
-const QString leadRightFrontCoordSerial = "\n8,";
-const QString leadLeftFrontCoordSerial = "\n9,";
-const QString leadDartShootCoordSerial = "\n10,";
+const QString leadLeftBackCoordSerial = "\n2,";
+const QString leadRightBackCoordSerial = "\n3,";
+const QString leadLeftFrontCoordSerial = "\n4,";
+const QString leadRightFrontCoordSerial = "\n5,";
+const QString leadDartShootCoordSerial = "\n6,";
+const QString rackLeftBackCoordSerial = "\n7,";
+const QString rackRightBackSerial = "\n8,";
+const QString rackLeftFrontSerial = "\n9,";
+const QString rackRightFrontSerial = "\n10,";
+const QString rackLeftBackSystem2CoordSerial = "\n11,";
+const QString rackRightBackSystem2CoordSerial = "\n12,";
+const QString rackLeftFrontSystem2CoordSerial = "\n13,";
+const QString rackRightFrontSystem2CoordSerial = "\n14,";
+const int rackLeftBackSystem2DMSSerial = 11;
+const int rackRightBackSystem2DMSSerial = 12;
+const int rackLeftFrontSystem2DMSSerial = 13;
+const int rackRightFrontSystem2DMSSerial = 14;
 #endif
 
 #if LEAD_POINT_NUM == 2
@@ -159,25 +194,172 @@ void testDartComputingByTS::serialHandle(QString startSerial, coord* point, QLin
     zLineEdit->insert(point->z);
 }
 
-coord target;
-coord rackLeftBack;
-coord leadLeftBack;
-coord leadRightBack;
-coord rackRightBack;
-coord rackRightFront;
-coord leadRightFront;
-coord leadLeftFront;
-coord rackLeftFront;
-coord leadDartShoot;
-coord rackLBC;
-coord rackRFC;
-coord rackRBC;
-coord rackLFC;
+// 增强的度分秒转换函数（增加符号处理）
+QString testDartComputingByTS::convertDecimalToDMS(double decimalDegrees) {
+    const bool isNegative = decimalDegrees < 0;
+    decimalDegrees = qAbs(decimalDegrees);
+
+    // 分离度分秒
+    int degrees = static_cast<int>(decimalDegrees);
+    double decimalMinutes = (decimalDegrees - degrees) * 60.0;
+    int minutes = static_cast<int>(decimalMinutes);
+    double seconds = (decimalMinutes - minutes) * 60.0;
+
+    // 处理进位
+    seconds = qRound(seconds * 100.0) / 100.0; // 四舍五入到0.01秒
+    if (seconds >= 60.0) {
+        seconds -= 60.0;
+        minutes += 1;
+    }
+    if (minutes >= 60) {
+        minutes -= 60;
+        degrees += 1;
+    }
+
+    // 符号处理（度数带符号）
+    if (isNegative) degrees = -degrees;
+
+    // 格式化为 DD.MMSSss 格式（兼容测绘仪器格式）
+    return QString("%1.%2%3")
+            .arg(degrees)
+            .arg(minutes, 2, 10, QLatin1Char('0'))
+            .arg(QString::number(seconds, 'f', 2).leftJustified(4, '0', true));
+}
+
+// 增强的笛卡尔转球坐标函数
+Eigen::Vector3d testDartComputingByTS::cartesianToSpherical(const Eigen::Vector3d &cartesian) {
+    const double x = cartesian.x();
+    const double y = cartesian.y();
+    const double z = cartesian.z();
+
+    // 计算距离
+    const double distance = std::hypot(x, y, z);
+
+    // 处理零距离情况
+    if (qFuzzyIsNull(distance)) {
+        return Eigen::Vector3d(0.0, 0.0, 0.0);
+    }
+
+    // 计算俯仰角（0-180度）
+    const double pitch = qRadiansToDegrees(std::acos(z / distance));
+
+    // 计算方位角（0-360度）
+    double yaw = qRadiansToDegrees(std::atan2(y, x));
+    if (yaw < 0) yaw += 360.0;
+
+    return Eigen::Vector3d(yaw, pitch, distance);
+}
+
+
+/**
+* @brief 将60进制的球坐标角度转换成100进制的角度
+* @param QString 输入字符串（60进制的角度）
+* @retval double 100进制的角度
+* @bug
+*/
+double testDartComputingByTS::convertDMS(const QString &dmsStr) {
+    QString str = dmsStr;
+    str.replace(" ", "");
+    QStringList parts = str.split('.');
+    if (parts.size() < 2) return str.toDouble();
+
+    int degrees = parts[0].toInt();
+    QString fraction = parts[1].leftJustified(4, '0', true); // 补足4位
+
+    int minutes = fraction.left(2).toInt();
+    int seconds = fraction.mid(2, 2).toInt();
+
+    return degrees + minutes / 60.0 + seconds / 3600.0;
+}
+
+Eigen::Vector3d testDartComputingByTS::sphericalToCartesian(double yawDeg, double pitchDeg, double distance) {
+//    qDebug()<<"yawDeg"<<yawDeg<<"pitchDeg"<<pitchDeg<<"distance"<<distance;
+    double yaw = qDegreesToRadians(yawDeg);
+    double pitch = qDegreesToRadians(pitchDeg);
+
+    double x = distance * sin(pitch) * cos(yaw);
+    double y = distance * sin(pitch) * sin(yaw);
+    double z = distance * cos(pitch);
+
+    return Eigen::Vector3d(x, y, z);
+}
+
+void testDartComputingByTS::DMSSerialHanddle(int ss, int serial, SphereCoord* point, QLineEdit* yawLineEdit, QLineEdit* pitchLineEdit, QLineEdit* distanceLineEdit, QString serialYaw, QString serialPitch, QString serialDistance){
+    if(ss == serial){
+        point->yawDMS = serialYaw;
+        point->pitchDMS = serialPitch;
+        point->distance = serialDistance;
+
+        yawLineEdit->clear();
+        pitchLineEdit->clear();
+        distanceLineEdit->clear();
+
+        yawLineEdit->insert(point->yawDMS);
+        pitchLineEdit->insert(point->pitchDMS);
+        distanceLineEdit->insert(point->distance);
+    }
+}
 
 void testDartComputingByTS::serialPortReadyRead_Slot() {
     if (!this->visible) {
         return;
     }
+
+    // 预处理球坐标数据
+    QString originalBuffer = receiveBuff_2;
+    QStringList lines = originalBuffer.split(QRegularExpression("\n"), Qt::SkipEmptyParts);
+    QStringList newLines;
+    static int currentSSPoint;
+
+    qDebug()<<"line.size ="<<lines.size();
+    for (int i = 0; i < lines.size(); ++i) {
+        QString line = lines[i].trimmed();
+        if (line.startsWith("SS")) {
+            // 解析点号
+            QStringList parts = line.split(QRegularExpression("\\s+|,"), Qt::SkipEmptyParts);
+            if (parts.size() >= 2) {
+                bool ok;
+                currentSSPoint = parts[1].toInt(&ok);
+                if (!ok) currentSSPoint = -1;
+//                qDebug()<<"currentSSPoint"<<currentSSPoint;
+            }
+        } else if (line.startsWith("SD")) {
+            if (currentSSPoint != -1) {
+//                qDebug()<<"SD handle: currentSSPoint"<<currentSSPoint;
+                QStringList parts = line.split(QRegularExpression("\\s+|,"), Qt::SkipEmptyParts);
+//                qDebug()<<"SD handle: parts.size"<<parts.size();
+                if (parts.size() >= 4) {
+                    // 解析角度和距离
+                    DMSSerialHanddle(currentSSPoint, rackLeftBackSystem2DMSSerial, &rackLeftBackDMSSystem2, ui->rackLeftBackSystem2CoordYawLineEdit, ui->rackLeftBackSystem2CoordPitchLineEdit, ui->rackLeftBackSystem2CoordDistanceLineEdit, parts[1], parts[2], parts[3]);
+                    DMSSerialHanddle(currentSSPoint, rackRightBackSystem2DMSSerial, &rackRightBackDMSSystem2, ui->rackRightBackSystem2CoordYawLineEdit, ui->rackRightBackSystem2CoordPitchLineEdit, ui->rackRightBackSystem2CoordDistanceLineEdit, parts[1], parts[2], parts[3]);
+                    DMSSerialHanddle(currentSSPoint, rackLeftFrontSystem2DMSSerial, &rackLeftFrontDMSSystem2, ui->rackLeftFrontSystem2CoordYawLineEdit, ui->rackLeftFrontSystem2CoordPitchLineEdit, ui->rackLeftFrontSystem2CoordDistanceLineEdit, parts[1], parts[2], parts[3]);
+                    DMSSerialHanddle(currentSSPoint, rackRightFrontSystem2DMSSerial, &rackRightFrontDMSSystem2, ui->rackRightFrontSystem2CoordYawLineEdit, ui->rackRightFrontSystem2CoordPitchLineEdit, ui->rackRightFrontSystem2CoordDistanceLineEdit, parts[1], parts[2], parts[3]);
+
+                    double yaw = convertDMS(parts[1]);
+                    double pitch = convertDMS(parts[2]);
+                    double distance = parts[3].toDouble();
+
+                    // 坐标转换
+                    Eigen::Vector3d xyz = sphericalToCartesian(yaw, pitch, distance);
+
+                    // 生成XYZ数据行（不四舍五入，截断到4位小数）
+                    QString xyzLine = QString("%1,%2,%3,%4,-")
+                            .arg(currentSSPoint)
+                            .arg(QString::number(xyz.x(), 'f', 6))
+                            .arg(QString::number(xyz.y(), 'f', 6))
+                            .arg(QString::number(xyz.z(), 'f', 6));
+                    qDebug()<<"xyzLine"<<xyzLine;
+                    newLines.append(xyzLine);
+                }
+            }
+            currentSSPoint = -1;
+        } else {
+            newLines.append(line); // 保留非球坐标数据
+        }
+    }
+
+    // 重构缓冲区
+    receiveBuff_2 = newLines.join("\n") + "\n";
 
     // 检查并处理 targetCoordSerial
     if (receiveBuff_2.contains(targetCoordSerial) && receiveBuff_2.contains(endSerial)) {
@@ -246,6 +428,26 @@ void testDartComputingByTS::serialPortReadyRead_Slot() {
         serialHandle(leadDartShootCoordSerial, &leadDartShoot, ui->leadDartShootCoordXLineEdit, ui->leadDartShootCoordYLineEdit, ui->leadDartShootCoordZLineEdit);
     }
 
+    // 检查并处理 rackLeftBackSystem2CoordSerial
+    if (receiveBuff_2.contains(rackLeftBackSystem2CoordSerial) && receiveBuff_2.contains(endSerial)) {
+        serialHandle(rackLeftBackSystem2CoordSerial, &rackLeftBackSystem2, ui->rackLeftBackSystem2CoordXLineEdit, ui->rackLeftBackSystem2CoordYLineEdit, ui->rackLeftBackSystem2CoordZLineEdit);
+    }
+
+    // 检查并处理 rackRightBackSystem2CoordSerial
+    if (receiveBuff_2.contains(rackRightBackSystem2CoordSerial) && receiveBuff_2.contains(endSerial)) {
+        serialHandle(rackRightBackSystem2CoordSerial, &rackRightBackSystem2, ui->rackRightBackSystem2CoordXLineEdit, ui->rackRightBackSystem2CoordYLineEdit, ui->rackRightBackSystem2CoordZLineEdit);
+    }
+
+    // 检查并处理 rackRightFrontSystem2CoordSerial
+    if (receiveBuff_2.contains(rackRightFrontSystem2CoordSerial) && receiveBuff_2.contains(endSerial)) {
+        serialHandle(rackRightFrontSystem2CoordSerial, &rackRightFrontSystem2, ui->rackRightFrontSystem2CoordXLineEdit, ui->rackRightFrontSystem2CoordYLineEdit, ui->rackRightFrontSystem2CoordZLineEdit);
+    }
+
+    // 检查并处理 rackLeftFrontSystem2CoordSerial
+    if (receiveBuff_2.contains(rackLeftFrontSystem2CoordSerial) && receiveBuff_2.contains(endSerial)) {
+        serialHandle(rackLeftFrontSystem2CoordSerial, &rackLeftFrontSystem2, ui->rackLeftFrontSystem2CoordXLineEdit, ui->rackLeftFrontSystem2CoordYLineEdit, ui->rackLeftFrontSystem2CoordZLineEdit);
+    }
+
 }
 /*
 void testDartComputingByTS::serialPortReadyRead_Slot(){
@@ -308,7 +510,198 @@ double DeltaL(QLineEdit* Coord1X, QLineEdit* Coord1Y, QLineEdit* Coord2X, QLineE
             (Coord1Y->text().toDouble() - Coord2Y->text().toDouble()) *
             (Coord1Y->text().toDouble() - Coord2Y->text().toDouble()));
 }
+// 计算点集质心
+Eigen::Vector3d testDartComputingByTS::calculateCentroid(const std::vector<Eigen::Vector3d>& points)
+{
+    Eigen::Vector3d centroid = Eigen::Vector3d::Zero();
+    for (const auto& p : points) {
+        centroid += p;
+    }
+    return centroid / points.size();
+}
 
+// 计算变换矩阵（旋转+平移）
+void testDartComputingByTS::calculateTransform(
+        const std::vector<Eigen::Vector3d>& sourcePoints,
+        const std::vector<Eigen::Vector3d>& targetPoints,
+        const Eigen::Vector3d& sourceCentroid,
+        const Eigen::Vector3d& targetCentroid,
+        Eigen::Matrix3d& rotation,
+        Eigen::Vector3d& translation)
+{
+    // 构建协方差矩阵
+    Eigen::MatrixXd H = Eigen::MatrixXd::Zero(2, 2);
+    for (size_t i = 0; i < sourcePoints.size(); ++i) {
+        Eigen::Vector2d src = (sourcePoints[i] - sourceCentroid).head<2>();
+        Eigen::Vector2d tgt = (targetPoints[i] - targetCentroid).head<2>();
+        H += tgt * src.transpose();
+    }
+
+    // SVD分解求旋转
+    Eigen::JacobiSVD<Eigen::MatrixXd> svd(H, Eigen::ComputeFullU | Eigen::ComputeFullV);
+    Eigen::Matrix2d R = svd.matrixV() * svd.matrixU().transpose();
+
+    // 处理反射情况
+    if (R.determinant() < 0) {
+        Eigen::MatrixXd V = svd.matrixV();
+        V.col(1) *= -1;
+        R = V * svd.matrixU().transpose();
+    }
+
+    // 构造3D旋转矩阵
+    rotation = Eigen::Matrix3d::Identity();
+    rotation.block<2,2>(0,0) = R;
+
+    // 计算平移（包含Z轴补偿）
+    translation = targetCentroid - rotation * sourceCentroid;
+}
+
+// 应用变换到目标点
+Eigen::Vector3d testDartComputingByTS::applyTransform(
+        const Eigen::Vector3d& point,
+        const Eigen::Vector3d& sourceCentroid,
+        const Eigen::Vector3d& targetCentroid,
+        const Eigen::Matrix3d& rotation,
+        const Eigen::Vector3d& translation)
+{
+    return rotation * (point - sourceCentroid) + targetCentroid;
+}
+
+// 角度标准化（0-360度）
+double testDartComputingByTS::normalizeAngle(double degrees)
+{
+    degrees = fmod(degrees, 360.0);
+    if (degrees < 0) {
+        degrees += 360.0;
+    }
+    return degrees;
+}
+// ==================== 坐标系转换与Yaw补偿模块 ====================
+void testDartComputingByTS::calculateCoordinateTransform()
+{
+    // 读取源坐标系四个点（System1）
+    std::vector<Eigen::Vector3d> sourcePoints = {
+            getCoordFromUI(ui->rackLeftBackCoordXLineEdit, ui->rackLeftBackCoordYLineEdit, ui->rackLeftBackCoordZLineEdit),
+            getCoordFromUI(ui->rackRightBackCoordXLineEdit, ui->rackRightBackCoordYLineEdit, ui->rackRightBackCoordZLineEdit),
+            getCoordFromUI(ui->rackRightFrontCoordXLineEdit, ui->rackRightFrontCoordYLineEdit, ui->rackRightFrontCoordZLineEdit),
+            getCoordFromUI(ui->rackLeftFrontCoordXLineEdit, ui->rackLeftFrontCoordYLineEdit, ui->rackLeftFrontCoordZLineEdit)
+    };
+
+    // 读取目标坐标系四个点（System2）
+    std::vector<Eigen::Vector3d> targetPoints = {
+            getCoordFromUI(ui->rackLeftBackSystem2CoordXLineEdit, ui->rackLeftBackSystem2CoordYLineEdit, ui->rackLeftBackSystem2CoordZLineEdit),
+            getCoordFromUI(ui->rackRightBackSystem2CoordXLineEdit, ui->rackRightBackSystem2CoordYLineEdit, ui->rackRightBackSystem2CoordZLineEdit),
+            getCoordFromUI(ui->rackRightFrontSystem2CoordXLineEdit, ui->rackRightFrontSystem2CoordYLineEdit, ui->rackRightFrontSystem2CoordZLineEdit),
+            getCoordFromUI(ui->rackLeftFrontSystem2CoordXLineEdit, ui->rackLeftFrontSystem2CoordYLineEdit, ui->rackLeftFrontSystem2CoordZLineEdit)
+    };
+
+    // 计算质心
+    Eigen::Vector3d sourceCentroid = calculateCentroid(sourcePoints);
+    Eigen::Vector3d targetCentroid = calculateCentroid(targetPoints);
+
+    // 计算变换矩阵
+    Eigen::Matrix3d rotation;
+    Eigen::Vector3d translation;
+    calculateTransform(sourcePoints, targetPoints, sourceCentroid, targetCentroid, rotation, translation);
+
+    // 转换目标点
+    Eigen::Vector3d targetPoint = getCoordFromUI(ui->targetCoordXLineEdit, ui->targetCoordYLineEdit, ui->targetCoordZLineEdit);
+    Eigen::Vector3d transformed = applyTransform(targetPoint, sourceCentroid, targetCentroid, rotation, translation);
+
+    // ==================== Yaw补偿计算 ====================
+    const QVector<SphereCoord*> measuredSphereCoords = {
+            &rackLeftBackDMSSystem2,
+            &rackRightBackDMSSystem2,
+            &rackRightFrontDMSSystem2,
+            &rackLeftFrontDMSSystem2
+    };
+
+    QVector<double> yawOffsets;
+    for(int i=0; i<4; ++i){
+        // 获取理论球坐标
+        Eigen::Vector3d theoreticalSphere = cartesianToSpherical(targetPoints[i]);
+
+        // 获取实测球坐标
+        double measuredYaw = convertDMS(measuredSphereCoords[i]->yawDMS);
+
+        // 计算角度偏差（带方向感知）
+        double offset = angularDifference(theoreticalSphere.x(), measuredYaw);
+        yawOffsets.append(offset);
+    }
+
+    // 计算加权平均（基于距离可信度）
+    double avgOffset = weightedAverage(yawOffsets, getDistanceWeights(measuredSphereCoords));
+
+    // ==================== 应用补偿 ====================
+    Eigen::Vector3d spherical = cartesianToSpherical(transformed);
+    double compensatedYaw = normalizeAngle(spherical.x() + avgOffset);
+
+    // 更新UI显示
+    updateUIResults(compensatedYaw, spherical.y(), spherical.z(), avgOffset);
+}
+
+// 辅助函数
+Eigen::Vector3d testDartComputingByTS::getCoordFromUI(QLineEdit* x, QLineEdit* y, QLineEdit* z)
+{
+    return Eigen::Vector3d(
+            x->text().toDouble(),
+            y->text().toDouble(),
+            z->text().toDouble()
+    );
+}
+
+double testDartComputingByTS::angularDifference(double theoretical, double measured)
+{
+    double diff = measured - theoretical;
+    return diff - 360.0 * floor((diff + 180.0) / 360.0); // 保持在±180度范围内
+}
+
+QVector<double> testDartComputingByTS::getDistanceWeights(const QVector<SphereCoord*>& points)
+{
+    QVector<double> weights;
+    double total = 0.0;
+
+            foreach(const SphereCoord* p, points) {
+            double d = p->distance.toDouble();
+            weights.append(1.0 / (d*d + 1e-6)); // 距离平方反比加权
+            total += weights.last();
+        }
+
+    // 归一化
+    for(auto& w : weights) w /= total;
+    return weights;
+}
+
+double testDartComputingByTS::weightedAverage(const QVector<double>& values, const QVector<double>& weights)
+{
+    double sum = 0.0;
+    for(int i=0; i<values.size(); ++i){
+        sum += values[i] * weights[i];
+    }
+    return sum;
+}
+
+void testDartComputingByTS::updateUIResults(double yaw, double pitch, double distance, double offset)
+{
+    // 球坐标显示
+    ui->targetSystem2YawLineEdit->setText(
+            QString("%1 (Δ%2°)")
+                    .arg(convertDecimalToDMS(yaw))
+                    .arg(offset, 0, 'f', 2));
+
+    ui->targetSystem2PitchLineEdit->setText(convertDecimalToDMS(pitch));
+    ui->targetSystem2DistanceLineEdit->setText(QString::number(distance, 'f', 2));
+
+    // 笛卡尔坐标反馈
+    Eigen::Vector3d finalCart = sphericalToCartesian(yaw, pitch, distance);
+    ui->targetSystem2CoordXLineEdit->setText(QString::number(finalCart.x(), 'f', 3));
+    ui->targetSystem2CoordYLineEdit->setText(QString::number(finalCart.y(), 'f', 3));
+    ui->targetSystem2CoordZLineEdit->setText(QString::number(finalCart.z(), 'f', 3));
+
+    // 可视化反馈
+    QString color = (fabs(offset) > 5.0) ? "red" : "green";
+    ui->targetSystem2YawLineEdit->setStyleSheet(QString("color: %1;").arg(color));
+}
 void testDartComputingByTS::on_computeXandHPushButton_clicked()
 {
 #if TRANSFORM_DEBUG
@@ -402,6 +795,53 @@ void testDartComputingByTS::on_computeXandHPushButton_clicked()
                                     (leadLeftDeltaL + leadRightDeltaL)));
     ui->setaLineEdit_2->insert(QString::number(ui->setaLineEdit->text().toDouble() * 180 / PI));
 
+    // 获取坐标值
+    double x_rf = ui->rackRightFrontSystem2CoordXLineEdit->text().toDouble();
+    double y_rf = ui->rackRightFrontSystem2CoordYLineEdit->text().toDouble();
+    double z_rf = ui->rackRightFrontSystem2CoordZLineEdit->text().toDouble();
+
+    double x_rb = ui->rackRightBackSystem2CoordXLineEdit->text().toDouble();
+    double y_rb = ui->rackRightBackSystem2CoordYLineEdit->text().toDouble();
+    double z_rb = ui->rackRightBackSystem2CoordZLineEdit->text().toDouble();
+
+    double x_lf = ui->rackLeftFrontSystem2CoordXLineEdit->text().toDouble();
+    double y_lf = ui->rackLeftFrontSystem2CoordYLineEdit->text().toDouble();
+    double z_lf = ui->rackLeftFrontSystem2CoordZLineEdit->text().toDouble();
+
+    double x_lb = ui->rackLeftBackSystem2CoordXLineEdit->text().toDouble();
+    double y_lb = ui->rackLeftBackSystem2CoordYLineEdit->text().toDouble();
+    double z_lb = ui->rackLeftBackSystem2CoordZLineEdit->text().toDouble();
+
+    // 计算长度差
+    double rackRightDeltaLSys2 = qSqrt(qPow(x_rf - x_rb, 2) + qPow(y_rf - y_rb, 2));
+    double rackLeftDeltaLSys2 = qSqrt(qPow(x_lf - x_lb, 2) + qPow(y_lf - y_lb, 2));
+    double rackFrontDeltaLSys2 = qSqrt(qPow(x_rf - x_lf, 2) + qPow(y_rf - y_lf, 2));
+    double rackBackDeltaLSys2 = qSqrt(qPow(x_rb - x_lb, 2) + qPow(y_rb - y_lb, 2));
+
+    // 俯仰角计算
+    const double pitchNumerator = (z_rf - z_rb) + (z_lf - z_lb);
+    const double pitchDenominator = rackRightDeltaLSys2 + rackLeftDeltaLSys2;
+    if(qFuzzyIsNull(pitchDenominator)) {
+        qWarning() << "Pitch denominator is zero!";
+        return;
+    }
+    const double pitchRad = qAtan(pitchNumerator / pitchDenominator);
+
+    ui->rackSystem2PitchRadLineEdit->setText(QString::number(pitchRad));
+    ui->rackSystem2PitchDegLineEdit->setText(QString::number(qRadiansToDegrees(pitchRad)));
+
+    // 横滚角计算
+    double rollNumerator = (z_lf - z_rf) + (z_lb - z_rb);
+    double rollDenominator = rackFrontDeltaLSys2 + rackBackDeltaLSys2;
+    if(qFuzzyIsNull(rollDenominator)) {
+        qWarning() << "Roll denominator is zero!";
+        return;
+    }
+    const double rollRad = qAtan(rollNumerator / rollDenominator);
+
+    ui->rackSystem2RollRadLineEdit->setText(QString::number(rollRad));
+    ui->rackSystem2RollDegLineEdit->setText(QString::number(qRadiansToDegrees(rollRad)));
+
     // 计算 leadLeft 边与 rackLeft 边的夹角
     double leadLeftX = ui->leadLeftFrontCoordXLineEdit->text().toDouble() - ui->leadLeftBackCoordXLineEdit->text().toDouble();
     double leadLeftY = ui->leadLeftFrontCoordYLineEdit->text().toDouble() - ui->leadLeftBackCoordYLineEdit->text().toDouble();
@@ -466,34 +906,35 @@ void testDartComputingByTS::on_computeXandHPushButton_clicked()
             (leadLeftBackY + leadRightBackY) / 2.0
     );
     Eigen::Vector2d projection = backMidPoint + bisectorDir * (dartShootPoint - backMidPoint).dot(bisectorDir);
-    const double leadMiddleX = projection.x();
-    const double leadMiddleY = projection.y();
-    const double leadMiddleZ = ui->leadDartShootCoordZLineEdit->text().toDouble(); // Z值保持与发射点相同
+    double leadMiddleX = projection.x();
+    double leadMiddleY = projection.y();
+    double leadMiddleZ = ui->leadDartShootCoordZLineEdit->text().toDouble(); // Z值保持与发射点相同
 
     // 获取目标点坐标
-    const double targetX = ui->targetCoordXLineEdit->text().toDouble();
-    const double targetY = ui->targetCoordYLineEdit->text().toDouble();
-    const double targetZ = ui->targetCoordZLineEdit->text().toDouble();
+    double targetX = ui->targetCoordXLineEdit->text().toDouble();
+    double targetY = ui->targetCoordYLineEdit->text().toDouble();
+    double targetZ = ui->targetCoordZLineEdit->text().toDouble();
 
     //--------------------- 统一计算 x、h、deltaPsi ---------------------
     // 计算水平距离x（投影点与目标点）
-    const double dx = targetX - leadMiddleX;
-    const double dy = targetY - leadMiddleY;
-    const double xDistance = sqrt(dx*dx + dy*dy);
+    double dx = targetX - leadMiddleX;
+    double dy = targetY - leadMiddleY;
+    double xDistance = sqrt(dx*dx + dy*dy);
     ui->xLineEdit->setText(QString::number(xDistance));
 
     // 计算高度差h
-    const double hDifference = targetZ - leadMiddleZ;
+    double hDifference = targetZ - leadMiddleZ;
     ui->hLineEdit->setText(QString::number(hDifference));
 
     // 计算deltaPsi（目标连线方向与导轨边的平均夹角差）
     Eigen::Vector2d targetDir(dx, dy);  // 复用dx, dy计算结果
-    const double angleLeft = qAtan2(targetDir.y(), targetDir.x()) - qAtan2(leadLeftDir.y(), leadLeftDir.x());
-    const double angleRight = qAtan2(targetDir.y(), targetDir.x()) - qAtan2(leadRightDir.y(), leadRightDir.x());
-    const double deltaPsi = -(angleLeft + angleRight) / 2.0; // 向右转为正
+    double angleLeft = qAtan2(targetDir.y(), targetDir.x()) - qAtan2(leadLeftDir.y(), leadLeftDir.x());
+    double angleRight = qAtan2(targetDir.y(), targetDir.x()) - qAtan2(leadRightDir.y(), leadRightDir.x());
+    double deltaPsi = -(angleLeft + angleRight) / 2.0; // 向右转为正
     ui->deltaPsiLineEdit->setText(QString::number(deltaPsi));
-    ui->deltaPsiLineEdit_2->insert(QString::number(deltaPsi * 180 / PI));  // 转换为度
+    ui->deltaPsiLineEdit_2->insert(QString::number(deltaPsi * 180 / PI));  // 转换为度// 在on_computeXandHPushButton_clicked()方法末尾添加
 
+    calculateCoordinateTransform();
 }
 
 void testDartComputingByTS::on_deltaXlineEdit_editingFinished()

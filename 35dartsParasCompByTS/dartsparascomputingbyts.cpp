@@ -53,7 +53,6 @@ coord rackRBC2;
 coord rackLFC2;
 
 #if LEAD_POINT_NUM == 4
-coord leadLBC[YAW_TEST_N], leadRBC[YAW_TEST_N], leadRFC[YAW_TEST_N], leadLFC[YAW_TEST_N], leadMDS[YAW_TEST_N];
 const QString endSerial = ",-";
 const QString pauseSerial = ",";
 const QString targetCoordSerial = "\n1,";
@@ -61,15 +60,11 @@ const QString referCoord1System1Serial = "\n2,";
 const QString referCoord2System1Serial = "\n3,";
 const QString referCoord1System2Serial = "\n4,";
 const QString referCoord2System2Serial = "\n5,";
-//const QString rackLeftBackCoordSerial = "\n6,";
-//const QString rackRightBackSerial = "\n7,";
-const QString leadRightBackCoordSerial = "\n8,";
-const QString leadLeftBackCoordSerial = "\n9,";
-//const QString rackLeftFrontSerial = "\n10,";
-//const QString rackRightFrontSerial = "\n11,";
-const QString leadRightFrontCoordSerial = "\n12,";
-const QString leadLeftFrontCoordSerial = "\n13,";
-const QString leadDartShootCoordSerial = "\n14,";
+const QString leadRightBackCoordSerial = "\n7,";
+const QString leadLeftBackCoordSerial = "\n6,";
+const QString leadRightFrontCoordSerial = "\n9,";
+const QString leadLeftFrontCoordSerial = "\n8,";
+const QString leadDartShootCoordSerial = "\n10,";
 #endif
 
 #if LEAD_POINT_NUM == 2
@@ -118,7 +113,7 @@ Eigen::Vector3d dartsParasComputingByTS::sphericalToCartesian(double yawDeg, dou
 
     double x = distance * sin(pitch) * cos(yaw);
     double y = distance * sin(pitch) * sin(yaw);
-    double z = distance * cos(M_PI - pitch);
+    double z = distance * cos(pitch);
 
     return Eigen::Vector3d(x, y, z);
 }
@@ -697,7 +692,8 @@ void dartsParasComputingByTS::ui_update(){
 * @param None
 * @retval None
 * @bug
-*/void dartsParasComputingByTS::coord_transform() {
+*/
+void dartsParasComputingByTS::coord_transform() {
     // 从控件里更新数据
     loadCoordsFromPlainTextEdit();
 
@@ -790,6 +786,8 @@ void dartsParasComputingByTS::ui_update(){
 
     // 变换所有相关坐标点
     target2 = transformPoint(target2);
+    referCoord1System1 = transformPoint(referCoord1System1);
+    referCoord2System1 = transformPoint(referCoord2System1);
 
     // 更新UI
     ui_update();
