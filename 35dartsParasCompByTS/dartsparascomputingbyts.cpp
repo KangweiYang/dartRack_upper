@@ -421,8 +421,8 @@ Eigen::Vector3d dartsParasComputingByTS::applyTransformation(const Eigen::Vector
 * @bug
 */
 dartsParasComputingByTS::dartsParasComputingByTS(QSerialPort *serialPort, QSerialPort *serialPort2, QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::dartsParasComputingByTS)
+        QWidget(parent),
+        ui(new Ui::dartsParasComputingByTS)
 {
     bool visible = true;
     ui->setupUi(this);
@@ -451,21 +451,21 @@ void dartsParasComputingByTS::serialPortReadyRead_Slot(){
     if(this->visible && ((receiveBuff.contains("curYaw: ") && receiveBuff.contains("/") ) || (receiveBuff.contains("curTen: ") && receiveBuff.contains(";")))){     //stm32 send:   curYaw: 100/ \n curTen: -1000;
         int yawIndex = receiveBuff.lastIndexOf("curYaw: ") + 7;
         int tenIndex = receiveBuff.lastIndexOf("curTen: ") + 7;
-            if(yawIndex != 6){
-                QString curYaw;
-                curYaw = receiveBuff.right(receiveBuff.size() - yawIndex - 1);
-                curYaw.chop(curYaw.size() - curYaw.indexOf("/"));
-                ui->currentYawLineEdit->clear();
-                ui->currentYawLineEdit->insert(curYaw);
+        if(yawIndex != 6){
+            QString curYaw;
+            curYaw = receiveBuff.right(receiveBuff.size() - yawIndex - 1);
+            curYaw.chop(curYaw.size() - curYaw.indexOf("/"));
+            ui->currentYawLineEdit->clear();
+            ui->currentYawLineEdit->insert(curYaw);
         }
-            if(tenIndex != 6){
-                QString curTen;
-                curTen = receiveBuff.right(receiveBuff.size() - tenIndex - 1);
-                curTen.chop(curTen.size() - curTen.indexOf(";"));
-                ui->currentTensionLineEdit->clear();
-                ui->currentTensionLineEdit->insert(curTen);
+        if(tenIndex != 6){
+            QString curTen;
+            curTen = receiveBuff.right(receiveBuff.size() - tenIndex - 1);
+            curTen.chop(curTen.size() - curTen.indexOf(";"));
+            ui->currentTensionLineEdit->clear();
+            ui->currentTensionLineEdit->insert(curTen);
         }
-            receiveBuff.clear();
+        receiveBuff.clear();
     }
 }
 
@@ -554,7 +554,7 @@ void dartsParasComputingByTS::serialPortReadyRead2_Slot() {
 
     // 检查并处理 leadLeftBackCoordSerial
 #if LEAD_POINT_NUM == 4
-        if (receiveBuff_2.contains(leadLeftBackCoordSerial) && receiveBuff_2.contains(endSerial)) {
+    if (receiveBuff_2.contains(leadLeftBackCoordSerial) && receiveBuff_2.contains(endSerial)) {
         serialHandle(leadLeftBackCoordSerial, &leadLeftBack2, ui->leadLeftBackCoordXLineEdit,
                      ui->leadLeftBackCoordYLineEdit, ui->leadLeftBackCoordZLineEdit);
     }
@@ -692,8 +692,7 @@ void dartsParasComputingByTS::ui_update(){
 * @param None
 * @retval None
 * @bug
-*/
-void dartsParasComputingByTS::coord_transform() {
+*/void dartsParasComputingByTS::coord_transform() {
     // 从控件里更新数据
     loadCoordsFromPlainTextEdit();
 
@@ -822,10 +821,10 @@ void dartsParasComputingByTS::on_computeXandHPushButton_clicked()
                                    ui->leadRightBackCoordXLineEdit, ui->leadRightBackCoordYLineEdit);
 
     ui->setaLineEdit_2->insert(QString::number(qAtan(ui->leadLeftFrontCoordZLineEdit->text().toDouble() -
-                                                   ui->leadLeftBackCoordZLineEdit->text().toDouble() +
-                                                   ui->leadRightFrontCoordZLineEdit->text().toDouble() -
-                                                   ui->leadRightBackCoordZLineEdit->text().toDouble()) /
-                                             (leadLeftDeltaL + leadRightDeltaL)));
+                                                     ui->leadLeftBackCoordZLineEdit->text().toDouble() +
+                                                     ui->leadRightFrontCoordZLineEdit->text().toDouble() -
+                                                     ui->leadRightBackCoordZLineEdit->text().toDouble()) /
+                                               (leadLeftDeltaL + leadRightDeltaL)));
     ui->setaLineEdit->insert(QString::number(ui->setaLineEdit_2->text().toDouble() * 180 / PI));
 
 //    ui->xLineEdit->insert(QString::number(ui->lLineEdit->text().toDouble() * qCos(ui->betaLineEdit->text().toDouble() * PI / 180.0) + ui->deltaXlineEdit->text().toDouble() / 1000));
@@ -1049,7 +1048,7 @@ void dartsParasComputingByTS::send3HzPacket()
 
     // 状态判断逻辑
     if (elapsed < 3000) { // 前3秒
-        stateByte = 0x02;
+        stateByte = 0x01;
     } else if (elapsed < 10000) { // 3-10秒（7秒）
         stateByte = 0x02;
     } else if (elapsed < 30000) { // 10-30秒（20秒）
@@ -1071,10 +1070,12 @@ void dartsParasComputingByTS::send3HzPacket()
     QByteArray header = packet.left(4);
     packet.append(calculateHeaderCRC(header));
 
-    // 添加数据部分
+    // 包名
     packet.append(0x0A);
-    packet.append(stateByte);
     packet.append(0x02);
+
+    // 添加数据部分
+    packet.append(stateByte);
     packet.append((char)0x00);
     packet.append((char)0x00);
 
@@ -1155,6 +1156,10 @@ void dartsParasComputingByTS::send1HzPacket()
     // 计算帧头CRC
     QByteArray header = packet.left(4);
     packet.append(calculateHeaderCRC(header));
+
+    // 包名
+    packet.append(0x05);
+    packet.append(0x01);
 
     // 添加数据部分
     packet.append(stateByte);

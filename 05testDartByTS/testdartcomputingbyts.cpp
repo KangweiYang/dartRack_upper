@@ -11,6 +11,8 @@
 #include <QMessageBox>
 #include <QString>
 #include <Eigen/Dense> // 需要安装Eigen库
+#include <Eigen/Geometry>
+
 #if WIN
 #include <QRegExpValidator>
 #endif
@@ -244,7 +246,7 @@ Eigen::Vector3d testDartComputingByTS::cartesianToSpherical(const Eigen::Vector3
     const double pitch = qRadiansToDegrees(std::acos(z / distance));
 
     // 计算方位角（0-360度）
-    double yaw = qRadiansToDegrees(std::atan2(y, x));
+    double yaw = 180 - qRadiansToDegrees(std::atan2(y, x));
     if (yaw < 0) yaw += 360.0;
 
     return Eigen::Vector3d(yaw, pitch, distance);
@@ -510,198 +512,51 @@ double DeltaL(QLineEdit* Coord1X, QLineEdit* Coord1Y, QLineEdit* Coord2X, QLineE
             (Coord1Y->text().toDouble() - Coord2Y->text().toDouble()) *
             (Coord1Y->text().toDouble() - Coord2Y->text().toDouble()));
 }
-// 计算点集质心
-Eigen::Vector3d testDartComputingByTS::calculateCentroid(const std::vector<Eigen::Vector3d>& points)
-{
-    Eigen::Vector3d centroid = Eigen::Vector3d::Zero();
-    for (const auto& p : points) {
-        centroid += p;
-    }
-    return centroid / points.size();
-}
 
-// 计算变换矩阵（旋转+平移）
-void testDartComputingByTS::calculateTransform(
-        const std::vector<Eigen::Vector3d>& sourcePoints,
-        const std::vector<Eigen::Vector3d>& targetPoints,
-        const Eigen::Vector3d& sourceCentroid,
-        const Eigen::Vector3d& targetCentroid,
-        Eigen::Matrix3d& rotation,
-        Eigen::Vector3d& translation)
-{
-    // 构建协方差矩阵
-    Eigen::MatrixXd H = Eigen::MatrixXd::Zero(2, 2);
-    for (size_t i = 0; i < sourcePoints.size(); ++i) {
-        Eigen::Vector2d src = (sourcePoints[i] - sourceCentroid).head<2>();
-        Eigen::Vector2d tgt = (targetPoints[i] - targetCentroid).head<2>();
-        H += tgt * src.transpose();
+
+// 使用Kabsch算法计算二维最优旋转和平移
+void computeTransformation(const std::vector<Eigen::Vector2d>& source,
+                           const std::vector<Eigen::Vector2d>& target,
+                           Eigen::Matrix2d& rotation,
+                           Eigen::Vector2d& translation) {
+    // 计算重心
+    Eigen::Vector2d centroidSrc = Eigen::Vector2d::Zero();
+    Eigen::Vector2d centroidTgt = Eigen::Vector2d::Zero();
+    for (int i = 0; i < source.size(); ++i) {
+        centroidSrc += source[i];
+        centroidTgt += target[i];
+    }
+    centroidSrc /= source.size();
+    centroidTgt /= target.size();
+
+    // 去中心化坐标
+    std::vector<Eigen::Vector2d> srcCentered, tgtCentered;
+    for (int i = 0; i < source.size(); ++i) {
+        srcCentered.push_back(source[i] - centroidSrc);
+        tgtCentered.push_back(target[i] - centroidTgt);
     }
 
-    // SVD分解求旋转
-    Eigen::JacobiSVD<Eigen::MatrixXd> svd(H, Eigen::ComputeFullU | Eigen::ComputeFullV);
-    Eigen::Matrix2d R = svd.matrixV() * svd.matrixU().transpose();
+    // 计算协方差矩阵H
+    Eigen::Matrix2d H = Eigen::Matrix2d::Zero();
+    for (int i = 0; i < source.size(); ++i) {
+        H += tgtCentered[i] * srcCentered[i].transpose();
+    }
 
-    // 处理反射情况
-    if (R.determinant() < 0) {
-        Eigen::MatrixXd V = svd.matrixV();
+    // SVD分解
+    Eigen::JacobiSVD<Eigen::Matrix2d> svd(H, Eigen::ComputeFullU | Eigen::ComputeFullV);
+    Eigen::Matrix2d U = svd.matrixU();
+    Eigen::Matrix2d V = svd.matrixV();
+    rotation = V * U.transpose();
+
+    // 处理反射（确保是旋转矩阵）
+    if (rotation.determinant() < 0) {
         V.col(1) *= -1;
-        R = V * svd.matrixU().transpose();
+        rotation = V * U.transpose();
     }
 
-    // 构造3D旋转矩阵
-    rotation = Eigen::Matrix3d::Identity();
-    rotation.block<2,2>(0,0) = R;
-
-    // 计算平移（包含Z轴补偿）
-    translation = targetCentroid - rotation * sourceCentroid;
+    translation = centroidTgt - rotation * centroidSrc;
 }
 
-// 应用变换到目标点
-Eigen::Vector3d testDartComputingByTS::applyTransform(
-        const Eigen::Vector3d& point,
-        const Eigen::Vector3d& sourceCentroid,
-        const Eigen::Vector3d& targetCentroid,
-        const Eigen::Matrix3d& rotation,
-        const Eigen::Vector3d& translation)
-{
-    return rotation * (point - sourceCentroid) + targetCentroid;
-}
-
-// 角度标准化（0-360度）
-double testDartComputingByTS::normalizeAngle(double degrees)
-{
-    degrees = fmod(degrees, 360.0);
-    if (degrees < 0) {
-        degrees += 360.0;
-    }
-    return degrees;
-}
-// ==================== 坐标系转换与Yaw补偿模块 ====================
-void testDartComputingByTS::calculateCoordinateTransform()
-{
-    // 读取源坐标系四个点（System1）
-    std::vector<Eigen::Vector3d> sourcePoints = {
-            getCoordFromUI(ui->rackLeftBackCoordXLineEdit, ui->rackLeftBackCoordYLineEdit, ui->rackLeftBackCoordZLineEdit),
-            getCoordFromUI(ui->rackRightBackCoordXLineEdit, ui->rackRightBackCoordYLineEdit, ui->rackRightBackCoordZLineEdit),
-            getCoordFromUI(ui->rackRightFrontCoordXLineEdit, ui->rackRightFrontCoordYLineEdit, ui->rackRightFrontCoordZLineEdit),
-            getCoordFromUI(ui->rackLeftFrontCoordXLineEdit, ui->rackLeftFrontCoordYLineEdit, ui->rackLeftFrontCoordZLineEdit)
-    };
-
-    // 读取目标坐标系四个点（System2）
-    std::vector<Eigen::Vector3d> targetPoints = {
-            getCoordFromUI(ui->rackLeftBackSystem2CoordXLineEdit, ui->rackLeftBackSystem2CoordYLineEdit, ui->rackLeftBackSystem2CoordZLineEdit),
-            getCoordFromUI(ui->rackRightBackSystem2CoordXLineEdit, ui->rackRightBackSystem2CoordYLineEdit, ui->rackRightBackSystem2CoordZLineEdit),
-            getCoordFromUI(ui->rackRightFrontSystem2CoordXLineEdit, ui->rackRightFrontSystem2CoordYLineEdit, ui->rackRightFrontSystem2CoordZLineEdit),
-            getCoordFromUI(ui->rackLeftFrontSystem2CoordXLineEdit, ui->rackLeftFrontSystem2CoordYLineEdit, ui->rackLeftFrontSystem2CoordZLineEdit)
-    };
-
-    // 计算质心
-    Eigen::Vector3d sourceCentroid = calculateCentroid(sourcePoints);
-    Eigen::Vector3d targetCentroid = calculateCentroid(targetPoints);
-
-    // 计算变换矩阵
-    Eigen::Matrix3d rotation;
-    Eigen::Vector3d translation;
-    calculateTransform(sourcePoints, targetPoints, sourceCentroid, targetCentroid, rotation, translation);
-
-    // 转换目标点
-    Eigen::Vector3d targetPoint = getCoordFromUI(ui->targetCoordXLineEdit, ui->targetCoordYLineEdit, ui->targetCoordZLineEdit);
-    Eigen::Vector3d transformed = applyTransform(targetPoint, sourceCentroid, targetCentroid, rotation, translation);
-
-    // ==================== Yaw补偿计算 ====================
-    const QVector<SphereCoord*> measuredSphereCoords = {
-            &rackLeftBackDMSSystem2,
-            &rackRightBackDMSSystem2,
-            &rackRightFrontDMSSystem2,
-            &rackLeftFrontDMSSystem2
-    };
-
-    QVector<double> yawOffsets;
-    for(int i=0; i<4; ++i){
-        // 获取理论球坐标
-        Eigen::Vector3d theoreticalSphere = cartesianToSpherical(targetPoints[i]);
-
-        // 获取实测球坐标
-        double measuredYaw = convertDMS(measuredSphereCoords[i]->yawDMS);
-
-        // 计算角度偏差（带方向感知）
-        double offset = angularDifference(theoreticalSphere.x(), measuredYaw);
-        yawOffsets.append(offset);
-    }
-
-    // 计算加权平均（基于距离可信度）
-    double avgOffset = weightedAverage(yawOffsets, getDistanceWeights(measuredSphereCoords));
-
-    // ==================== 应用补偿 ====================
-    Eigen::Vector3d spherical = cartesianToSpherical(transformed);
-    double compensatedYaw = normalizeAngle(spherical.x() + avgOffset);
-
-    // 更新UI显示
-    updateUIResults(compensatedYaw, spherical.y(), spherical.z(), avgOffset);
-}
-
-// 辅助函数
-Eigen::Vector3d testDartComputingByTS::getCoordFromUI(QLineEdit* x, QLineEdit* y, QLineEdit* z)
-{
-    return Eigen::Vector3d(
-            x->text().toDouble(),
-            y->text().toDouble(),
-            z->text().toDouble()
-    );
-}
-
-double testDartComputingByTS::angularDifference(double theoretical, double measured)
-{
-    double diff = measured - theoretical;
-    return diff - 360.0 * floor((diff + 180.0) / 360.0); // 保持在±180度范围内
-}
-
-QVector<double> testDartComputingByTS::getDistanceWeights(const QVector<SphereCoord*>& points)
-{
-    QVector<double> weights;
-    double total = 0.0;
-
-            foreach(const SphereCoord* p, points) {
-            double d = p->distance.toDouble();
-            weights.append(1.0 / (d*d + 1e-6)); // 距离平方反比加权
-            total += weights.last();
-        }
-
-    // 归一化
-    for(auto& w : weights) w /= total;
-    return weights;
-}
-
-double testDartComputingByTS::weightedAverage(const QVector<double>& values, const QVector<double>& weights)
-{
-    double sum = 0.0;
-    for(int i=0; i<values.size(); ++i){
-        sum += values[i] * weights[i];
-    }
-    return sum;
-}
-
-void testDartComputingByTS::updateUIResults(double yaw, double pitch, double distance, double offset)
-{
-    // 球坐标显示
-    ui->targetSystem2YawLineEdit->setText(
-            QString("%1 (Δ%2°)")
-                    .arg(convertDecimalToDMS(yaw))
-                    .arg(offset, 0, 'f', 2));
-
-    ui->targetSystem2PitchLineEdit->setText(convertDecimalToDMS(pitch));
-    ui->targetSystem2DistanceLineEdit->setText(QString::number(distance, 'f', 2));
-
-    // 笛卡尔坐标反馈
-    Eigen::Vector3d finalCart = sphericalToCartesian(yaw, pitch, distance);
-    ui->targetSystem2CoordXLineEdit->setText(QString::number(finalCart.x(), 'f', 3));
-    ui->targetSystem2CoordYLineEdit->setText(QString::number(finalCart.y(), 'f', 3));
-    ui->targetSystem2CoordZLineEdit->setText(QString::number(finalCart.z(), 'f', 3));
-
-    // 可视化反馈
-    QString color = (fabs(offset) > 5.0) ? "red" : "green";
-    ui->targetSystem2YawLineEdit->setStyleSheet(QString("color: %1;").arg(color));
-}
 void testDartComputingByTS::on_computeXandHPushButton_clicked()
 {
 #if TRANSFORM_DEBUG
@@ -934,7 +789,71 @@ void testDartComputingByTS::on_computeXandHPushButton_clicked()
     ui->deltaPsiLineEdit->setText(QString::number(deltaPsi));
     ui->deltaPsiLineEdit_2->insert(QString::number(deltaPsi * 180 / PI));  // 转换为度// 在on_computeXandHPushButton_clicked()方法末尾添加
 
-    calculateCoordinateTransform();
+
+    // ==================== 新增坐标转换逻辑 ====================
+    try {
+        // 1. 收集标定点数据
+        std::vector<Eigen::Vector3d> originalPoints = {
+                {rackLeftBack.x.toDouble(),  rackLeftBack.y.toDouble(),  rackLeftBack.z.toDouble()},
+                {rackRightBack.x.toDouble(), rackRightBack.y.toDouble(), rackRightBack.z.toDouble()},
+                {rackRightFront.x.toDouble(),rackRightFront.y.toDouble(),rackRightFront.z.toDouble()},
+                {rackLeftFront.x.toDouble(), rackLeftFront.y.toDouble(), rackLeftFront.z.toDouble()}
+        };
+
+        std::vector<Eigen::Vector3d> newPoints = {
+                {rackLeftBackSystem2.x.toDouble(),  rackLeftBackSystem2.y.toDouble(),  rackLeftBackSystem2.z.toDouble()},
+                {rackRightBackSystem2.x.toDouble(), rackRightBackSystem2.y.toDouble(), rackRightBackSystem2.z.toDouble()},
+                {rackRightFrontSystem2.x.toDouble(),rackRightFrontSystem2.y.toDouble(),rackRightFrontSystem2.z.toDouble()},
+                {rackLeftFrontSystem2.x.toDouble(), rackLeftFrontSystem2.y.toDouble(), rackLeftFrontSystem2.z.toDouble()}
+        };
+
+        // 2. 提取XY坐标
+        std::vector<Eigen::Vector2d> origXY, newXY;
+        for (int i = 0; i < 4; ++i) {
+            origXY.emplace_back(originalPoints[i].x(), originalPoints[i].y());
+            newXY.emplace_back(newPoints[i].x(), newPoints[i].y());
+        }
+
+        // 3. 计算XY变换参数
+        Eigen::Matrix2d R;
+        Eigen::Vector2d T;
+        computeTransformation(origXY, newXY, R, T);
+
+        // 4. 计算Z轴平移
+        double tz = 0.0;
+        for (int i = 0; i < 4; ++i) {
+            tz += (newPoints[i].z() - originalPoints[i].z());
+        }
+        tz /= 4.0;
+
+        // 5. 变换目标点
+        Eigen::Vector3d originalTarget(
+                ui->targetCoordXLineEdit->text().toDouble(),
+                ui->targetCoordYLineEdit->text().toDouble(),
+                ui->targetCoordZLineEdit->text().toDouble()
+        );
+
+        // 应用变换
+        Eigen::Vector2d transformedXY = R * Eigen::Vector2d(originalTarget.x(), originalTarget.y()) + T;
+        double transformedZ = originalTarget.z() + tz;
+        Eigen::Vector3d newTarget(transformedXY.x(), transformedXY.y(), transformedZ);
+
+        // 6. 转换为球坐标
+        Eigen::Vector3d sphere = cartesianToSpherical(newTarget);
+
+        // 更新UI
+        ui->targetSystem2YawLineEdit->setText(convertDecimalToDMS(sphere.x()));
+        ui->targetSystem2PitchLineEdit->setText(convertDecimalToDMS(sphere.y()));
+        ui->targetSystem2DistanceLineEdit->setText(QString::number(sphere.z()));
+
+        ui->targetSystem2CoordXLineEdit->setText(QString::number(newTarget.x()));
+        ui->targetSystem2CoordYLineEdit->setText(QString::number(newTarget.y()));
+        ui->targetSystem2CoordZLineEdit->setText(QString::number(newTarget.z()));
+
+    } catch (const std::exception& e) {
+        QMessageBox::critical(this, "计算错误", "坐标转换时发生数值错误，请检查输入数据有效性");
+    }
+
 }
 
 void testDartComputingByTS::on_deltaXlineEdit_editingFinished()
