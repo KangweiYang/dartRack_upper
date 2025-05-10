@@ -1044,7 +1044,7 @@ void dartsParasComputingByTS::on_sendAllParasPushButton_clicked()
 void dartsParasComputingByTS::send3HzPacket()
 {
     const int elapsed = shootTimer.elapsed();
-    quint8 stateByte = 0x00;
+    quint8 stateByte = 0x01;
 
     // 状态判断逻辑
     if (elapsed < 3000) { // 前3秒
@@ -1055,8 +1055,10 @@ void dartsParasComputingByTS::send3HzPacket()
         stateByte = 0x00;
     } else if (elapsed < 37000) { // 30-37秒（7秒）
         stateByte = 0x02;
-    } else { // 37秒后
+    } else if (elapsed < 52000){ // 37秒后
         stateByte = 0x01;
+    } else{                     //52秒停
+        timer3Hz->stop();
     }
 
     // 构建数据包
@@ -1129,21 +1131,19 @@ quint16 dartsParasComputingByTS::calculatePacketCRC(const QByteArray &data)
 void dartsParasComputingByTS::send1HzPacket()
 {
     const int elapsed = shootTimer.elapsed();
-    quint8 stateByte = 0x00;
+    quint8 stateByte = ui->dart_target_LineEdit->text().toInt();
     quint8 countdown = 0;
 
     // 状态判断逻辑
     if (elapsed < 3000) {
-        stateByte = 0x00;
     } else if (elapsed < 10000) {
-        stateByte = 0x00;
     } else if (elapsed < 30000) { // 倒计时20秒
         int remaining = 30 - (elapsed/1000);
         countdown = qBound(0, remaining, 20);
     } else if (elapsed < 37000) {
-        stateByte = 0x00;
+    } else if (elapsed < 52000) {
     } else {
-        stateByte = 0x00;
+        timer1Hz->stop();
     }
 
     // 构建数据包
@@ -1162,8 +1162,8 @@ void dartsParasComputingByTS::send1HzPacket()
     packet.append(0x01);
 
     // 添加数据部分
-    packet.append(stateByte);
     packet.append(countdown);
+    packet.append(stateByte);
 
     // 添加目标参数（高2位）
     packet.append(dartTarget << 6);
