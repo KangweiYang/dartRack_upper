@@ -1047,15 +1047,15 @@ void dartsParasComputingByTS::send3HzPacket()
     quint8 stateByte = 0x01;
 
     // 状态判断逻辑
-    if (elapsed < 3000) { // 前3秒
+    if (elapsed < 3000 / 3) { // 前3秒
         stateByte = 0x01;
-    } else if (elapsed < 10000) { // 3-10秒（7秒）
+    } else if (elapsed < 10000 / 3) { // 3-10秒（7秒）
         stateByte = 0x02;
-    } else if (elapsed < 30000) { // 10-30秒（20秒）
+    } else if (elapsed < 30000 / 3) { // 10-30秒（20秒）
         stateByte = 0x00;
-    } else if (elapsed < 37000) { // 30-37秒（7秒）
+    } else if (elapsed < 37000 / 3) { // 30-37秒（7秒）
         stateByte = 0x02;
-    } else if (elapsed < 52000){ // 37秒后
+    } else if (elapsed < 52000 / 3){ // 37秒后
         stateByte = 0x01;
     } else{                     //52秒停
         timer3Hz->stop();
@@ -1098,7 +1098,7 @@ void dartsParasComputingByTS::send3HzPacket()
     }
 
     // 超过总时间停止
-    if (elapsed >= 52000) { // 3+7+20+7+15=52秒
+    if (elapsed >= 52000 / 3) { // 3+7+20+7+15=52秒
         timer3Hz->stop();
         isSending = false;
     }
