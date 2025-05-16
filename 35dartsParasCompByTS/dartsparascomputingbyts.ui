@@ -662,7 +662,7 @@
     <item row="13" column="9">
      <widget class="QLineEdit" name="dart_target_LineEdit">
       <property name="text">
-       <string/>
+       <string>1</string>
       </property>
       <property name="readOnly">
        <bool>false</bool>

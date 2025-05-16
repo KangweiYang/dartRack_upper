@@ -1048,11 +1048,14 @@ void dartsParasComputingByTS::send3HzPacket()
 {
     const int elapsed = shootTimer.elapsed();
     quint8 stateByte = 0x01;
+    quint8 game_process = 0x00;
 
     // 状态判断逻辑
     if (elapsed < 3000 / 3) { // 前3秒
+        game_process = 0x00;
         stateByte = 0x01;
     } else if (elapsed < 10000 / 3) { // 3-10秒（7秒）
+        if(elapsed > 12000 / 3) game_process = 0x04;
         stateByte = 0x02;
     } else if (elapsed < 30000 / 3) { // 10-30秒（20秒）
         stateByte = 0x00;
@@ -1066,6 +1069,18 @@ void dartsParasComputingByTS::send3HzPacket()
 
     // 构建数据包
     QByteArray packet;
+    packet.append(0xA5);
+    packet.append(0x11);
+    packet.append((char)0x00);
+    packet.append((char)0x00);
+    packet.append((char)0x00);
+    packet.append(0x01);
+    packet.append((char)0x00);
+    packet.append((0x01) | (game_process << 4));
+    for (int i = 0; i < 10; ++i) {
+        packet.append((char)0x00);
+    }
+
     packet.append(0xA5);
     packet.append(0x06);
     packet.append((char)0x00);
