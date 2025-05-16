@@ -682,9 +682,9 @@ void dartsParasComputingByTS::ui_update(){
     ui->leadLeftFrontCoordZLineEdit->setText(leadLeftFront2.z);
 
 // 更新leadMiddleDartShoot2相关UI
-    ui->leadDartShootCoordXLineEdit->setText(leadMiddleDartShoot2.x);
-    ui->leadDartShootCoordYLineEdit->setText(leadMiddleDartShoot2.y);
-    ui->leadDartShootCoordZLineEdit->setText(leadMiddleDartShoot2.z);
+    ui->leadDartShootCoordXLineEdit->setText(leadDartShoot2.x);
+    ui->leadDartShootCoordYLineEdit->setText(leadDartShoot2.y);
+    ui->leadDartShootCoordZLineEdit->setText(leadDartShoot2.z);
 }
 
 /**
@@ -900,9 +900,9 @@ void dartsParasComputingByTS::on_computeXandHPushButton_clicked()
     // 更新 UI
     ui_update();
 
-    ui->leadDartShootCoordXLineEdit->setText(leadMiddleDartShoot2.x);
-    ui->leadDartShootCoordYLineEdit->setText(leadMiddleDartShoot2.y);
-    ui->leadDartShootCoordZLineEdit->setText(leadMiddleDartShoot2.z);
+    ui->leadDartShootCoordXLineEdit->setText(leadDartShoot2.x);
+    ui->leadDartShootCoordYLineEdit->setText(leadDartShoot2.y);
+    ui->leadDartShootCoordZLineEdit->setText(leadDartShoot2.z);
 }
 
 
@@ -936,8 +936,11 @@ void dartsParasComputingByTS::on_computeTall1PushButton_clicked()
 {
     // 更新界面显示
     ui->yaw1LineEdit->setText(ui->deltaPsi1LineEdit->text());
+    ui->yaw2LineEdit->setText(ui->deltaPsi2LineEdit->text());
+    ui->yaw3LineEdit->setText(ui->deltaPsi3LineEdit->text());
+    ui->yaw4LineEdit->setText(ui->deltaPsi4LineEdit->text());
     ui->Tall1LineEditOutput->clear();
-    ui->Tall1LineEditOutput->insert(QString::number(ui->f0LineEditInput->text().toDouble() + (((ui->mdart1PlusGLineEditInput->text().toDouble() + ui->mLauncherPlusGLineEditInput->text().toDouble()) / 1000 * ui->xLineEdit->text().toDouble() * ui->xLineEdit->text().toDouble() /( 4 * qCos(ui->setaLineEdit->text().toDouble() * PI / 180.0) * qCos(ui->setaLineEdit->text().toDouble() * PI / 180.0) * (ui->xLineEdit->text().toDouble() * qTan(ui->setaLineEdit->text().toDouble() * PI / 180.0) - ui->hLineEdit->text().toDouble()))) - ui->integralOfF0PlusDxtensionLineEditInput->text().toDouble()) / ui->k1PlusXtensionLineEditInput->text().toDouble()));
+    ui->Tall1LineEditOutput->insert(QString::number(ui->f0LineEditInput->text().toDouble() + (((ui->mdart1PlusGLineEditInput->text().toDouble() + ui->mLauncherPlusGLineEditInput->text().toDouble()) * 9.8 / 1000 * ui->xLineEdit->text().toDouble() * ui->xLineEdit->text().toDouble() /( 4 * qCos(ui->setaLineEdit_2->text().toDouble()) * qCos(ui->setaLineEdit_2->text().toDouble()) * (ui->xLineEdit->text().toDouble() * qTan(ui->setaLineEdit_2->text().toDouble()) - ui->hLineEdit->text().toDouble()))) - ui->integralOfF0PlusDxtensionLineEditInput->text().toDouble()) / ui->k1PlusXtensionLineEditInput->text().toDouble()));
 }
 
 void dartsParasComputingByTS::on_mdart1PlusGLineEditInput_editingFinished()
@@ -953,7 +956,7 @@ void dartsParasComputingByTS::on_yaw1LineEdit_editingFinished()
 void dartsParasComputingByTS::on_computeTall2PushButton_clicked()
 {
     ui->Tall2LineEditOutput->clear();
-    ui->Tall2LineEditOutput->insert(QString::number(ui->f0LineEditInput->text().toDouble() + (((ui->mdart2PlusGLineEditInput->text().toDouble() + ui->mLauncherPlusGLineEditInput->text().toDouble()) / 1000 * ui->xLineEdit->text().toDouble() * ui->xLineEdit->text().toDouble() /( 4 * qCos(ui->setaLineEdit->text().toDouble() * PI / 180.0) * qCos(ui->setaLineEdit->text().toDouble() * PI / 180.0) * (ui->xLineEdit->text().toDouble() * qTan(ui->setaLineEdit->text().toDouble() * PI / 180.0) - ui->hLineEdit->text().toDouble()))) - ui->integralOfF0PlusDxtensionLineEditInput->text().toDouble()) / ui->k1PlusXtensionLineEditInput->text().toDouble()));
+    ui->Tall2LineEditOutput->insert(QString::number(ui->f0LineEditInput->text().toDouble() + (((ui->mdart2PlusGLineEditInput->text().toDouble() + ui->mLauncherPlusGLineEditInput->text().toDouble()) * 9.8 / 1000 * ui->xLineEdit->text().toDouble() * ui->xLineEdit->text().toDouble() /( 4 * qCos(ui->setaLineEdit_2->text().toDouble()) * qCos(ui->setaLineEdit_2->text().toDouble()) * (ui->xLineEdit->text().toDouble() * qTan(ui->setaLineEdit_2->text().toDouble()) - ui->hLineEdit->text().toDouble()))) - ui->integralOfF0PlusDxtensionLineEditInput->text().toDouble()) / ui->k1PlusXtensionLineEditInput->text().toDouble()));
 }
 
 void dartsParasComputingByTS::on_mdart2PlusGLineEditInput_editingFinished()
@@ -969,7 +972,7 @@ void dartsParasComputingByTS::on_yaw2LineEdit_editingFinished()
 void dartsParasComputingByTS::on_computeTall3PushButton_clicked()
 {
     ui->Tall3LineEditOutput->clear();
-    ui->Tall3LineEditOutput->insert(QString::number(ui->f0LineEditInput->text().toDouble() + (((ui->mdart3PlusGLineEditInput->text().toDouble() + ui->mLauncherPlusGLineEditInput->text().toDouble()) / 1000 * ui->xLineEdit->text().toDouble() * ui->xLineEdit->text().toDouble() /( 4 * qCos(ui->setaLineEdit->text().toDouble() * PI / 180.0) * qCos(ui->setaLineEdit->text().toDouble() * PI / 180.0) * (ui->xLineEdit->text().toDouble() * qTan(ui->setaLineEdit->text().toDouble() * PI / 180.0) - ui->hLineEdit->text().toDouble()))) - ui->integralOfF0PlusDxtensionLineEditInput->text().toDouble()) / ui->k1PlusXtensionLineEditInput->text().toDouble()));
+    ui->Tall3LineEditOutput->insert(QString::number(ui->f0LineEditInput->text().toDouble() + (((ui->mdart3PlusGLineEditInput->text().toDouble() + ui->mLauncherPlusGLineEditInput->text().toDouble()) * 9.8 / 1000 * ui->xLineEdit->text().toDouble() * ui->xLineEdit->text().toDouble() /( 4 * qCos(ui->setaLineEdit_2->text().toDouble()) * qCos(ui->setaLineEdit_2->text().toDouble()) * (ui->xLineEdit->text().toDouble() * qTan(ui->setaLineEdit_2->text().toDouble()) - ui->hLineEdit->text().toDouble()))) - ui->integralOfF0PlusDxtensionLineEditInput->text().toDouble()) / ui->k1PlusXtensionLineEditInput->text().toDouble()));
 }
 
 void dartsParasComputingByTS::on_mdart3PlusGLineEditInput_editingFinished()
@@ -985,7 +988,7 @@ void dartsParasComputingByTS::on_yaw3LineEdit_editingFinished()
 void dartsParasComputingByTS::on_computeTall4PushButton_clicked()
 {
     ui->Tall4LineEditOutput->clear();
-    ui->Tall4LineEditOutput->insert(QString::number(ui->f0LineEditInput->text().toDouble() + (((ui->mdart4PlusGLineEditInput->text().toDouble() + ui->mLauncherPlusGLineEditInput->text().toDouble()) / 1000 * ui->xLineEdit->text().toDouble() * ui->xLineEdit->text().toDouble() /( 4 * qCos(ui->setaLineEdit->text().toDouble() * PI / 180.0) * qCos(ui->setaLineEdit->text().toDouble() * PI / 180.0) * (ui->xLineEdit->text().toDouble() * qTan(ui->setaLineEdit->text().toDouble() * PI / 180.0) - ui->hLineEdit->text().toDouble()))) - ui->integralOfF0PlusDxtensionLineEditInput->text().toDouble()) / ui->k1PlusXtensionLineEditInput->text().toDouble()));
+    ui->Tall4LineEditOutput->insert(QString::number(ui->f0LineEditInput->text().toDouble() + (((ui->mdart4PlusGLineEditInput->text().toDouble() + ui->mLauncherPlusGLineEditInput->text().toDouble()) * 9.8 / 1000 * ui->xLineEdit->text().toDouble() * ui->xLineEdit->text().toDouble() /( 4 * qCos(ui->setaLineEdit_2->text().toDouble()) * qCos(ui->setaLineEdit_2->text().toDouble()) * (ui->xLineEdit->text().toDouble() * qTan(ui->setaLineEdit_2->text().toDouble()) - ui->hLineEdit->text().toDouble()))) - ui->integralOfF0PlusDxtensionLineEditInput->text().toDouble()) / ui->k1PlusXtensionLineEditInput->text().toDouble()));
 }
 
 void dartsParasComputingByTS::on_mdart4PlusGLineEditInput_editingFinished()

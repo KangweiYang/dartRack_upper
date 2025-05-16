@@ -110,9 +110,9 @@ testDartComputingByTS::testDartComputingByTS(QSerialPort *serialPort, QSerialPor
     serialPort2 = serialPort2;
     bool visible = true;
     ui->setupUi(this);
-    setEditOnlyNum(ui->setaLineEdit, ui->f0LineEditInput);
-    setEditOnlyNum(ui->mdart1PlusGLineEditInput, ui->mdart2PlusGLineEditInput);
-    setEditOnlyNum(ui->Tall1LineEditInput, ui->integralOfF0PlusDxtensionLineEditInput);
+//    setEditOnlyNum(ui->setaLineEdit, ui->f0LineEditInput);
+//    setEditOnlyNum(ui->mdart1PlusGLineEditInput, ui->mdart2PlusGLineEditInput);
+//    setEditOnlyNum(ui->Tall1LineEditInput, ui->integralOfF0PlusDxtensionLineEditInput);
 
     connect(serialPort2, SIGNAL(readyRead()), this, SLOT(serialPortReadyRead_Slot()));
 }
@@ -225,7 +225,7 @@ QString testDartComputingByTS::convertDecimalToDMS(double decimalDegrees) {
     return QString("%1.%2%3")
             .arg(degrees)
             .arg(minutes, 2, 10, QLatin1Char('0'))
-            .arg(QString::number(seconds, 'f', 2).leftJustified(4, '0', true));
+            .arg(QString::number(seconds, 'd', 0));
 }
 
 // 增强的笛卡尔转球坐标函数
@@ -246,7 +246,7 @@ Eigen::Vector3d testDartComputingByTS::cartesianToSpherical(const Eigen::Vector3
     const double pitch = qRadiansToDegrees(std::acos(z / distance));
 
     // 计算方位角（0-360度）
-    double yaw = 180 - qRadiansToDegrees(std::atan2(y, x));
+    double yaw = 180 + qRadiansToDegrees(std::atan(y/x));
     if (yaw < 0) yaw += 360.0;
 
     return Eigen::Vector3d(yaw, pitch, distance);
@@ -793,11 +793,91 @@ void testDartComputingByTS::on_computeXandHPushButton_clicked()
     // ==================== 新增坐标转换逻辑 ====================
     try {
         // 1. 收集标定点数据
+
+// 提取左后机架坐标
+        rackLeftBack = {
+                ui->rackLeftBackCoordXLineEdit->text(),
+                ui->rackLeftBackCoordYLineEdit->text(),
+                ui->rackLeftBackCoordZLineEdit->text()
+        };
+
+// 提取右后机架坐标
+        rackRightBack = {
+                ui->rackRightBackCoordXLineEdit->text(),
+                ui->rackRightBackCoordYLineEdit->text(),
+                ui->rackRightBackCoordZLineEdit->text()
+        };
+
+// 提取右前机架坐标
+        rackRightFront = {
+                ui->rackRightFrontCoordXLineEdit->text(),
+                ui->rackRightFrontCoordYLineEdit->text(),
+                ui->rackRightFrontCoordZLineEdit->text()
+        };
+
+// 提取左前机架坐标
+        rackLeftFront = {
+                ui->rackLeftFrontCoordXLineEdit->text(),
+                ui->rackLeftFrontCoordYLineEdit->text(),
+                ui->rackLeftFrontCoordZLineEdit->text()
+        };
+
         std::vector<Eigen::Vector3d> originalPoints = {
                 {rackLeftBack.x.toDouble(),  rackLeftBack.y.toDouble(),  rackLeftBack.z.toDouble()},
                 {rackRightBack.x.toDouble(), rackRightBack.y.toDouble(), rackRightBack.z.toDouble()},
                 {rackRightFront.x.toDouble(),rackRightFront.y.toDouble(),rackRightFront.z.toDouble()},
                 {rackLeftFront.x.toDouble(), rackLeftFront.y.toDouble(), rackLeftFront.z.toDouble()}
+        };
+// 提取左后机架坐标
+        rackLeftBackSystem2 = {
+                ui->rackLeftBackSystem2CoordXLineEdit->text(),
+                ui->rackLeftBackSystem2CoordYLineEdit->text(),
+                ui->rackLeftBackSystem2CoordZLineEdit->text()
+        };
+
+        rackLeftBackDMSSystem2 = {
+                ui->rackLeftBackSystem2CoordYawLineEdit->text(),
+                ui->rackLeftBackSystem2CoordPitchLineEdit->text(),
+                ui->rackLeftBackSystem2CoordDistanceLineEdit->text()
+        };
+
+// 提取右后机架坐标
+        rackRightBackSystem2 = {
+                ui->rackRightBackSystem2CoordXLineEdit->text(),
+                ui->rackRightBackSystem2CoordYLineEdit->text(),
+                ui->rackRightBackSystem2CoordZLineEdit->text()
+        };
+
+        rackRightBackDMSSystem2 = {
+                ui->rackRightBackSystem2CoordYawLineEdit->text(),
+                ui->rackRightBackSystem2CoordPitchLineEdit->text(),
+                ui->rackRightBackSystem2CoordDistanceLineEdit->text()
+        };
+
+// 提取右前机架坐标
+        rackRightFrontSystem2 = {
+                ui->rackRightFrontSystem2CoordXLineEdit->text(),
+                ui->rackRightFrontSystem2CoordYLineEdit->text(),
+                ui->rackRightFrontSystem2CoordZLineEdit->text()
+        };
+
+        rackRightFrontDMSSystem2 = {
+                ui->rackRightFrontSystem2CoordYawLineEdit->text(),
+                ui->rackRightFrontSystem2CoordPitchLineEdit->text(),
+                ui->rackRightFrontSystem2CoordDistanceLineEdit->text()
+        };
+
+// 提取左前机架坐标
+        rackLeftFrontSystem2 = {
+                ui->rackLeftFrontSystem2CoordXLineEdit->text(),
+                ui->rackLeftFrontSystem2CoordYLineEdit->text(),
+                ui->rackLeftFrontSystem2CoordZLineEdit->text()
+        };
+
+        rackLeftFrontDMSSystem2 = {
+                ui->rackLeftFrontSystem2CoordYawLineEdit->text(),
+                ui->rackLeftFrontSystem2CoordPitchLineEdit->text(),
+                ui->rackLeftFrontSystem2CoordDistanceLineEdit->text()
         };
 
         std::vector<Eigen::Vector3d> newPoints = {
@@ -850,6 +930,53 @@ void testDartComputingByTS::on_computeXandHPushButton_clicked()
         ui->targetSystem2CoordYLineEdit->setText(QString::number(newTarget.y()));
         ui->targetSystem2CoordZLineEdit->setText(QString::number(newTarget.z()));
 
+        // 转换右前机架坐标
+        Eigen::Vector3d rackRightFront(
+                ui->rackRightFrontCoordXLineEdit->text().toDouble(),
+                ui->rackRightFrontCoordYLineEdit->text().toDouble(),
+                ui->rackRightFrontCoordZLineEdit->text().toDouble()
+        );
+        Eigen::Vector2d transformedRightFrontXY = R * Eigen::Vector2d(rackRightFront.x(), rackRightFront.y()) + T;
+        double transformedRightFrontZ = rackRightFront.z() + tz;
+        ui->rackRightFrontCoordXLineEdit->setText(QString::number(transformedRightFrontXY.x()));
+        ui->rackRightFrontCoordYLineEdit->setText(QString::number(transformedRightFrontXY.y()));
+        ui->rackRightFrontCoordZLineEdit->setText(QString::number(transformedRightFrontZ));
+
+// 转换左前机架坐标
+        Eigen::Vector3d rackLeftFront(
+                ui->rackLeftFrontCoordXLineEdit->text().toDouble(),
+                ui->rackLeftFrontCoordYLineEdit->text().toDouble(),
+                ui->rackLeftFrontCoordZLineEdit->text().toDouble()
+        );
+        Eigen::Vector2d transformedLeftFrontXY = R * Eigen::Vector2d(rackLeftFront.x(), rackLeftFront.y()) + T;
+        double transformedLeftFrontZ = rackLeftFront.z() + tz;
+        ui->rackLeftFrontCoordXLineEdit->setText(QString::number(transformedLeftFrontXY.x()));
+        ui->rackLeftFrontCoordYLineEdit->setText(QString::number(transformedLeftFrontXY.y()));
+        ui->rackLeftFrontCoordZLineEdit->setText(QString::number(transformedLeftFrontZ));
+
+// 转换右后机架坐标
+        Eigen::Vector3d rackRightBack(
+                ui->rackRightBackCoordXLineEdit->text().toDouble(),
+                ui->rackRightBackCoordYLineEdit->text().toDouble(),
+                ui->rackRightBackCoordZLineEdit->text().toDouble()
+        );
+        Eigen::Vector2d transformedRightBackXY = R * Eigen::Vector2d(rackRightBack.x(), rackRightBack.y()) + T;
+        double transformedRightBackZ = rackRightBack.z() + tz;
+        ui->rackRightBackCoordXLineEdit->setText(QString::number(transformedRightBackXY.x()));
+        ui->rackRightBackCoordYLineEdit->setText(QString::number(transformedRightBackXY.y()));
+        ui->rackRightBackCoordZLineEdit->setText(QString::number(transformedRightBackZ));
+
+// 转换左后机架坐标
+        Eigen::Vector3d rackLeftBack(
+                ui->rackLeftBackCoordXLineEdit->text().toDouble(),
+                ui->rackLeftBackCoordYLineEdit->text().toDouble(),
+                ui->rackLeftBackCoordZLineEdit->text().toDouble()
+        );
+        Eigen::Vector2d transformedLeftBackXY = R * Eigen::Vector2d(rackLeftBack.x(), rackLeftBack.y()) + T;
+        double transformedLeftBackZ = rackLeftBack.z() + tz;
+        ui->rackLeftBackCoordXLineEdit->setText(QString::number(transformedLeftBackXY.x()));
+        ui->rackLeftBackCoordYLineEdit->setText(QString::number(transformedLeftBackXY.y()));
+        ui->rackLeftBackCoordZLineEdit->setText(QString::number(transformedLeftBackZ));
     } catch (const std::exception& e) {
         QMessageBox::critical(this, "计算错误", "坐标转换时发生数值错误，请检查输入数据有效性");
     }
@@ -879,7 +1006,7 @@ void testDartComputingByTS::on_lLineEdit_editingFinished()
 void testDartComputingByTS::on_computeTall4PushButton_clicked()
 {
     ui->integralOfF0PlusDxtensionLineEditOutput->clear();
-    ui->integralOfF0PlusDxtensionLineEditOutput->insert(QString::number((ui->mdart1PlusGLineEditInput->text().toDouble() + ui->mLauncherPlusGLineEditInput->text().toDouble()) / 1000 * ui->xLineEdit->text().toDouble() * ui->xLineEdit->text().toDouble() /( 4 * qCos(ui->setaLineEdit->text().toDouble() * PI / 180.0) * qCos(ui->setaLineEdit->text().toDouble() * PI / 180.0) * (ui->xLineEdit->text().toDouble() * qTan(ui->setaLineEdit->text().toDouble() * PI / 180.0) - ui->hLineEdit->text().toDouble()))));
+    ui->integralOfF0PlusDxtensionLineEditOutput->insert(QString::number((ui->mdart1PlusGLineEditInput->text().toDouble() + ui->mLauncherPlusGLineEditInput->text().toDouble()) * 9.8 / 1000 * ui->xLineEdit->text().toDouble() * ui->xLineEdit->text().toDouble() /( 4 * qCos(ui->setaLineEdit->text().toDouble()) * qCos(ui->setaLineEdit->text().toDouble()) * (ui->xLineEdit->text().toDouble() * qTan(ui->setaLineEdit->text().toDouble()) - ui->hLineEdit->text().toDouble()))));
 }
 
 void testDartComputingByTS::on_mdart1PlusGLineEditInput_editingFinished()
@@ -898,7 +1025,7 @@ void testDartComputingByTS::on_copyTall4PushButton_clicked()
 void testDartComputingByTS::on_computeK1PlusXtensionPushButton_clicked()
 {
     ui->k1PlusXtensionLineEditInput->clear();
-    ui->k1PlusXtensionLineEditInput->insert(QString::number(((ui->mdart1PlusGLineEditInput->text().toDouble() + ui->mLauncherPlusGLineEditInput->text().toDouble()) / 1000 * ui->xLineEdit->text().toDouble() * ui->xLineEdit->text().toDouble() /( 4 * qCos(ui->setaLineEdit->text().toDouble() * PI / 180.0) * qCos(ui->setaLineEdit->text().toDouble() * PI / 180.0) * (ui->xLineEdit->text().toDouble() * qTan(ui->setaLineEdit->text().toDouble() * PI / 180.0) - ui->hLineEdit->text().toDouble())) - ui->integralOfF0PlusDxtensionLineEditInput->text().toDouble()) / (ui->Tall1LineEditInput->text().toDouble() - ui->f0LineEditInput->text().toDouble())));
+    ui->k1PlusXtensionLineEditInput->insert(QString::number(((ui->mdart1PlusGLineEditInput->text().toDouble() + ui->mLauncherPlusGLineEditInput->text().toDouble()) * 9.8 / 1000 * ui->xLineEdit->text().toDouble() * ui->xLineEdit->text().toDouble() /( 4 * qCos(ui->setaLineEdit->text().toDouble()) * qCos(ui->setaLineEdit->text().toDouble()) * (ui->xLineEdit->text().toDouble() * qTan(ui->setaLineEdit->text().toDouble()) - ui->hLineEdit->text().toDouble())) - ui->integralOfF0PlusDxtensionLineEditInput->text().toDouble()) / (ui->Tall1LineEditInput->text().toDouble() - ui->f0LineEditInput->text().toDouble())));
 }
 
 void testDartComputingByTS::on_f0LineEditInput_editingFinished()

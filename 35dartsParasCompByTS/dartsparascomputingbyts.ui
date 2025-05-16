@@ -620,7 +620,7 @@
     <item row="7" column="1">
      <widget class="QLabel" name="mdart3PlusGlabelInput">
       <property name="text">
-       <string>m镖3·g</string>
+       <string>m镖3(g)</string>
       </property>
      </widget>
     </item>
@@ -645,7 +645,7 @@
     <item row="9" column="1">
      <widget class="QLabel" name="mdart4PlusGlabelInput">
       <property name="text">
-       <string>m镖4·g</string>
+       <string>m镖4(g)</string>
       </property>
      </widget>
     </item>
@@ -692,7 +692,7 @@
     <item row="4" column="1">
      <widget class="QLabel" name="mdart2PlusGlabelInput">
       <property name="text">
-       <string>m镖2·g</string>
+       <string>m镖2(g)</string>
       </property>
      </widget>
     </item>
@@ -719,7 +719,7 @@
     <item row="0" column="1">
      <widget class="QLabel" name="mLauncherPlusGLabelInput">
       <property name="text">
-       <string>m发射台·g</string>
+       <string>m发射台(g)</string>
       </property>
      </widget>
     </item>
@@ -773,7 +773,7 @@
     <item row="2" column="1">
      <widget class="QLabel" name="mdart1PlusGlabelInput">
       <property name="text">
-       <string>m镖1·g</string>
+       <string>m镖1(g)</string>
       </property>
      </widget>
     </item>
