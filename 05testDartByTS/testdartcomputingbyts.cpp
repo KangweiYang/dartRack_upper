@@ -246,7 +246,7 @@ Eigen::Vector3d testDartComputingByTS::cartesianToSpherical(const Eigen::Vector3
     const double pitch = qRadiansToDegrees(std::acos(z / distance));
 
     // 计算方位角（0-360度）
-    double yaw = 180 + qRadiansToDegrees(std::atan(y/x));
+    double yaw = - qRadiansToDegrees(std::atan(y/x));
     if (yaw < 0) yaw += 360.0;
 
     return Eigen::Vector3d(yaw, pitch, distance);
@@ -276,7 +276,7 @@ double testDartComputingByTS::convertDMS(const QString &dmsStr) {
 
 Eigen::Vector3d testDartComputingByTS::sphericalToCartesian(double yawDeg, double pitchDeg, double distance) {
 //    qDebug()<<"yawDeg"<<yawDeg<<"pitchDeg"<<pitchDeg<<"distance"<<distance;
-    double yaw = qDegreesToRadians(yawDeg);
+    double yaw = 2 * PI - qDegreesToRadians(yawDeg);
     double pitch = qDegreesToRadians(pitchDeg);
 
     double x = distance * sin(pitch) * cos(yaw);
@@ -313,7 +313,7 @@ void testDartComputingByTS::serialPortReadyRead_Slot() {
     QStringList newLines;
     static int currentSSPoint;
 
-    qDebug()<<"line.size ="<<lines.size();
+//    qDebug()<<"line.size ="<<lines.size();
     for (int i = 0; i < lines.size(); ++i) {
         QString line = lines[i].trimmed();
         if (line.startsWith("SS")) {
@@ -887,24 +887,44 @@ void testDartComputingByTS::on_computeXandHPushButton_clicked()
                 {rackLeftFrontSystem2.x.toDouble(), rackLeftFrontSystem2.y.toDouble(), rackLeftFrontSystem2.z.toDouble()}
         };
 
-        // 2. 提取XY坐标
-        std::vector<Eigen::Vector2d> origXY, newXY;
-        for (int i = 0; i < 4; ++i) {
-            origXY.emplace_back(originalPoints[i].x(), originalPoints[i].y());
-            newXY.emplace_back(newPoints[i].x(), newPoints[i].y());
-        }
-
-        // 3. 计算XY变换参数
+        // 2. 计算平面刚体变换（XY平移+Z轴旋转）
         Eigen::Matrix2d R;
         Eigen::Vector2d T;
-        computeTransformation(origXY, newXY, R, T);
-
-        // 4. 计算Z轴平移
         double tz = 0.0;
+
+        // 计算质心
+        Eigen::Vector2d orig_centroid(0, 0), new_centroid(0, 0);
         for (int i = 0; i < 4; ++i) {
+            orig_centroid += Eigen::Vector2d(originalPoints[i].x(), originalPoints[i].y());
+            new_centroid += Eigen::Vector2d(newPoints[i].x(), newPoints[i].y());
             tz += (newPoints[i].z() - originalPoints[i].z());
         }
+        orig_centroid /= 4.0;
+        new_centroid /= 4.0;
         tz /= 4.0;
+
+        // 计算协方差矩阵
+        Eigen::Matrix2d H = Eigen::Matrix2d::Zero();
+        for (int i = 0; i < 4; ++i) {
+            Eigen::Vector2d o = Eigen::Vector2d(originalPoints[i].x(), originalPoints[i].y()) - orig_centroid;
+            Eigen::Vector2d n = Eigen::Vector2d(newPoints[i].x(), newPoints[i].y()) - new_centroid;
+            H += o * n.transpose();
+        }
+
+        // SVD分解计算旋转
+        Eigen::JacobiSVD<Eigen::Matrix2d> svd(H, Eigen::ComputeFullU | Eigen::ComputeFullV);
+        Eigen::Matrix2d U = svd.matrixU();
+        Eigen::Matrix2d V = svd.matrixV();
+        R = V * U.transpose();
+
+        // 确保行列式为1（防止反射）
+        if (R.determinant() < 0) {
+            V.col(1) *= -1;
+            R = V * U.transpose();
+        }
+
+        // 计算平移量
+        T = new_centroid - R * orig_centroid;
 
         // 5. 变换目标点
         Eigen::Vector3d originalTarget(
@@ -938,9 +958,12 @@ void testDartComputingByTS::on_computeXandHPushButton_clicked()
         );
         Eigen::Vector2d transformedRightFrontXY = R * Eigen::Vector2d(rackRightFront.x(), rackRightFront.y()) + T;
         double transformedRightFrontZ = rackRightFront.z() + tz;
+
+#if TRANS_COORD_DEBUG
         ui->rackRightFrontCoordXLineEdit->setText(QString::number(transformedRightFrontXY.x()));
         ui->rackRightFrontCoordYLineEdit->setText(QString::number(transformedRightFrontXY.y()));
         ui->rackRightFrontCoordZLineEdit->setText(QString::number(transformedRightFrontZ));
+#endif
 
 // 转换左前机架坐标
         Eigen::Vector3d rackLeftFront(
@@ -950,9 +973,11 @@ void testDartComputingByTS::on_computeXandHPushButton_clicked()
         );
         Eigen::Vector2d transformedLeftFrontXY = R * Eigen::Vector2d(rackLeftFront.x(), rackLeftFront.y()) + T;
         double transformedLeftFrontZ = rackLeftFront.z() + tz;
+#if TRANS_COORD_DEBUG
         ui->rackLeftFrontCoordXLineEdit->setText(QString::number(transformedLeftFrontXY.x()));
         ui->rackLeftFrontCoordYLineEdit->setText(QString::number(transformedLeftFrontXY.y()));
         ui->rackLeftFrontCoordZLineEdit->setText(QString::number(transformedLeftFrontZ));
+#endif
 
 // 转换右后机架坐标
         Eigen::Vector3d rackRightBack(
@@ -962,9 +987,11 @@ void testDartComputingByTS::on_computeXandHPushButton_clicked()
         );
         Eigen::Vector2d transformedRightBackXY = R * Eigen::Vector2d(rackRightBack.x(), rackRightBack.y()) + T;
         double transformedRightBackZ = rackRightBack.z() + tz;
+#if TRANS_COORD_DEBUG
         ui->rackRightBackCoordXLineEdit->setText(QString::number(transformedRightBackXY.x()));
         ui->rackRightBackCoordYLineEdit->setText(QString::number(transformedRightBackXY.y()));
         ui->rackRightBackCoordZLineEdit->setText(QString::number(transformedRightBackZ));
+#endif
 
 // 转换左后机架坐标
         Eigen::Vector3d rackLeftBack(
@@ -974,9 +1001,23 @@ void testDartComputingByTS::on_computeXandHPushButton_clicked()
         );
         Eigen::Vector2d transformedLeftBackXY = R * Eigen::Vector2d(rackLeftBack.x(), rackLeftBack.y()) + T;
         double transformedLeftBackZ = rackLeftBack.z() + tz;
+#if TRANS_COORD_DEBUG
         ui->rackLeftBackCoordXLineEdit->setText(QString::number(transformedLeftBackXY.x()));
         ui->rackLeftBackCoordYLineEdit->setText(QString::number(transformedLeftBackXY.y()));
         ui->rackLeftBackCoordZLineEdit->setText(QString::number(transformedLeftBackZ));
+#endif
+        ui->rackLeftBackErrorCoordLineEdit->setText(QString::number(transformedLeftBackXY.x() - ui->rackLeftBackSystem2CoordXLineEdit->text().toDouble()
+                                                         + transformedLeftBackXY.y() - ui->rackLeftBackSystem2CoordYLineEdit->text().toDouble()
+                                                         + transformedLeftBackZ - ui->rackLeftBackSystem2CoordZLineEdit->text().toDouble()));
+        ui->rackRightBackErrorCoordLineEdit->setText(QString::number(transformedRightBackXY.x() - ui->rackRightBackSystem2CoordXLineEdit->text().toDouble()
+                                                         + transformedRightBackXY.y() - ui->rackRightBackSystem2CoordYLineEdit->text().toDouble()
+                                                         + transformedRightBackZ - ui->rackRightBackSystem2CoordZLineEdit->text().toDouble()));
+        ui->rackLeftFrontErrorCoordLineEdit->setText(QString::number(transformedLeftFrontXY.x() - ui->rackLeftFrontSystem2CoordXLineEdit->text().toDouble()
+                                                         + transformedLeftFrontXY.y() - ui->rackLeftFrontSystem2CoordYLineEdit->text().toDouble()
+                                                         + transformedLeftFrontZ - ui->rackLeftFrontSystem2CoordZLineEdit->text().toDouble()));
+        ui->rackRightFrontErrorCoordLineEdit->setText(QString::number(transformedRightFrontXY.x() - ui->rackRightFrontSystem2CoordXLineEdit->text().toDouble()
+                                                                      + transformedRightFrontXY.y() - ui->rackRightFrontSystem2CoordYLineEdit->text().toDouble()
+                                                                      + transformedRightFrontZ - ui->rackRightFrontSystem2CoordZLineEdit->text().toDouble()));
     } catch (const std::exception& e) {
         QMessageBox::critical(this, "计算错误", "坐标转换时发生数值错误，请检查输入数据有效性");
     }

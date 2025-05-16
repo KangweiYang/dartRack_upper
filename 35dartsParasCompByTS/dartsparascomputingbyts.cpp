@@ -108,7 +108,7 @@ double dartsParasComputingByTS::convertDMS(const QString &dmsStr) {
 
 Eigen::Vector3d dartsParasComputingByTS::sphericalToCartesian(double yawDeg, double pitchDeg, double distance) {
 //    qDebug()<<"yawDeg"<<yawDeg<<"pitchDeg"<<pitchDeg<<"distance"<<distance;
-    double yaw = qDegreesToRadians(yawDeg);
+    double yaw = 2 * PI - qDegreesToRadians(yawDeg);
     double pitch = qDegreesToRadians(pitchDeg);
 
     double x = distance * sin(pitch) * cos(yaw);
@@ -476,7 +476,7 @@ void dartsParasComputingByTS::serialPortReadyRead2_Slot() {
     QStringList newLines;
     static int currentSSPoint;
 
-    qDebug()<<"line.size ="<<lines.size();
+//    qDebug()<<"line.size ="<<lines.size();
     for (int i = 0; i < lines.size(); ++i) {
         QString line = lines[i].trimmed();
         if (line.startsWith("SS")) {

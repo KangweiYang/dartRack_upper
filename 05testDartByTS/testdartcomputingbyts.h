@@ -6,6 +6,7 @@
 #include <qlineedit.h>
 #include <Eigen/Dense> // 需要安装Eigen库
 
+#define TRANS_COORD_DEBUG   0
 double DeltaL(QLineEdit* Coord1X, QLineEdit* Coord1Y, QLineEdit* Coord2X, QLineEdit* Coord2Y);
 
 namespace Ui {
