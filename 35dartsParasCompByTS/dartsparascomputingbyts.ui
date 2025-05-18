@@ -503,10 +503,18 @@
      </widget>
     </item>
     <item row="5" column="1">
-     <widget class="QLineEdit" name="mdart2PlusGLineEditInput"/>
+     <widget class="QLineEdit" name="mdart2PlusGLineEditInput">
+      <property name="text">
+       <string>110</string>
+      </property>
+     </widget>
     </item>
     <item row="10" column="1">
-     <widget class="QLineEdit" name="mdart4PlusGLineEditInput"/>
+     <widget class="QLineEdit" name="mdart4PlusGLineEditInput">
+      <property name="text">
+       <string>110</string>
+      </property>
+     </widget>
     </item>
     <item row="0" column="0">
      <widget class="QLabel" name="f0LabelInput">
@@ -561,7 +569,11 @@
      </widget>
     </item>
     <item row="1" column="1">
-     <widget class="QLineEdit" name="mLauncherPlusGLineEditInput"/>
+     <widget class="QLineEdit" name="mLauncherPlusGLineEditInput">
+      <property name="text">
+       <string>70.23</string>
+      </property>
+     </widget>
     </item>
     <item row="0" column="2">
      <widget class="QLabel" name="k1PlusXtensionLabelInput">
@@ -682,7 +694,7 @@
     <item row="1" column="2">
      <widget class="QLineEdit" name="k1PlusXtensionLineEditInput">
       <property name="text">
-       <string/>
+       <string>0.036</string>
       </property>
      </widget>
     </item>
@@ -778,7 +790,11 @@
      </widget>
     </item>
     <item row="1" column="4" colspan="3">
-     <widget class="QLineEdit" name="integralOfF0PlusDxtensionLineEditInput"/>
+     <widget class="QLineEdit" name="integralOfF0PlusDxtensionLineEditInput">
+      <property name="text">
+       <string>4.7</string>
+      </property>
+     </widget>
     </item>
     <item row="12" column="9">
      <widget class="QLabel" name="Tall1LabelOutput_9">
@@ -863,7 +879,11 @@
      <widget class="QLineEdit" name="deltaPsi1LineEdit"/>
     </item>
     <item row="1" column="0">
-     <widget class="QLineEdit" name="f0LineEditInput"/>
+     <widget class="QLineEdit" name="f0LineEditInput">
+      <property name="text">
+       <string>380</string>
+      </property>
+     </widget>
     </item>
     <item row="15" column="9">
      <widget class="QPushButton" name="shootPushButton">
@@ -893,7 +913,11 @@
      </widget>
     </item>
     <item row="8" column="1">
-     <widget class="QLineEdit" name="mdart3PlusGLineEditInput"/>
+     <widget class="QLineEdit" name="mdart3PlusGLineEditInput">
+      <property name="text">
+       <string>110</string>
+      </property>
+     </widget>
     </item>
     <item row="8" column="8">
      <widget class="QLineEdit" name="Tall3LineEditOutput">
@@ -906,7 +930,11 @@
      </widget>
     </item>
     <item row="3" column="1">
-     <widget class="QLineEdit" name="mdart1PlusGLineEditInput"/>
+     <widget class="QLineEdit" name="mdart1PlusGLineEditInput">
+      <property name="text">
+       <string>110</string>
+      </property>
+     </widget>
     </item>
     <item row="3" column="5" colspan="2">
      <widget class="QPushButton" name="computeTall4PushButton_2">

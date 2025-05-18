@@ -156,8 +156,10 @@ coord leadBC[YAW_TEST_N], leadFC[YAW_TEST_N], leadMDS[YAW_TEST_N];
     Eigen::Vector3d sphericalToCartesian(double yawDeg, double pitchDeg, double distance);
     void send3HzPacket();
     void send1HzPacket();
+    void send1HzPacket2();
     QTimer* timer3Hz;
     QTimer* timer1Hz;
+    QTimer* timer1Hz2;
     QElapsedTimer shootTimer;
     bool isSending;
     QMessageBox* busyMessage;
@@ -165,6 +167,7 @@ coord leadBC[YAW_TEST_N], leadFC[YAW_TEST_N], leadMDS[YAW_TEST_N];
     // 包序号计数器
     quint8 seq3Hz;
     quint8 seq1Hz;
+    quint8 seq1Hz2;
 
     // 状态时间跟踪
     int shootStartTime; // 记录开始时间（毫秒）

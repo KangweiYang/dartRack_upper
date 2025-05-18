@@ -438,13 +438,16 @@ dartsParasComputingByTS::dartsParasComputingByTS(QSerialPort *serialPort, QSeria
 
     timer3Hz = new QTimer(this);
     timer1Hz = new QTimer(this);
+    timer1Hz2 = new QTimer(this);
     isSending = false;
     seq3Hz = 0;
     seq1Hz = 0;
+    seq1Hz2 = 0;
     busyMessage = nullptr;
 
     connect(timer3Hz, &QTimer::timeout, this, &dartsParasComputingByTS::send3HzPacket);
     connect(timer1Hz, &QTimer::timeout, this, &dartsParasComputingByTS::send1HzPacket);
+    connect(timer1Hz2, &QTimer::timeout, this, &dartsParasComputingByTS::send1HzPacket2);
 }
 
 void dartsParasComputingByTS::serialPortReadyRead_Slot(){
@@ -603,6 +606,7 @@ dartsParasComputingByTS::~dartsParasComputingByTS()
     this->visible = false;
     timer3Hz->stop();
     timer1Hz->stop();
+    timer1Hz2->stop();
     delete ui;
 }
 
@@ -1044,6 +1048,86 @@ void dartsParasComputingByTS::on_sendAllParasPushButton_clicked()
     this->on_sendThirdDartParasPushButton_clicked();
     this->on_sendFourthDartParasPushButton_clicked();
 }
+
+quint8 dartsParasComputingByTS::calculateHeaderCRC(const QByteArray &data)
+{
+    // 简化的CRC8计算示例
+    quint8 crc = 0;
+    for (char c : data) {
+        crc ^= c;
+        for (int i = 0; i < 8; i++) {
+            crc = (crc & 0x80) ? (crc << 1) ^ 0x07 : (crc << 1);
+        }
+    }
+    return crc;
+}
+
+quint16 dartsParasComputingByTS::calculatePacketCRC(const QByteArray &data)
+{
+    // CRC16-CCITT计算
+    quint16 crc = 0xFFFF;
+    for (char c : data) {
+        crc ^= (quint8)c << 8;
+        for (int i = 0; i < 8; i++) {
+            crc = crc & 0x8000 ? (crc << 1) ^ 0x1021 : crc << 1;
+        }
+    }
+    return crc;
+}
+void dartsParasComputingByTS::send1HzPacket2()
+{
+    const int elapsed = shootTimer.elapsed();
+
+    quint8 game_process = 0x00;
+
+    // 状态判断逻辑
+    if (elapsed < 2000) { // 前3秒
+        game_process = 0x00;
+    } else if (elapsed < 10000) { // 3-10秒（7秒）
+        game_process = 0x04;
+    } else if (elapsed < 30000) { // 10-30秒（20秒）
+        game_process = 0x04;
+    } else if (elapsed < 37000) { // 30-37秒（7秒）
+        game_process = 0x04;
+    } else if (elapsed < 52000){ // 37秒后
+        game_process = 0x04;
+    } else{                     //52秒停
+        game_process = 0x00;
+        timer1Hz2->stop();
+    }
+
+    // 构建数据包
+    QByteArray packet;
+    packet.append(0xA5);
+    packet.append(0x0b);
+    packet.append((char)0x00);
+    packet.append(seq1Hz2++);
+
+    // 计算帧头CRC
+    QByteArray header = packet.left(4);
+    packet.append(calculateHeaderCRC(header));
+
+    // 包名
+    packet.append(0x01);
+    packet.append((char)0x00);
+    // 添加数据部分
+
+    packet.append((0x01) | (game_process << 4));
+    for (int i = 0; i < 10; ++i) {
+        packet.append((char)0x00);
+    }
+
+    // 计算整包CRC
+    quint16 crc = calculatePacketCRC(packet);
+    packet.append(crc & 0xFF);
+    packet.append(crc >> 8);
+
+    // 发送数据
+    if (serialPort1 && serialPort1->isOpen()) {
+        serialPort1->write(packet);
+    }
+}
+
 void dartsParasComputingByTS::send3HzPacket()
 {
     const int elapsed = shootTimer.elapsed();
@@ -1069,18 +1153,6 @@ void dartsParasComputingByTS::send3HzPacket()
 
     // 构建数据包
     QByteArray packet;
-    packet.append(0xA5);
-    packet.append(0x11);
-    packet.append((char)0x00);
-    packet.append((char)0x00);
-    packet.append((char)0x00);
-    packet.append(0x01);
-    packet.append((char)0x00);
-    packet.append((0x01) | (game_process << 4));
-    for (int i = 0; i < 10; ++i) {
-        packet.append((char)0x00);
-    }
-
     packet.append(0xA5);
     packet.append(0x06);
     packet.append((char)0x00);
@@ -1121,31 +1193,6 @@ void dartsParasComputingByTS::send3HzPacket()
         isSending = false;
     }
 }
-quint8 dartsParasComputingByTS::calculateHeaderCRC(const QByteArray &data)
-{
-    // 简化的CRC8计算示例
-    quint8 crc = 0;
-    for (char c : data) {
-        crc ^= c;
-        for (int i = 0; i < 8; i++) {
-            crc = (crc & 0x80) ? (crc << 1) ^ 0x07 : (crc << 1);
-        }
-    }
-    return crc;
-}
-
-quint16 dartsParasComputingByTS::calculatePacketCRC(const QByteArray &data)
-{
-    // CRC16-CCITT计算
-    quint16 crc = 0xFFFF;
-    for (char c : data) {
-        crc ^= (quint8)c << 8;
-        for (int i = 0; i < 8; i++) {
-            crc = crc & 0x8000 ? (crc << 1) ^ 0x1021 : crc << 1;
-        }
-    }
-    return crc;
-}
 void dartsParasComputingByTS::send1HzPacket()
 {
     const int elapsed = shootTimer.elapsed();
@@ -1181,10 +1228,10 @@ void dartsParasComputingByTS::send1HzPacket()
 
     // 添加数据部分
     packet.append(countdown);
-    packet.append(stateByte);
+    packet.append(stateByte | (dartTarget << 6));
 
     // 添加目标参数（高2位）
-    packet.append(dartTarget << 6);
+    packet.append((char )0x00);
 
     // 计算整包CRC
     quint16 crc = calculatePacketCRC(packet);
@@ -1222,6 +1269,7 @@ void dartsParasComputingByTS::on_shootPushButton_clicked()
     shootStartTime = 0;
     seq3Hz = 0;
     seq1Hz = 0;
+    seq1Hz2 = 0;
 
     // 从控件获取参数
     targetChangeTime = ui->target_change_timeLineEdit->text().toUShort();
@@ -1231,6 +1279,7 @@ void dartsParasComputingByTS::on_shootPushButton_clicked()
     // 启动定时器
     timer3Hz->start(333); // ≈3Hz
     timer1Hz->start(1000); // 1Hz
+    timer1Hz2->start(500); // 2Hz
     shootTimer.start();
 }
 void dartsParasComputingByTS::on_abortShootPushButton_clicked()
