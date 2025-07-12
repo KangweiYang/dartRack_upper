@@ -884,13 +884,13 @@ void dartsParasComputingByTS::on_computeXandHPushButton_clicked()
 
     //--------------------- 统一计算 x、h、deltaPsi ---------------------
     // 计算水平距离x（投影点与目标点）
-    const double dx = targetX - leadMiddleX;
-    const double dy = targetY - leadMiddleY;
+    const double dx = targetX - leadDartShoot2.x.toDouble();
+    const double dy = targetY - leadDartShoot2.y.toDouble();
     const double xDistance = sqrt(dx*dx + dy*dy);
     ui->xLineEdit->setText(QString::number(xDistance));
 
     // 计算高度差h
-    const double hDifference = targetZ - leadMiddleZ;
+    const double hDifference = targetZ - leadDartShoot2.z.toDouble();
     ui->hLineEdit->setText(QString::number(hDifference));
 
     // 计算deltaPsi（目标连线方向与导轨边的平均夹角差）
@@ -1082,17 +1082,17 @@ void dartsParasComputingByTS::send1HzPacket2()
 
     // 状态判断逻辑
     if (elapsed < 2000) { // 前3秒
-        game_process = 0x00;
+        game_process = 0x04;
     } else if (elapsed < 10000) { // 3-10秒（7秒）
         game_process = 0x04;
     } else if (elapsed < 30000) { // 10-30秒（20秒）
         game_process = 0x04;
     } else if (elapsed < 37000) { // 30-37秒（7秒）
         game_process = 0x04;
-    } else if (elapsed < 52000){ // 37秒后
+    } else if (elapsed < 40000){ // 37秒后
         game_process = 0x04;
-    } else{                     //52秒停
-        game_process = 0x00;
+    } else{                     //40秒停
+        game_process = 0x04;
         timer1Hz2->stop();
     }
 
@@ -1135,19 +1135,19 @@ void dartsParasComputingByTS::send3HzPacket()
     quint8 game_process = 0x00;
 
     // 状态判断逻辑
-    if (elapsed < 3000 / 3) { // 前3秒
+    if (elapsed < 3000) { // 前3秒
         game_process = 0x00;
         stateByte = 0x01;
-    } else if (elapsed < 10000 / 3) { // 3-10秒（7秒）
+    } else if (elapsed < 10000) { // 3-10秒（7秒）
         if(elapsed > 12000 / 3) game_process = 0x04;
         stateByte = 0x02;
-    } else if (elapsed < 30000 / 3) { // 10-30秒（20秒）
+    } else if (elapsed < 30000) { // 10-30秒（20秒）
         stateByte = 0x00;
-    } else if (elapsed < 37000 / 3) { // 30-37秒（7秒）
+    } else if (elapsed < 37000) { // 30-37秒（7秒）
         stateByte = 0x02;
-    } else if (elapsed < 52000 / 3){ // 37秒后
+    } else if (elapsed < 40000){ // 37秒后
         stateByte = 0x01;
-    } else{                     //52秒停
+    } else{                     //40秒停
         timer3Hz->stop();
     }
 
@@ -1169,7 +1169,6 @@ void dartsParasComputingByTS::send3HzPacket()
     // 添加数据部分
     packet.append(stateByte);
     packet.append((char)0x00);
-    packet.append((char)0x00);
 
     // 添加两个16位参数（小端序）
     packet.append(targetChangeTime & 0xFF);
@@ -1188,7 +1187,7 @@ void dartsParasComputingByTS::send3HzPacket()
     }
 
     // 超过总时间停止
-    if (elapsed >= 52000 / 3) { // 3+7+20+7+15=52秒
+    if (elapsed >= 40000) { // 3+7+20+7+3=40秒
         timer3Hz->stop();
         isSending = false;
     }
@@ -1206,7 +1205,7 @@ void dartsParasComputingByTS::send1HzPacket()
         int remaining = 30 - (elapsed/1000);
         countdown = qBound(0, remaining, 20);
     } else if (elapsed < 37000) {
-    } else if (elapsed < 52000) {
+    } else if (elapsed < 40000) {
     } else {
         timer1Hz->stop();
     }
@@ -1277,9 +1276,9 @@ void dartsParasComputingByTS::on_shootPushButton_clicked()
     dartTarget = ui->dart_target_LineEdit->text().toUShort() & 0x03; // 只取低2位
 
     // 启动定时器
-    timer3Hz->start(333); // ≈3Hz
+    timer3Hz->start(1000); // ≈3Hz
     timer1Hz->start(1000); // 1Hz
-    timer1Hz2->start(500); // 2Hz
+    timer1Hz2->start(1000); // 2Hz
     shootTimer.start();
 }
 void dartsParasComputingByTS::on_abortShootPushButton_clicked()

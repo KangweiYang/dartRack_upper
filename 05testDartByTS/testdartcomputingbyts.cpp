@@ -772,13 +772,13 @@ void testDartComputingByTS::on_computeXandHPushButton_clicked()
 
     //--------------------- 统一计算 x、h、deltaPsi ---------------------
     // 计算水平距离x（投影点与目标点）
-    double dx = targetX - leadMiddleX;
-    double dy = targetY - leadMiddleY;
+    double dx = targetX - leadDartShoot.x.toDouble();
+    double dy = targetY - leadDartShoot.y.toDouble();
     double xDistance = sqrt(dx*dx + dy*dy);
     ui->xLineEdit->setText(QString::number(xDistance));
 
     // 计算高度差h
-    double hDifference = targetZ - leadMiddleZ;
+    double hDifference = targetZ - leadDartShoot.z.toDouble();
     ui->hLineEdit->setText(QString::number(hDifference));
 
     // 计算deltaPsi（目标连线方向与导轨边的平均夹角差）

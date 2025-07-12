@@ -59,21 +59,21 @@
     <item row="3" column="7">
      <widget class="QLineEdit" name="leadRightBackCoordZLineEdit">
       <property name="text">
-       <string>0.2</string>
+       <string>-1.033153</string>
       </property>
      </widget>
     </item>
     <item row="1" column="7">
      <widget class="QLineEdit" name="leadRightBackCoordXLineEdit">
       <property name="text">
-       <string>0.5</string>
+       <string>9.720197</string>
       </property>
      </widget>
     </item>
     <item row="2" column="1">
      <widget class="QLineEdit" name="targetCoordYLineEdit">
       <property name="text">
-       <string>2</string>
+       <string>-12.0439</string>
       </property>
      </widget>
     </item>
@@ -87,7 +87,7 @@
     <item row="2" column="7">
      <widget class="QLineEdit" name="leadRightBackCoordYLineEdit">
       <property name="text">
-       <string>0.2</string>
+       <string>-2.513764</string>
       </property>
      </widget>
     </item>
@@ -105,24 +105,17 @@
       </property>
      </widget>
     </item>
-    <item row="3" column="1">
-     <widget class="QLineEdit" name="targetCoordZLineEdit">
-      <property name="text">
-       <string>1</string>
-      </property>
-     </widget>
-    </item>
     <item row="1" column="4">
      <widget class="QLineEdit" name="referCoord1System2XLineEdit">
       <property name="text">
-       <string>2</string>
+       <string>1</string>
       </property>
      </widget>
     </item>
     <item row="1" column="14">
      <widget class="QLineEdit" name="leadLeftFrontCoordXLineEdit">
       <property name="text">
-       <string>0.4</string>
+       <string>10.262048</string>
       </property>
      </widget>
     </item>
@@ -136,7 +129,7 @@
     <item row="3" column="14">
      <widget class="QLineEdit" name="leadLeftFrontCoordZLineEdit">
       <property name="text">
-       <string>0.6</string>
+       <string>-0.664616</string>
       </property>
      </widget>
     </item>
@@ -164,21 +157,21 @@
     <item row="2" column="4">
      <widget class="QLineEdit" name="referCoord1System2YLineEdit">
       <property name="text">
-       <string>2</string>
+       <string>1</string>
       </property>
      </widget>
     </item>
     <item row="2" column="5">
      <widget class="QLineEdit" name="referCoord2System2YLineEdit">
       <property name="text">
-       <string>2</string>
+       <string>1</string>
       </property>
      </widget>
     </item>
     <item row="2" column="14">
      <widget class="QLineEdit" name="leadLeftFrontCoordYLineEdit">
       <property name="text">
-       <string>0.8</string>
+       <string>-2.703581</string>
       </property>
      </widget>
     </item>
@@ -213,7 +206,7 @@
     <item row="1" column="1">
      <widget class="QLineEdit" name="targetCoordXLineEdit">
       <property name="text">
-       <string>24.5</string>
+       <string>33.492</string>
       </property>
      </widget>
     </item>
@@ -234,7 +227,7 @@
     <item row="1" column="5">
      <widget class="QLineEdit" name="referCoord2System2XLineEdit">
       <property name="text">
-       <string>3</string>
+       <string>2</string>
       </property>
      </widget>
     </item>
@@ -255,7 +248,7 @@
     <item row="3" column="18">
      <widget class="QLineEdit" name="leadDartShootCoordZLineEdit">
       <property name="text">
-       <string>0.5</string>
+       <string>-0.713201</string>
       </property>
      </widget>
     </item>
@@ -269,28 +262,28 @@
     <item row="2" column="18">
      <widget class="QLineEdit" name="leadDartShootCoordYLineEdit">
       <property name="text">
-       <string>0.7</string>
+       <string>-2.659256</string>
       </property>
      </widget>
     </item>
     <item row="3" column="5">
      <widget class="QLineEdit" name="referCoord2System2ZLineEdit">
       <property name="text">
-       <string>1.334242</string>
+       <string>2</string>
       </property>
      </widget>
     </item>
     <item row="3" column="4">
      <widget class="QLineEdit" name="referCoord1System2ZLineEdit">
       <property name="text">
-       <string>1.334253</string>
+       <string>2</string>
       </property>
      </widget>
     </item>
     <item row="1" column="18">
      <widget class="QLineEdit" name="leadDartShootCoordXLineEdit">
       <property name="text">
-       <string>0.4</string>
+       <string>10.102551</string>
       </property>
      </widget>
     </item>
@@ -304,21 +297,21 @@
     <item row="1" column="6">
      <widget class="QLineEdit" name="leadLeftBackCoordXLineEdit">
       <property name="text">
-       <string>0.4</string>
+       <string>9.736406</string>
       </property>
      </widget>
     </item>
     <item row="2" column="6">
      <widget class="QLineEdit" name="leadLeftBackCoordYLineEdit">
       <property name="text">
-       <string>0.2</string>
+       <string>-2.475998</string>
       </property>
      </widget>
     </item>
     <item row="3" column="6">
      <widget class="QLineEdit" name="leadLeftBackCoordZLineEdit">
       <property name="text">
-       <string>0.2</string>
+       <string>-1.030358</string>
       </property>
      </widget>
     </item>
@@ -332,21 +325,28 @@
     <item row="1" column="15">
      <widget class="QLineEdit" name="leadRightFrontCoordXLineEdit">
       <property name="text">
-       <string>0.5</string>
+       <string>10.246685</string>
       </property>
      </widget>
     </item>
     <item row="2" column="15">
      <widget class="QLineEdit" name="leadRightFrontCoordYLineEdit">
       <property name="text">
-       <string>0.8</string>
+       <string>-2.741332</string>
       </property>
      </widget>
     </item>
     <item row="3" column="15">
      <widget class="QLineEdit" name="leadRightFrontCoordZLineEdit">
       <property name="text">
-       <string>0.6</string>
+       <string>-0.667029</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QLineEdit" name="targetCoordZLineEdit">
+      <property name="text">
+       <string>-0.153401</string>
       </property>
      </widget>
     </item>
@@ -654,7 +654,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -665,7 +665,11 @@
    </property>
    <layout class="QGridLayout" name="gridLayout">
     <item row="10" column="2">
-     <widget class="QLineEdit" name="deltaPsi4LineEdit"/>
+     <widget class="QLineEdit" name="deltaPsi4LineEdit">
+      <property name="text">
+       <string>-800</string>
+      </property>
+     </widget>
     </item>
     <item row="5" column="4">
      <widget class="QLabel" name="integralOfF0PlusDxtensionLabelInput_7">
@@ -690,14 +694,14 @@
        <string/>
       </property>
       <property name="readOnly">
-       <bool>true</bool>
+       <bool>false</bool>
       </property>
      </widget>
     </item>
     <item row="8" column="3">
      <widget class="QLineEdit" name="dart3IntegralOfF0PlusDxtensionLineEditInput">
       <property name="text">
-       <string>22</string>
+       <string>27.37</string>
       </property>
      </widget>
     </item>
@@ -711,7 +715,7 @@
     <item row="10" column="3">
      <widget class="QLineEdit" name="dart4IntegralOfF0PlusDxtensionLineEditInput">
       <property name="text">
-       <string>22</string>
+       <string>27.35</string>
       </property>
      </widget>
     </item>
@@ -768,12 +772,16 @@
        <string/>
       </property>
       <property name="readOnly">
-       <bool>true</bool>
+       <bool>false</bool>
       </property>
      </widget>
     </item>
     <item row="6" column="2">
-     <widget class="QLineEdit" name="deltaPsi2LineEdit"/>
+     <widget class="QLineEdit" name="deltaPsi2LineEdit">
+      <property name="text">
+       <string>-350</string>
+      </property>
+     </widget>
     </item>
     <item row="8" column="5">
      <widget class="QPushButton" name="computeTall3PushButton">
@@ -803,7 +811,7 @@
     <item row="4" column="1">
      <widget class="QLineEdit" name="mdart1PlusGLineEditInput">
       <property name="text">
-       <string>110</string>
+       <string>109.60</string>
       </property>
      </widget>
     </item>
@@ -876,7 +884,11 @@
      </widget>
     </item>
     <item row="8" column="2">
-     <widget class="QLineEdit" name="deltaPsi3LineEdit"/>
+     <widget class="QLineEdit" name="deltaPsi3LineEdit">
+      <property name="text">
+       <string>-720</string>
+      </property>
+     </widget>
     </item>
     <item row="1" column="2">
      <widget class="QLabel" name="mLauncherPlusGLabelInput">
@@ -918,7 +930,7 @@
     <item row="2" column="3">
      <widget class="QLineEdit" name="k1PlusXtensionLineEditInput">
       <property name="text">
-       <string>0.036</string>
+       <string>0.0346974</string>
       </property>
      </widget>
     </item>
@@ -949,7 +961,7 @@
     <item row="4" column="3">
      <widget class="QLineEdit" name="dart1IntegralOfF0PlusDxtensionLineEditInput">
       <property name="text">
-       <string>22</string>
+       <string>27.43</string>
       </property>
      </widget>
     </item>
@@ -997,7 +1009,7 @@
     <item row="6" column="3">
      <widget class="QLineEdit" name="dart2IntegralOfF0PlusDxtensionLineEditInput">
       <property name="text">
-       <string>22</string>
+       <string>27.12</string>
       </property>
      </widget>
     </item>
@@ -1052,7 +1064,7 @@
        <string/>
       </property>
       <property name="readOnly">
-       <bool>true</bool>
+       <bool>false</bool>
       </property>
      </widget>
     </item>
@@ -1079,7 +1091,7 @@
     <item row="10" column="1">
      <widget class="QLineEdit" name="mdart4PlusGLineEditInput">
       <property name="text">
-       <string>110</string>
+       <string>109.12</string>
       </property>
      </widget>
     </item>
@@ -1089,7 +1101,7 @@
        <string/>
       </property>
       <property name="readOnly">
-       <bool>true</bool>
+       <bool>false</bool>
       </property>
      </widget>
     </item>
@@ -1106,14 +1118,14 @@
     <item row="8" column="1">
      <widget class="QLineEdit" name="mdart3PlusGLineEditInput">
       <property name="text">
-       <string>110</string>
+       <string>109.93</string>
       </property>
      </widget>
     </item>
     <item row="2" column="2">
      <widget class="QLineEdit" name="mLauncherPlusGLineEditInput">
       <property name="text">
-       <string>70.23</string>
+       <string>79.37</string>
       </property>
      </widget>
     </item>
@@ -1137,7 +1149,7 @@
     <item row="6" column="1">
      <widget class="QLineEdit" name="mdart2PlusGLineEditInput">
       <property name="text">
-       <string>110</string>
+       <string>108.93</string>
       </property>
      </widget>
     </item>
@@ -1156,7 +1168,11 @@
      </widget>
     </item>
     <item row="4" column="2">
-     <widget class="QLineEdit" name="deltaPsi1LineEdit"/>
+     <widget class="QLineEdit" name="deltaPsi1LineEdit">
+      <property name="text">
+       <string>-600</string>
+      </property>
+     </widget>
     </item>
     <item row="7" column="7">
      <widget class="QLabel" name="Tall1LabelOutput_5">
