@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- 基础信息 -->
+    <key>CFBundleName</key>
+    <string>Imageli</string>
+    <key>CFBundleDisplayName</key>
+    <string>Imageli</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.momo.imageli</string> <!-- 唯一标识符 -->
+    <key>CFBundleVersion</key>
+    <string>100</string> <!-- 内部版本号 (整数) -->
+    <key>CFBundleShortVersionString</key>
+    <string>1.0.0</string> <!-- 用户可见版本 -->
+
+    <!-- 应用类型 -->
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>NSPrincipalClass</key>
+    <string>NSApplication</string>
+
+    <!-- 显示配置 -->
+    <key>NSHighResolutionCapable</key>
+    <true/> <!-- 支持Retina -->
+    <key>LSUIElement</key>
+    <false/> <!-- 显示Dock图标 -->
+
+    <!-- 图标 -->
+    <key>CFBundleIconFile</key>
+    <string>AppIcon.icns</string> <!-- 需提供.icns文件 -->
+
+    <!-- 支持的macOS版本 -->
+    <key>LSMinimumSystemVersion</key>
+    <string>10.15</string> <!-- 最低支持Catalina -->
+
+    <!-- ===== 图片压缩软件特有配置 ===== -->
+    <!-- 1. 文件关联 -->
+    <key>CFBundleDocumentTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeName</key>
+            <string>Image File</string>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string> <!-- 允许编辑文件 -->
+            <key>LSHandlerRank</key>
+            <string>Owner</string> <!-- 设为默认应用 -->
+            <key>LSItemContentTypes</key>
+            <array>
+                <!-- 支持的图片格式 -->
+                <string>public.png</string>
+                <string>public.jpeg</string>
+                <string>public.heic</string>
+                <string>com.adobe.webp</string>
+                <string>com.microsoft.bmp</string>
+            </array>
+            <key>CFBundleTypeIconFile</key>
+            <string>DocIcon.icns</string> <!-- 文件类型图标 -->
+        </dict>
+    </array>
+
+    <!-- 2. 快速查看插件 (可选) -->
+    <key>QLThumbnailMinimumSize</key>
+    <integer>32</integer>
+    <key>QLThumbnailGeneratorID</key>
+    <string>com.imageli.thumbnailer</string>
+
+    <!-- 3. 沙盒权限 -->
+    <key>com.apple.security.app-sandbox</key>
+    <true/>
+    <key>com.apple.security.files.user-selected.read-write</key>
+    <true/>
+    <key>com.apple.security.files.downloads.read-write</key>
+    <true/>
+
+    <!-- 4. 隐私权限描述 -->
+    <key>NSDocumentsFolderUsageDescription</key>
+    <string>需要访问您的文档以保存压缩后的图片</string>
+    <key>NSPicturesFolderUsageDescription</key>
+    <string>需要访问图片库以选择要压缩的图片</string>
+</dict>
+</plist>

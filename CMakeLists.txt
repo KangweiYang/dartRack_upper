@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.28)
+#set(APPLE 1)
 set(PUBLISH_BIN_RELEASE ${CMAKE_CURRENT_SOURCE_DIR}/dartRack_upper)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PUBLISH_BIN_RELEASE})
 set(CMAKE_CXX_STANDARD 17)
@@ -48,3 +49,10 @@ target_link_libraries(dartRack_upper
         darts_paras_computing_by_ts
 )
 
+#if(WIN32)
+#    include(cmake_pack_windows.cmake)
+#elseif(APPLE)
+#    include(cmake_pack_macos.cmake)
+#elseif(UNIX)
+#    include(cmake_pack_linux.cmake)
+#endif()

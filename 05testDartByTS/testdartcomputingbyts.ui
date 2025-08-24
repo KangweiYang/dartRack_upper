@@ -198,7 +198,7 @@
     <item row="2" column="6">
      <widget class="QLineEdit" name="leadDartShootCoordYLineEdit">
       <property name="text">
-       <string>1.719983</string>
+       <string>-0.620309</string>
       </property>
      </widget>
     </item>
@@ -212,7 +212,7 @@
     <item row="1" column="1">
      <widget class="QLineEdit" name="targetCoordXLineEdit">
       <property name="text">
-       <string>-2.048534</string>
+       <string>18.591186</string>
       </property>
      </widget>
     </item>
@@ -240,7 +240,7 @@
     <item row="1" column="2">
      <widget class="QLineEdit" name="leadLeftBackCoordXLineEdit">
       <property name="text">
-       <string>-0.343154</string>
+       <string>0.871519</string>
       </property>
      </widget>
     </item>
@@ -261,21 +261,21 @@
     <item row="3" column="3">
      <widget class="QLineEdit" name="leadRightBackCoordZLineEdit">
       <property name="text">
-       <string>-1.191982</string>
+       <string>-0.897559</string>
       </property>
      </widget>
     </item>
     <item row="3" column="2">
      <widget class="QLineEdit" name="leadLeftBackCoordZLineEdit">
       <property name="text">
-       <string>-1.189519</string>
+       <string>-0.898612</string>
       </property>
      </widget>
     </item>
     <item row="1" column="4">
      <widget class="QLineEdit" name="leadLeftFrontCoordXLineEdit">
       <property name="text">
-       <string>-0.377400</string>
+       <string>1.266582</string>
       </property>
      </widget>
     </item>
@@ -289,7 +289,7 @@
     <item row="3" column="1">
      <widget class="QLineEdit" name="targetCoordZLineEdit">
       <property name="text">
-       <string>-0.363176</string>
+       <string>-0.045829</string>
       </property>
      </widget>
     </item>
@@ -303,21 +303,21 @@
     <item row="3" column="4">
      <widget class="QLineEdit" name="leadLeftFrontCoordZLineEdit">
       <property name="text">
-       <string>-0.838246</string>
+       <string>-0.551161</string>
       </property>
      </widget>
     </item>
     <item row="1" column="5">
      <widget class="QLineEdit" name="leadRightFrontCoordXLineEdit">
       <property name="text">
-       <string>-0.338107</string>
+       <string>1.236218</string>
       </property>
      </widget>
     </item>
     <item row="2" column="3">
      <widget class="QLineEdit" name="leadRightBackCoordYLineEdit">
       <property name="text">
-       <string>1.341394</string>
+       <string>-0.375831</string>
       </property>
      </widget>
     </item>
@@ -331,14 +331,14 @@
     <item row="1" column="3">
      <widget class="QLineEdit" name="leadRightBackCoordXLineEdit">
       <property name="text">
-       <string>-0.303711</string>
+       <string>0.840794</string>
       </property>
      </widget>
     </item>
     <item row="2" column="2">
      <widget class="QLineEdit" name="leadLeftBackCoordYLineEdit">
       <property name="text">
-       <string>1.338140</string>
+       <string>-0.346917</string>
       </property>
      </widget>
     </item>
@@ -359,21 +359,21 @@
     <item row="2" column="5">
      <widget class="QLineEdit" name="leadRightFrontCoordYLineEdit">
       <property name="text">
-       <string>1.912239</string>
+       <string>-0.787727</string>
       </property>
      </widget>
     </item>
     <item row="3" column="6">
      <widget class="QLineEdit" name="leadDartShootCoordZLineEdit">
       <property name="text">
-       <string>-0.884146</string>
+       <string>-0.606829</string>
       </property>
      </widget>
     </item>
     <item row="2" column="4">
      <widget class="QLineEdit" name="leadLeftFrontCoordYLineEdit">
       <property name="text">
-       <string>1.908098</string>
+       <string>-0.758793</string>
       </property>
      </widget>
     </item>
@@ -387,7 +387,7 @@
     <item row="2" column="1">
      <widget class="QLineEdit" name="targetCoordYLineEdit">
       <property name="text">
-       <string>26.866567</string>
+       <string>-18.854791</string>
       </property>
      </widget>
     </item>
@@ -401,7 +401,7 @@
     <item row="3" column="5">
      <widget class="QLineEdit" name="leadRightFrontCoordZLineEdit">
       <property name="text">
-       <string>-0.840525</string>
+       <string>-0.551005</string>
       </property>
      </widget>
     </item>
@@ -422,7 +422,7 @@
     <item row="1" column="6">
      <widget class="QLineEdit" name="leadDartShootCoordXLineEdit">
       <property name="text">
-       <string>-0.342403</string>
+       <string>1.104989</string>
       </property>
      </widget>
     </item>

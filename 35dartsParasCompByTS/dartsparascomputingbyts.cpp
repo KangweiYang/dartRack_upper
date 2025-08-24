@@ -56,15 +56,15 @@ coord rackLFC2;
 const QString endSerial = ",-";
 const QString pauseSerial = ",";
 const QString targetCoordSerial = "\n1,";
-const QString referCoord1System1Serial = "\n2,";
-const QString referCoord2System1Serial = "\n3,";
-const QString referCoord1System2Serial = "\n4,";
-const QString referCoord2System2Serial = "\n5,";
-const QString leadRightBackCoordSerial = "\n7,";
-const QString leadLeftBackCoordSerial = "\n6,";
-const QString leadRightFrontCoordSerial = "\n9,";
-const QString leadLeftFrontCoordSerial = "\n8,";
-const QString leadDartShootCoordSerial = "\n10,";
+const QString referCoord1System1Serial = "\n12,";
+const QString referCoord2System1Serial = "\n13,";
+const QString referCoord1System2Serial = "\n14,";
+const QString referCoord2System2Serial = "\n15,";
+const QString leadRightBackCoordSerial = "\n3,";
+const QString leadLeftBackCoordSerial = "\n2,";
+const QString leadRightFrontCoordSerial = "\n5,";
+const QString leadLeftFrontCoordSerial = "\n4,";
+const QString leadDartShootCoordSerial = "\n6,";
 #endif
 
 #if LEAD_POINT_NUM == 2
