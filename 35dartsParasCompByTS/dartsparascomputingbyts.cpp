@@ -22,67 +22,120 @@
 #include <Eigen/Core>
 
 #define TRANSFORM_DEBUG 1
-
+// 圆周率常量
 const double PI = 3.14159265358979323846264338;
 
-struct coord
-{
-    QString x;
-    QString y;
-    QString z;
+// 三维坐标结构体（使用字符串存储坐标值）
+struct coord {
+    QString x;  // X坐标值（字符串格式）
+    QString y;  // Y坐标值（字符串格式）
+    QString z;  // Z坐标值（字符串格式）
 };
 
+// 目标点坐标（系统2坐标系）
 coord target2;
+
+// 参考点1在系统1中的坐标
 coord referCoord1System1;
+// 参考点2在系统1中的坐标
 coord referCoord2System1;
+// 参考点1在系统2中的坐标
 coord referCoord1System2;
+// 参考点2在系统2中的坐标
 coord referCoord2System2;
+
+// 导轨左后方坐标（系统2坐标系）
 coord rackLeftBack2;
+// 导轨左后方引导点坐标
 coord leadLeftBack2;
+// 导轨右后方引导点坐标
 coord leadRightBack2;
+// 导轨右后方坐标
 coord rackRightBack2;
+// 导轨右前方坐标
 coord rackRightFront2;
+// 导轨右前方引导点坐标
 coord leadRightFront2;
+// 导轨左前方引导点坐标
 coord leadLeftFront2;
+// 导轨左前方坐标
 coord rackLeftFront2;
+// 飞镖发射点坐标
 coord leadDartShoot2;
+// 飞镖发射中点坐标
 coord leadMiddleDartShoot2;
+
+// 导轨左后角坐标（简化命名）
 coord rackLBC2;
+// 导轨右前角坐标（简化命名）
 coord rackRFC2;
+// 导轨右后角坐标（简化命名）
 coord rackRBC2;
+// 导轨左前角坐标（简化命名）
 coord rackLFC2;
 
-#if LEAD_POINT_NUM == 4
+#if LEAD_POINT_NUM == 4  // 当使用4个引导点时
+// 数据结束标识符
 const QString endSerial = ",-";
+// 数据分隔符
 const QString pauseSerial = ",";
+// 目标点坐标串口标识符
 const QString targetCoordSerial = "\n1,";
+// 系统1参考点1串口标识符
 const QString referCoord1System1Serial = "\n12,";
+// 系统1参考点2串口标识符
 const QString referCoord2System1Serial = "\n13,";
+// 系统2参考点1串口标识符
 const QString referCoord1System2Serial = "\n14,";
+// 系统2参考点2串口标识符
 const QString referCoord2System2Serial = "\n15,";
+// 右后方引导点串口标识符
 const QString leadRightBackCoordSerial = "\n3,";
+// 左后方引导点串口标识符
 const QString leadLeftBackCoordSerial = "\n2,";
+// 右前方引导点串口标识符
 const QString leadRightFrontCoordSerial = "\n5,";
+// 左前方引导点串口标识符
 const QString leadLeftFrontCoordSerial = "\n4,";
+// 飞镖发射点串口标识符
 const QString leadDartShootCoordSerial = "\n6,";
 #endif
 
-#if LEAD_POINT_NUM == 2
-coord leadBC[YAW_TEST_N], leadFC[YAW_TEST_N], leadMDS[YAW_TEST_N];
+#if LEAD_POINT_NUM == 2  // 当使用2个引导点时
+// 后方引导点数组（用于多组测试）
+coord leadBC[YAW_TEST_N];
+// 前方引导点数组（用于多组测试）
+coord leadFC[YAW_TEST_N];
+// 飞镖发射点数组（用于多组测试）
+coord leadMDS[YAW_TEST_N];
+
+// 数据结束标识符
 const QString endSerial = ",-";
+// 数据分隔符
 const QString pauseSerial = ",";
+// 目标点坐标串口标识符
 const QString targetCoordSerial = "\n1,";
+// 导轨左后方坐标串口标识符
 const QString rackLeftBackCoordSerial = "\n6,";
+// 导轨右后方坐标串口标识符
 const QString rackRightBackSerial = "\n7,";
+// 右后方引导点串口标识符
 const QString leadRightBackCoordSerial = "\n8,";
+// 左后方引导点串口标识符
 const QString leadLeftBackCoordSerial = "\n8,";
+// 导轨左前方坐标串口标识符
 const QString rackLeftFrontSerial = "\n9,";
+// 导轨右前方坐标串口标识符
 const QString rackRightFrontSerial = "\n10,";
+// 右前方引导点串口标识符
 const QString leadRightFrontCoordSerial = "\n11,";
+// 左前方引导点串口标识符
 const QString leadLeftFrontCoordSerial = "\n11,";
+// 飞镖发射点串口标识符
 const QString leadDartShootCoordSerial = "\n12,";
 #endif
 
+// 有效的偏航测试数量
 uint16_t yawTestValidNum = 0;
 
 /**
@@ -208,6 +261,30 @@ double calculateSignedLinePlaneAngle(
     return angleDeg;
 }
 
+/**
+ * @brief 从串口缓冲区解析特定格式的坐标数据并更新UI控件
+ *
+ * 该函数从全局接收缓冲区中提取以特定标识符开头的坐标数据，格式为：
+ *   [startSerial]x[pauseSerial]y[pauseSerial]z[endSerial]
+ * 解析后的坐标值将更新到对应的UI控件中
+ *
+ * @param startSerial 数据起始标识符（如"\n1,"）
+ * @param[out] x 存储解析出的X坐标值
+ * @param[out] y 存储解析出的Y坐标值
+ * @param[out] z 存储解析出的Z坐标值
+ * @param xLineEdit 显示X坐标的UI控件指针
+ * @param yLineEdit 显示Y坐标的UI控件指针
+ * @param zLineEdit 显示Z坐标的UI控件指针
+ *
+ * @note 函数执行流程：
+ *  1. 检查UI控件指针有效性
+ *  2. 在缓冲区定位数据起始位置
+ *  3. 提取并分割数据字符串
+ *  4. 验证数据完整性（至少3部分）
+ *  5. 解析坐标值并更新UI控件
+ *
+ * @warning 如果缓冲区中找不到startSerial或数据不完整，函数将输出错误信息并返回
+ */
 void dartsParasComputingByTS::serialRecord(QString startSerial, QString x, QString y, QString z, QLineEdit* xLineEdit, QLineEdit* yLineEdit, QLineEdit* zLineEdit) {
     if (!xLineEdit || !yLineEdit || !zLineEdit) {
         qDebug() << "Error: Null pointer passed to serialHandle";
@@ -247,6 +324,33 @@ void dartsParasComputingByTS::serialRecord(QString startSerial, QString x, QStri
     zLineEdit->clear();
     zLineEdit->insert(z);
 }
+
+/**
+ * @brief 从串口缓冲区解析坐标数据并更新结构体及UI控件
+ *
+ * 该函数从全局接收缓冲区中提取以特定标识符开头的坐标数据，格式为：
+ *   [startSerial]x[pauseSerial]y[pauseSerial]z[endSerial]
+ * 解析后的坐标值将存储到指定的coord结构体，并更新对应的UI控件
+ *
+ * @param startSerial 数据起始标识符（如"\n1,"）
+ * @param point 指向coord结构体的指针，用于存储解析出的坐标
+ * @param xLineEdit 显示X坐标的UI控件指针
+ * @param yLineEdit 显示Y坐标的UI控件指针
+ * @param zLineEdit 显示Z坐标的UI控件指针
+ *
+ * @note 函数执行流程：
+ *  1. 检查指针有效性（point和UI控件）
+ *  2. 在缓冲区定位数据起始位置
+ *  3. 提取并分割数据字符串
+ *  4. 验证数据完整性（至少3部分）
+ *  5. 解析坐标值并存储到结构体
+ *  6. 更新UI控件显示
+ *
+ * @warning 如果缓冲区中找不到startSerial或数据不完整，函数将输出错误信息并返回
+ * @warning 函数会修改传入的coord结构体内容
+ *
+ * @see serialRecord() 类似功能函数，但不更新结构体
+ */
 void dartsParasComputingByTS::serialHandle(QString startSerial, coord* point, QLineEdit* xLineEdit, QLineEdit* yLineEdit, QLineEdit* zLineEdit) {
     if (!point || !xLineEdit || !yLineEdit || !zLineEdit) {
         qDebug() << "Error: Null pointer passed to serialHandle";
@@ -419,284 +523,542 @@ Eigen::Vector3d dartsParasComputingByTS::applyTransformation(const Eigen::Vector
 * @param None
 * @retval None
 * @bug
-*/
-dartsParasComputingByTS::dartsParasComputingByTS(QSerialPort *serialPort, QSerialPort *serialPort2, QWidget *parent) :
-        QWidget(parent),
-        ui(new Ui::dartsParasComputingByTS)
+*//**
+ * @brief 飞镖参数计算界面构造函数
+ *
+ * 该构造函数初始化飞镖参数计算界面，设置串口连接，加载坐标数据，
+ * 建立信号槽连接，并初始化定时器系统
+ *
+ * @param serialPort 主串口对象指针（用于与飞镖系统通信）
+ * @param serialPort2 辅助串口对象指针（用于与测量系统通信）
+ * @param parent 父窗口指针
+ *
+ * @note 初始化流程：
+ *  1. 创建UI界面
+ *  2. 保存串口对象指针
+ *  3. 设置数值输入框限制
+ *  4. 从文本编辑框加载初始坐标数据
+ *  5. 连接串口数据接收信号槽
+ *  6. 初始化定时器系统（3Hz/1Hz/2Hz）
+ *  7. 设置定时器超时信号连接
+ *
+ * @warning 构造函数不负责打开串口，需确保传入的串口对象已正确初始化
+ * @see Widget 类中应已创建并配置好串口对象
+ */
+dartsParasComputingByTS::dartsParasComputingByTS(
+        QSerialPort *serialPort,
+        QSerialPort *serialPort2,
+        QWidget *parent
+) : QWidget(parent),
+    ui(new Ui::dartsParasComputingByTS)
 {
-    bool visible = true;
-    ui->setupUi(this);
+    bool visible = true;  // 界面可见标志
+    ui->setupUi(this);    // 初始化UI
+
+    // 保存串口对象指针
     serialPort1 = serialPort;
     serialPort2 = serialPort2;
 
+    // 设置数值输入框限制（仅允许数字输入）
     setEditOnlyNum(ui->xLineEdit, ui->hLineEdit);
 
+    // 从文本编辑框加载初始坐标数据
     loadCoordsFromPlainTextEdit();
-    connect(serialPort1, SIGNAL(readyRead()), this, SLOT(serialPortReadyRead_Slot()));
 
-    connect(serialPort2, SIGNAL(readyRead()), this, SLOT(serialPortReadyRead2_Slot()));
+    // 连接主串口数据接收信号
+    connect(serialPort1, SIGNAL(readyRead()),
+            this, SLOT(serialPortReadyRead_Slot()));
 
-    timer3Hz = new QTimer(this);
-    timer1Hz = new QTimer(this);
-    timer1Hz2 = new QTimer(this);
-    isSending = false;
-    seq3Hz = 0;
-    seq1Hz = 0;
-    seq1Hz2 = 0;
-    busyMessage = nullptr;
+    // 连接辅助串口数据接收信号
+    connect(serialPort2, SIGNAL(readyRead()),
+            this, SLOT(serialPortReadyRead2_Slot()));
 
-    connect(timer3Hz, &QTimer::timeout, this, &dartsParasComputingByTS::send3HzPacket);
-    connect(timer1Hz, &QTimer::timeout, this, &dartsParasComputingByTS::send1HzPacket);
-    connect(timer1Hz2, &QTimer::timeout, this, &dartsParasComputingByTS::send1HzPacket2);
+    // 初始化定时器系统
+    timer3Hz = new QTimer(this);    // 3Hz定时器（≈333ms）
+    timer1Hz = new QTimer(this);    // 1Hz定时器（1000ms）
+    timer1Hz2 = new QTimer(this);   // 2Hz定时器（500ms）
+
+    // 初始化状态变量
+    isSending = false;    // 数据发送状态标志
+    seq3Hz = 0;           // 3Hz数据包序列号
+    seq1Hz = 0;           // 1Hz数据包序列号
+    seq1Hz2 = 0;          // 2Hz数据包序列号
+    busyMessage = nullptr; // 忙状态提示框指针
+
+    // 连接定时器超时信号
+    connect(timer3Hz, &QTimer::timeout,
+            this, &dartsParasComputingByTS::send3HzPacket);
+    connect(timer1Hz, &QTimer::timeout,
+            this, &dartsParasComputingByTS::send1HzPacket);
+    connect(timer1Hz2, &QTimer::timeout,
+            this, &dartsParasComputingByTS::send1HzPacket2);
 }
+/**
+ * @brief 主串口数据接收槽函数
+ *
+ * 该函数处理从主串口接收的数据，解析飞镖系统发送的实时状态信息：
+ *   - 当前偏航角（curYaw）格式："curYaw: [角度值]/"
+ *   - 当前张力（curTen）格式："curTen: [张力值];"
+ *
+ * @note 处理流程：
+ *  1. 仅当界面可见时处理数据
+ *  2. 检查缓冲区是否包含完整的偏航角或张力数据
+ *  3. 定位并提取偏航角数值
+ *  4. 定位并提取张力数值
+ *  5. 更新UI控件显示
+ *  6. 清空缓冲区准备接收新数据
+ *
+ * @warning 数据格式必须严格遵循"curYaw: [值]/"和"curTen: [值];"格式
+ * @warning 函数会清空缓冲区，确保每次只处理最新数据
+ *
+ * @see 飞镖系统通信协议文档
+ */
+void dartsParasComputingByTS::serialPortReadyRead_Slot() {
+    // 仅当界面可见时处理数据
+    if (this->visible) {
+        // 检查缓冲区是否包含完整的偏航角或张力数据
+        bool hasYaw = receiveBuff.contains("curYaw: ") && receiveBuff.contains("/");
+        bool hasTen = receiveBuff.contains("curTen: ") && receiveBuff.contains(";");
 
-void dartsParasComputingByTS::serialPortReadyRead_Slot(){
-    if(this->visible && ((receiveBuff.contains("curYaw: ") && receiveBuff.contains("/") ) || (receiveBuff.contains("curTen: ") && receiveBuff.contains(";")))){     //stm32 send:   curYaw: 100/ \n curTen: -1000;
-        int yawIndex = receiveBuff.lastIndexOf("curYaw: ") + 7;
-        int tenIndex = receiveBuff.lastIndexOf("curTen: ") + 7;
-        if(yawIndex != 6){
-            QString curYaw;
-            curYaw = receiveBuff.right(receiveBuff.size() - yawIndex - 1);
-            curYaw.chop(curYaw.size() - curYaw.indexOf("/"));
-            ui->currentYawLineEdit->clear();
-            ui->currentYawLineEdit->insert(curYaw);
+        if (hasYaw || hasTen) {
+            // 定位偏航角数据起始位置
+            int yawIndex = receiveBuff.lastIndexOf("curYaw: ") + 7;
+            // 定位张力数据起始位置
+            int tenIndex = receiveBuff.lastIndexOf("curTen: ") + 7;
+
+            // 处理偏航角数据
+            if (yawIndex != 6) {  // 7-1=6，确保索引有效
+                // 提取偏航角字符串
+                QString curYaw = receiveBuff.right(receiveBuff.size() - yawIndex - 1);
+                // 截取到"/"之前的部分
+                curYaw.chop(curYaw.size() - curYaw.indexOf("/"));
+
+                // 更新UI显示
+                ui->currentYawLineEdit->clear();
+                ui->currentYawLineEdit->insert(curYaw);
+            }
+
+            // 处理张力数据
+            if (tenIndex != 6) {  // 7-1=6，确保索引有效
+                // 提取张力字符串
+                QString curTen = receiveBuff.right(receiveBuff.size() - tenIndex - 1);
+                // 截取到";"之前的部分
+                curTen.chop(curTen.size() - curTen.indexOf(";"));
+
+                // 更新UI显示
+                ui->currentTensionLineEdit->clear();
+                ui->currentTensionLineEdit->insert(curTen);
+            }
+
+            // 清空缓冲区，准备接收新数据
+            receiveBuff.clear();
         }
-        if(tenIndex != 6){
-            QString curTen;
-            curTen = receiveBuff.right(receiveBuff.size() - tenIndex - 1);
-            curTen.chop(curTen.size() - curTen.indexOf(";"));
-            ui->currentTensionLineEdit->clear();
-            ui->currentTensionLineEdit->insert(curTen);
-        }
-        receiveBuff.clear();
     }
 }
 
+/**
+ * @brief 辅助串口数据接收槽函数（球坐标数据处理）
+ *
+ * 该函数处理从全站仪接收的球坐标数据，将其转换为笛卡尔坐标并更新UI：
+ *  1. 解析球坐标数据（SS/SD格式）
+ *  2. 将球坐标转换为笛卡尔坐标
+ *  3. 重构缓冲区为XYZ格式
+ *  4. 更新所有坐标点的UI显示
+ *
+ * @note 球坐标数据格式：
+ *  SS [点号],...      // 设置当前点号
+ *  SD [方位角],[俯仰角],[斜距] // 球坐标数据
+ *
+ * @note 处理流程：
+ *  1. 分割缓冲区为行
+ *  2. 遍历每行数据：
+ *     - SS行：记录当前点号
+ *     - SD行：转换球坐标为笛卡尔坐标
+ *     - 其他行：保留原始数据
+ *  3. 重构缓冲区为XYZ格式
+ *  4. 更新所有坐标点的UI显示
+ *
+ * @warning 球坐标数据必须符合SS/SD格式规范
+ * @warning 角度值使用度分秒格式（需通过convertDMS转换）
+ *
+ * @see 全站仪通信协议文档
+ */
 void dartsParasComputingByTS::serialPortReadyRead2_Slot() {
-    // 预处理球坐标数据
+    // 保存原始缓冲区内容
     QString originalBuffer = receiveBuff_2;
+    // 按换行符分割数据
     QStringList lines = originalBuffer.split(QRegularExpression("\n"), Qt::SkipEmptyParts);
-    QStringList newLines;
-    static int currentSSPoint;
+    QStringList newLines; // 存储处理后的行
+    static int currentSSPoint = -1; // 当前点号（静态变量保持状态）
 
-//    qDebug()<<"line.size ="<<lines.size();
+    // 遍历所有数据行
     for (int i = 0; i < lines.size(); ++i) {
-        QString line = lines[i].trimmed();
+        QString line = lines[i].trimmed(); // 去除首尾空白
+
+        // 处理SS指令（设置当前点号）
         if (line.startsWith("SS")) {
-            // 解析点号
+            // 分割指令部分
             QStringList parts = line.split(QRegularExpression("\\s+|,"), Qt::SkipEmptyParts);
             if (parts.size() >= 2) {
                 bool ok;
+                // 解析点号
                 currentSSPoint = parts[1].toInt(&ok);
-                if (!ok) currentSSPoint = -1;
-//                qDebug()<<"currentSSPoint"<<currentSSPoint;
+                if (!ok) currentSSPoint = -1; // 解析失败标记
             }
-        } else if (line.startsWith("SD")) {
-            if (currentSSPoint != -1) {
-//                qDebug()<<"SD handle: currentSSPoint"<<currentSSPoint;
+        }
+            // 处理SD指令（球坐标数据）
+        else if (line.startsWith("SD")) {
+            if (currentSSPoint != -1) { // 确保有有效点号
+                // 分割数据部分
                 QStringList parts = line.split(QRegularExpression("\\s+|,"), Qt::SkipEmptyParts);
-//                qDebug()<<"SD handle: parts.size"<<parts.size();
-                if (parts.size() >= 4) {
-                    // 解析角度和距离
-                    double yaw = convertDMS(parts[1]);
-                    double pitch = convertDMS(parts[2]);
-                    double distance = parts[3].toDouble();
+                if (parts.size() >= 4) { // 确保有足够的数据部分
+                    // 解析球坐标参数
+                    double yaw = convertDMS(parts[1]);    // 方位角（度分秒转十进制）
+                    double pitch = convertDMS(parts[2]);   // 俯仰角（度分秒转十进制）
+                    double distance = parts[3].toDouble(); // 斜距
 
-                    // 坐标转换
+                    // 球坐标转笛卡尔坐标
                     Eigen::Vector3d xyz = sphericalToCartesian(yaw, pitch, distance);
 
-                    // 生成XYZ数据行（不四舍五入，截断到4位小数）
+                    // 生成XYZ格式数据行（保留6位小数）
                     QString xyzLine = QString("%1,%2,%3,%4,-")
-                            .arg(currentSSPoint)
-                            .arg(QString::number(xyz.x(), 'f', 6))
-                            .arg(QString::number(xyz.y(), 'f', 6))
-                            .arg(QString::number(xyz.z(), 'f', 6));
-                    qDebug()<<"xyzLine"<<xyzLine;
+                            .arg(currentSSPoint) // 点号
+                            .arg(QString::number(xyz.x(), 'f', 6)) // X坐标
+                            .arg(QString::number(xyz.y(), 'f', 6)) // Y坐标
+                            .arg(QString::number(xyz.z(), 'f', 6));// Z坐标
+
+                    // 添加到新行列表
                     newLines.append(xyzLine);
                 }
             }
-            currentSSPoint = -1;
-        } else {
-            newLines.append(line); // 保留非球坐标数据
+            currentSSPoint = -1; // 重置点号
+        }
+            // 其他数据行直接保留
+        else {
+            newLines.append(line);
         }
     }
 
-    // 重构缓冲区
+    // 重构缓冲区（XYZ格式）
     receiveBuff_2 = newLines.join("\n") + "\n";
 
-    // 原有处理逻辑保持不变
+    // =============== 更新所有坐标点的UI显示 ===============
+    // 目标点
     if (receiveBuff_2.contains(targetCoordSerial) && receiveBuff_2.contains(endSerial)) {
-        serialHandle(targetCoordSerial, &target2, ui->targetCoordXLineEdit, ui->targetCoordYLineEdit,
-                     ui->targetCoordZLineEdit);
+        serialHandle(targetCoordSerial, &target2, ui->targetCoordXLineEdit,
+                     ui->targetCoordYLineEdit, ui->targetCoordZLineEdit);
     }
+
+    // 参考点1（系统1）
     if (receiveBuff_2.contains(referCoord1System1Serial) && receiveBuff_2.contains(endSerial)) {
-        serialHandle(referCoord1System1Serial, &referCoord1System1, ui->referCoord1System1XLineEdit,
-                     ui->referCoord1System1YLineEdit, ui->referCoord1System1ZLineEdit);
+        serialHandle(referCoord1System1Serial, &referCoord1System1,
+                     ui->referCoord1System1XLineEdit, ui->referCoord1System1YLineEdit,
+                     ui->referCoord1System1ZLineEdit);
     }
 
+    // 参考点2（系统1）
     if (receiveBuff_2.contains(referCoord2System1Serial) && receiveBuff_2.contains(endSerial)) {
-        serialHandle(referCoord2System1Serial, &referCoord2System1, ui->referCoord2System1XLineEdit,
-                     ui->referCoord2System1YLineEdit, ui->referCoord2System1ZLineEdit);
+        serialHandle(referCoord2System1Serial, &referCoord2System1,
+                     ui->referCoord2System1XLineEdit, ui->referCoord2System1YLineEdit,
+                     ui->referCoord2System1ZLineEdit);
     }
 
+    // 参考点1（系统2）
     if (receiveBuff_2.contains(referCoord1System2Serial) && receiveBuff_2.contains(endSerial)) {
-        serialHandle(referCoord1System2Serial, &referCoord1System2, ui->referCoord1System2XLineEdit,
-                     ui->referCoord1System2YLineEdit, ui->referCoord1System2ZLineEdit);
+        serialHandle(referCoord1System2Serial, &referCoord1System2,
+                     ui->referCoord1System2XLineEdit, ui->referCoord1System2YLineEdit,
+                     ui->referCoord1System2ZLineEdit);
     }
 
+    // 参考点2（系统2）
     if (receiveBuff_2.contains(referCoord2System2Serial) && receiveBuff_2.contains(endSerial)) {
-        serialHandle(referCoord2System2Serial, &referCoord2System2, ui->referCoord2System2XLineEdit,
-                     ui->referCoord2System2YLineEdit, ui->referCoord2System2ZLineEdit);
+        serialHandle(referCoord2System2Serial, &referCoord2System2,
+                     ui->referCoord2System2XLineEdit, ui->referCoord2System2YLineEdit,
+                     ui->referCoord2System2ZLineEdit);
     }
 
-    // 检查并处理 leadRightBackCoordSerial
+    // 导轨右后方引导点
     if (receiveBuff_2.contains(leadRightBackCoordSerial) && receiveBuff_2.contains(endSerial)) {
-        serialHandle(leadRightBackCoordSerial, &leadRightBack2, ui->leadRightBackCoordXLineEdit,
-                     ui->leadRightBackCoordYLineEdit, ui->leadRightBackCoordZLineEdit);
+        serialHandle(leadRightBackCoordSerial, &leadRightBack2,
+                     ui->leadRightBackCoordXLineEdit, ui->leadRightBackCoordYLineEdit,
+                     ui->leadRightBackCoordZLineEdit);
     }
 
-    // 检查并处理 leadLeftBackCoordSerial
+    // 导轨左后方引导点（根据配置处理）
 #if LEAD_POINT_NUM == 4
     if (receiveBuff_2.contains(leadLeftBackCoordSerial) && receiveBuff_2.contains(endSerial)) {
-        serialHandle(leadLeftBackCoordSerial, &leadLeftBack2, ui->leadLeftBackCoordXLineEdit,
-                     ui->leadLeftBackCoordYLineEdit, ui->leadLeftBackCoordZLineEdit);
+        serialHandle(leadLeftBackCoordSerial, &leadLeftBack2,
+                     ui->leadLeftBackCoordXLineEdit, ui->leadLeftBackCoordYLineEdit,
+                     ui->leadLeftBackCoordZLineEdit);
     }
 #endif
 #if LEAD_POINT_NUM == 2
+    // 2点配置时，左后方与右后方相同
     leadLeftBack2.x = leadRightBack2.x;
     leadLeftBack2.y = leadRightBack2.y;
     leadLeftBack2.z = leadRightBack2.z;
 #endif
 
-
-    // 检查并处理 leadRightFrontCoordSerial
+    // 导轨右前方引导点
     if (receiveBuff_2.contains(leadRightFrontCoordSerial) && receiveBuff_2.contains(endSerial)) {
-        serialHandle(leadRightFrontCoordSerial, &leadRightFront2, ui->leadRightFrontCoordXLineEdit,
-                     ui->leadRightFrontCoordYLineEdit, ui->leadRightFrontCoordZLineEdit);
+        serialHandle(leadRightFrontCoordSerial, &leadRightFront2,
+                     ui->leadRightFrontCoordXLineEdit, ui->leadRightFrontCoordYLineEdit,
+                     ui->leadRightFrontCoordZLineEdit);
     }
 
-    // 检查并处理 leadLeftFrontCoordSerial
+    // 导轨左前方引导点（根据配置处理）
 #if LEAD_POINT_NUM == 4
     if (receiveBuff_2.contains(leadLeftFrontCoordSerial) && receiveBuff_2.contains(endSerial)) {
-        serialHandle(leadLeftFrontCoordSerial, &leadLeftFront2, ui->leadLeftFrontCoordXLineEdit,
-                     ui->leadLeftFrontCoordYLineEdit, ui->leadLeftFrontCoordZLineEdit);
+        serialHandle(leadLeftFrontCoordSerial, &leadLeftFront2,
+                     ui->leadLeftFrontCoordXLineEdit, ui->leadLeftFrontCoordYLineEdit,
+                     ui->leadLeftFrontCoordZLineEdit);
     }
 #endif
 #if LEAD_POINT_NUM == 2
+    // 2点配置时，左前方与右前方相同
     leadLeftFront2.x = leadRightFront2.x;
     leadLeftFront2.y = leadRightFront2.y;
     leadLeftFront2.z = leadRightFront2.z;
 #endif
 
-    // 检查并处理 leadDartShootCoordSerial
+    // 飞镖发射点
     if (receiveBuff_2.contains(leadDartShootCoordSerial) && receiveBuff_2.contains(endSerial)) {
-        serialHandle(leadDartShootCoordSerial, &leadDartShoot2, ui->leadDartShootCoordXLineEdit,
-                     ui->leadDartShootCoordYLineEdit, ui->leadDartShootCoordZLineEdit);
+        serialHandle(leadDartShootCoordSerial, &leadDartShoot2,
+                     ui->leadDartShootCoordXLineEdit, ui->leadDartShootCoordYLineEdit,
+                     ui->leadDartShootCoordZLineEdit);
     }
 }
-
 /**
-* @brief 析构函数
-* @param None
-* @retval None
-* @bug
-*/
+ * @brief 飞镖参数计算界面析构函数
+ *
+ * 该函数负责清理飞镖参数计算界面的所有资源：
+ *  1. 设置界面不可见标志
+ *  2. 停止所有定时器
+ *  3. 删除UI对象释放内存
+ *
+ * @note 清理流程：
+ *  1. 设置visible标志为false，防止后续操作访问已销毁对象
+ *  2. 停止3Hz数据包定时器
+ *  3. 停止1Hz数据包定时器
+ *  4. 停止2Hz数据包定时器
+ *  5. 删除UI对象及其所有子组件
+ *
+ * @warning 必须在父窗口关闭前调用此析构函数
+ * @warning 定时器必须在删除UI前停止，避免访问已销毁对象
+ * @warning 删除UI对象会自动释放所有子控件和布局资源
+ *
+ * @see QTimer::stop(), QWidget::~QWidget()
+ */
 dartsParasComputingByTS::~dartsParasComputingByTS()
 {
+    // 设置界面不可见标志，防止后续操作
     this->visible = false;
-    timer3Hz->stop();
-    timer1Hz->stop();
-    timer1Hz2->stop();
-    delete ui;
+
+    // 停止所有定时器（防止定时事件访问已销毁对象）
+    timer3Hz->stop();    // 停止3Hz数据包定时器
+    timer1Hz->stop();    // 停止1Hz数据包定时器
+    timer1Hz2->stop();   // 停止2Hz数据包定时器
+
+    // 删除UI对象及其所有子组件
+    delete ui;  // 自动调用Ui_dartsParasComputingByTS类的析构函数
+}
+/**
+ * @brief 窗口关闭事件处理函数
+ *
+ * 该函数在窗口关闭时被调用，用于设置界面不可见标志，
+ * 防止后续操作访问已关闭的窗口
+ *
+ * @param event 关闭事件对象（未使用）
+ *
+ * @note 功能：
+ *   - 设置visible标志为false，通知其他组件窗口已关闭
+ *   - 不阻止事件传播（窗口正常关闭）
+ *
+ * @warning 该函数不执行资源清理，仅设置状态标志
+ * @see dartsParasComputingByTS::~dartsParasComputingByTS() 负责实际资源清理
+ */
+void dartsParasComputingByTS::closeEvent(QCloseEvent *event) {
+    // 设置界面不可见标志
+    this->visible = false;
+    // 允许事件继续传播（窗口正常关闭）
+    event->accept();
 }
 
-void dartsParasComputingByTS::closeEvent(QCloseEvent *event){
-    this->visible = false;
-}
-
-void dartsParasComputingByTS::on_testDartPushButton_clicked()
-{
+/**
+ * @brief 测试飞镖按钮点击槽函数
+ *
+ * 该函数打开飞镖测试相关界面：
+ *  1. 创建飞镖参数计算页面
+ *  2. 创建飞镖测试控制页面
+ *  3. 设置页面位置与当前窗口相同
+ *  4. 显示两个页面
+ *
+ * @note 页面关系：
+ *  - testDartComputing: 飞镖参数计算界面
+ *  - testDart: 飞镖测试控制界面
+ *
+ * @warning 两个页面共享同一个串口对象
+ * @warning 调用者负责页面内存管理（无父对象）
+ */
+void dartsParasComputingByTS::on_testDartPushButton_clicked() {
+    // 创建飞镖参数计算页面
     testDartComputing *testDartComputingPage = new testDartComputing(serialPort1);
+    // 设置页面位置与当前窗口相同
     testDartComputingPage->setGeometry(this->geometry());
+    // 显示页面
     testDartComputingPage->show();
 
+    // 创建飞镖测试控制页面
     testDart *testDartPage = new testDart(serialPort1);
+    // 设置页面位置与当前窗口相同
     testDartPage->setGeometry(this->geometry());
+    // 显示页面
     testDartPage->show();
-
 }
 
-void dartsParasComputingByTS::on_yawAimingPushButton_clicked()
-{
+/**
+ * @brief 偏航瞄准按钮点击槽函数
+ *
+ * 该函数打开偏航瞄准界面：
+ *  1. 创建偏航瞄准页面
+ *  2. 设置页面位置与当前窗口相同
+ *  3. 显示页面
+ *
+ * @note 功能：
+ *  - 提供偏航角调整和校准功能
+ *  - 使用主串口与飞镖系统通信
+ *
+ * @warning 页面使用独立串口对象（与当前界面共享）
+ * @warning 调用者负责页面内存管理（无父对象）
+ */
+void dartsParasComputingByTS::on_yawAimingPushButton_clicked() {
+    // 创建偏航瞄准页面
     yawAiming *yawAimingPage = new yawAiming(serialPort1);
+    // 设置页面位置与当前窗口相同
     yawAimingPage->setGeometry(this->geometry());
+    // 显示页面
     yawAimingPage->show();
 }
-
 /**
-* @brief 更新UI
-* @param None
-* @retval None
-* @bug
-*/
-void dartsParasComputingByTS::ui_update(){
-    // 更新target2相关UI
+ * @brief 更新用户界面显示
+ *
+ * 该函数将当前存储的坐标数据同步更新到对应的UI控件，
+ * 确保界面显示与内部数据结构一致
+ *
+ * @note 更新内容包括：
+ *  1. 目标点坐标（target2）
+ *  2. 系统1参考点坐标（referCoord1System1, referCoord2System1）
+ *  3. 系统2参考点坐标（referCoord1System2, referCoord2System2）
+ *  4. 导轨引导点坐标（leadLeftBack2, leadRightBack2, leadRightFront2, leadLeftFront2）
+ *  5. 飞镖发射点坐标（leadDartShoot2）
+ *
+ * @warning 该函数不验证数据有效性，直接更新UI显示
+ * @warning 调用前应确保数据结构已正确初始化
+ *
+ * @see loadCoordsFromPlainTextEdit() 用于从UI加载数据到结构体
+ * @see coord_transform() 用于坐标转换后更新结构体
+ */
+void dartsParasComputingByTS::ui_update() {
+    // ==================== 目标点坐标更新 ====================
+    // 更新目标点X坐标
     ui->targetCoordXLineEdit->setText(target2.x);
+    // 更新目标点Y坐标
     ui->targetCoordYLineEdit->setText(target2.y);
+    // 更新目标点Z坐标
     ui->targetCoordZLineEdit->setText(target2.z);
 
-    // 更新referCoord1System1相关UI
+    // ==================== 系统1参考点更新 ====================
+    // 更新参考点1（系统1）X坐标
     ui->referCoord1System1XLineEdit->setText(referCoord1System1.x);
+    // 更新参考点1（系统1）Y坐标
     ui->referCoord1System1YLineEdit->setText(referCoord1System1.y);
+    // 更新参考点1（系统1）Z坐标
     ui->referCoord1System1ZLineEdit->setText(referCoord1System1.z);
 
-    // 更新referCoord2System1相关UI
+    // 更新参考点2（系统1）X坐标
     ui->referCoord2System1XLineEdit->setText(referCoord2System1.x);
+    // 更新参考点2（系统1）Y坐标
     ui->referCoord2System1YLineEdit->setText(referCoord2System1.y);
+    // 更新参考点2（系统1）Z坐标
     ui->referCoord2System1ZLineEdit->setText(referCoord2System1.z);
 
-    // 更新referCoord1System2相关UI
+    // ==================== 系统2参考点更新 ====================
+    // 更新参考点1（系统2）X坐标
     ui->referCoord1System2XLineEdit->setText(referCoord1System2.x);
+    // 更新参考点1（系统2）Y坐标
     ui->referCoord1System2YLineEdit->setText(referCoord1System2.y);
+    // 更新参考点1（系统2）Z坐标
     ui->referCoord1System2ZLineEdit->setText(referCoord1System2.z);
 
-    // 更新referCoord2System2相关UI
+    // 更新参考点2（系统2）X坐标
     ui->referCoord2System2XLineEdit->setText(referCoord2System2.x);
+    // 更新参考点2（系统2）Y坐标
     ui->referCoord2System2YLineEdit->setText(referCoord2System2.y);
+    // 更新参考点2（系统2）Z坐标
     ui->referCoord2System2ZLineEdit->setText(referCoord2System2.z);
 
-// 更新leadLeftBack2相关UI
+    // ==================== 导轨引导点更新 ====================
+    // 更新导轨左后方引导点X坐标
     ui->leadLeftBackCoordXLineEdit->setText(leadLeftBack2.x);
+    // 更新导轨左后方引导点Y坐标
     ui->leadLeftBackCoordYLineEdit->setText(leadLeftBack2.y);
+    // 更新导轨左后方引导点Z坐标
     ui->leadLeftBackCoordZLineEdit->setText(leadLeftBack2.z);
 
-// 更新leadRightBack2相关UI
+    // 更新导轨右后方引导点X坐标
     ui->leadRightBackCoordXLineEdit->setText(leadRightBack2.x);
+    // 更新导轨右后方引导点Y坐标
     ui->leadRightBackCoordYLineEdit->setText(leadRightBack2.y);
+    // 更新导轨右后方引导点Z坐标
     ui->leadRightBackCoordZLineEdit->setText(leadRightBack2.z);
 
-// 更新leadRightFront2相关UI
+    // 更新导轨右前方引导点X坐标
     ui->leadRightFrontCoordXLineEdit->setText(leadRightFront2.x);
+    // 更新导轨右前方引导点Y坐标
     ui->leadRightFrontCoordYLineEdit->setText(leadRightFront2.y);
+    // 更新导轨右前方引导点Z坐标
     ui->leadRightFrontCoordZLineEdit->setText(leadRightFront2.z);
 
-// 更新leadLeftFront2相关UI
+    // 更新导轨左前方引导点X坐标
     ui->leadLeftFrontCoordXLineEdit->setText(leadLeftFront2.x);
+    // 更新导轨左前方引导点Y坐标
     ui->leadLeftFrontCoordYLineEdit->setText(leadLeftFront2.y);
+    // 更新导轨左前方引导点Z坐标
     ui->leadLeftFrontCoordZLineEdit->setText(leadLeftFront2.z);
 
-// 更新leadMiddleDartShoot2相关UI
+    // ==================== 飞镖发射点更新 ====================
+    // 更新飞镖发射点X坐标
     ui->leadDartShootCoordXLineEdit->setText(leadDartShoot2.x);
+    // 更新飞镖发射点Y坐标
     ui->leadDartShootCoordYLineEdit->setText(leadDartShoot2.y);
+    // 更新飞镖发射点Z坐标
     ui->leadDartShootCoordZLineEdit->setText(leadDartShoot2.z);
 }
-
 /**
-* @brief yaw轴数据集坐标转换
-* @param None
-* @retval None
-* @bug
-*/void dartsParasComputingByTS::coord_transform() {
+ * @brief 坐标系转换函数（系统1到系统2）
+ *
+ * 该函数基于参考点对计算从系统1到系统2的坐标变换：
+ *  1. 使用两组参考点对计算平移向量
+ *  2. 使用参考点对的XY平面分量计算旋转矩阵
+ *  3. 将变换应用到所有相关坐标点
+ *
+ * @note 计算步骤：
+ *  1. 从UI加载最新坐标数据
+ *  2. 定义参考点对（系统1和系统2）
+ *  3. 计算质心和平移向量
+ *  4. 计算XY平面旋转矩阵（使用SVD分解）
+ *  5. 处理反射情况（行列式为负）
+ *  6. 应用变换到所有相关点
+ *  7. 更新UI显示
+ *
+ * @warning 需要至少2组有效的参考点对
+ * @warning 仅处理XY平面旋转（Z轴不变）
+ * @warning 使用Eigen库进行矩阵运算
+ *
+ * @see computeTransformation() 更通用的坐标变换函数
+ * @see applyTransformation() 应用变换到单点
+ */
+void dartsParasComputingByTS::coord_transform() {
     // 从控件里更新数据
     loadCoordsFromPlainTextEdit();
 
@@ -795,6 +1157,37 @@ void dartsParasComputingByTS::ui_update(){
     // 更新UI
     ui_update();
 }
+/**
+ * @brief 计算水平距离x和高度差h的槽函数
+ *
+ * 该函数执行以下操作：
+ *  1. 从UI控件加载最新坐标数据
+ *  2. 清空相关结果显示控件
+ *  3. 执行坐标系转换（系统1到系统2）
+ *  4. 更新UI显示
+ *  5. 计算导轨各边的长度变化量（DeltaL）
+ *  6. 计算导轨倾斜角（seta）
+ *  7. 计算导轨方向向量和角平分线
+ *  8. 计算发射点在导轨中心线上的投影
+ *  9. 计算水平距离x和高度差h
+ *  10. 计算偏航角偏差（deltaPsi）
+ *  11. 更新UI显示最终结果
+ *
+ * @note 计算流程：
+ *  1. 加载坐标数据并清空结果控件
+ *  2. 执行坐标系转换
+ *  3. 计算导轨各边长度变化量（DeltaL）
+ *  4. 计算导轨倾斜角（seta）
+ *  5. 计算导轨方向向量和角平分线
+ *  6. 计算发射点投影坐标
+ *  7. 计算水平距离x（投影点与目标点）
+ *  8. 计算高度差h（投影点与目标点）
+ *  9. 计算偏航角偏差（deltaPsi）
+ *  10. 更新UI显示所有结果
+ *
+ * @warning 计算前确保所有坐标数据已正确加载
+ * @warning 计算结果受导轨方向计算精度影响
+ */
 void dartsParasComputingByTS::on_computeXandHPushButton_clicked()
 {
     //从控件更新坐标
@@ -909,108 +1302,279 @@ void dartsParasComputingByTS::on_computeXandHPushButton_clicked()
     ui->leadDartShootCoordZLineEdit->setText(leadDartShoot2.z);
 }
 
-
+/**
+ * @brief 连接串口按钮点击槽函数
+ *
+ * 该函数处理"连接串口"按钮点击事件：
+ *  1. 设置界面不可见标志
+ *  2. 关闭当前窗口
+ *
+ * @note 触发后界面将隐藏并关闭
+ */
 void dartsParasComputingByTS::on_ConnectUartPushButton_clicked()
 {
-    this->visible = false;
-    this->close();
+    this->visible = false; // 设置界面不可见标志
+    this->close();         // 关闭当前窗口
 }
 
+/**
+ * @brief 长度输入框编辑完成槽函数
+ *
+ * 当长度输入框编辑完成后，触发计算X和H的槽函数
+ */
 void dartsParasComputingByTS::on_lLineEdit_editingFinished()
 {
-    this->on_computeXandHPushButton_clicked();
+    this->on_computeXandHPushButton_clicked(); // 触发计算X和H
 }
 
+/**
+ * @brief 角度输入框编辑完成槽函数
+ *
+ * 当角度输入框编辑完成后，触发计算X和H的槽函数
+ */
 void dartsParasComputingByTS::on_betaLineEdit_editingFinished()
 {
-    this->on_computeXandHPushButton_clicked();
+    this->on_computeXandHPushButton_clicked(); // 触发计算X和H
 }
 
+/**
+ * @brief X偏移输入框编辑完成槽函数
+ *
+ * 当X偏移输入框编辑完成后，触发计算X和H的槽函数
+ */
 void dartsParasComputingByTS::on_deltaXlineEdit_editingFinished()
 {
-    this->on_computeXandHPushButton_clicked();
+    this->on_computeXandHPushButton_clicked(); // 触发计算X和H
 }
 
+/**
+ * @brief H偏移输入框编辑完成槽函数
+ *
+ * 当H偏移输入框编辑完成后，触发计算X和H的槽函数
+ */
 void dartsParasComputingByTS::on_deltaHlineEdit_editingFinished()
 {
-    this->on_computeXandHPushButton_clicked();
+    this->on_computeXandHPushButton_clicked(); // 触发计算X和H
 }
 
+/**
+ * @brief 计算第一支飞镖张力槽函数
+ *
+ * 该函数计算第一支飞镖的张力值：
+ *  1. 更新偏航角显示
+ *  2. 计算并显示最终张力值
+ *
+ * @note 计算公式：
+ *  T_all1 = f0 + [((m_dart1 + m_launcher)*g/1000 * x^2) /
+ *          (4 * cos²(θ) * (x*tan(θ) - h)) - integral] / k
+ */
 void dartsParasComputingByTS::on_computeTall1PushButton_clicked()
 {
-    // 更新界面显示
+    // 更新界面显示 - 设置偏航角
     ui->yaw1LineEdit->setText(ui->deltaPsi1LineEdit->text());
     ui->yaw2LineEdit->setText(ui->deltaPsi2LineEdit->text());
     ui->yaw3LineEdit->setText(ui->deltaPsi3LineEdit->text());
     ui->yaw4LineEdit->setText(ui->deltaPsi4LineEdit->text());
+
+    // 清空并插入计算结果
     ui->Tall1LineEditOutput->clear();
-    ui->Tall1LineEditOutput->insert(QString::number(ui->dart1F0LineEditInput->text().toDouble() + (((ui->mdart1PlusGLineEditInput->text().toDouble() + ui->mLauncherPlusGLineEditInput->text().toDouble()) * 9.8 / 1000 * (ui->xLineEdit->text().toDouble()) * (ui->xLineEdit->text().toDouble() + ui->dart1RelativeHLineEdit->text().toDouble() * 0.01) /( 4 * qCos(ui->setaLineEdit_2->text().toDouble()) * qCos(ui->setaLineEdit_2->text().toDouble()) * ((ui->xLineEdit->text().toDouble() + ui->dart1RelativeHLineEdit->text().toDouble() * 0.01) * qTan(ui->setaLineEdit_2->text().toDouble()) - (ui->hLineEdit->text().toDouble() + ui->dart1RelativeHLineEdit->text().toDouble() * 0.01)))) - ui->dart1IntegralOfF0PlusDxtensionLineEditInput->text().toDouble()) / ui->k1PlusXtensionLineEditInput->text().toDouble()));
+    ui->Tall1LineEditOutput->insert(QString::number(
+            ui->dart1F0LineEditInput->text().toDouble() +
+            (((ui->mdart1PlusGLineEditInput->text().toDouble() +
+               ui->mLauncherPlusGLineEditInput->text().toDouble()) * 9.8 / 1000 *
+              ui->xLineEdit->text().toDouble() *
+              (ui->xLineEdit->text().toDouble()) /
+              (4 * qCos(ui->setaLineEdit_2->text().toDouble()) *
+               qCos(ui->setaLineEdit_2->text().toDouble()) *
+               ((ui->xLineEdit->text().toDouble()) *
+                qTan(ui->setaLineEdit_2->text().toDouble()) -
+                (ui->hLineEdit->text().toDouble() +
+                 ui->dart1RelativeHLineEdit->text().toDouble() * 0.01))
+              )) -
+             ui->dart1IntegralOfF0PlusDxtensionLineEditInput->text().toDouble()
+            ) /
+            ui->k1PlusXtensionLineEditInput->text().toDouble()
+    ));
 }
 
+/**
+ * @brief 飞镖1质量输入框编辑完成槽函数
+ *
+ * 当飞镖1质量输入框编辑完成后，触发计算飞镖1张力的槽函数
+ */
 void dartsParasComputingByTS::on_mdart1PlusGLineEditInput_editingFinished()
 {
-    this->on_computeTall1PushButton_clicked();
+    this->on_computeTall1PushButton_clicked(); // 触发计算飞镖1张力
 }
 
+/**
+ * @brief 偏航角1输入框编辑完成槽函数
+ *
+ * 当偏航角1输入框编辑完成后，触发计算飞镖1张力的槽函数
+ */
 void dartsParasComputingByTS::on_yaw1LineEdit_editingFinished()
 {
-    this->on_computeTall1PushButton_clicked();
+    this->on_computeTall1PushButton_clicked(); // 触发计算飞镖1张力
 }
 
+/**
+ * @brief 计算第二支飞镖张力槽函数
+ *
+ * 该函数计算第二支飞镖的张力值
+ *
+ * @note 计算公式与第一支飞镖类似，使用飞镖2的参数
+ */
 void dartsParasComputingByTS::on_computeTall2PushButton_clicked()
 {
     ui->Tall2LineEditOutput->clear();
-    ui->Tall2LineEditOutput->insert(QString::number(ui->dart2F0LineEditInput->text().toDouble() + (((ui->mdart2PlusGLineEditInput->text().toDouble() + ui->mLauncherPlusGLineEditInput->text().toDouble()) * 9.8 / 1000 * (ui->xLineEdit->text().toDouble()) * (ui->xLineEdit->text().toDouble() + ui->dart2RelativeHLineEdit->text().toDouble() * 0.01) /( 4 * qCos(ui->setaLineEdit_2->text().toDouble()) * qCos(ui->setaLineEdit_2->text().toDouble()) * ((ui->xLineEdit->text().toDouble() + ui->dart2RelativeHLineEdit->text().toDouble() * 0.01) * qTan(ui->setaLineEdit_2->text().toDouble()) - (ui->hLineEdit->text().toDouble() + ui->dart2RelativeHLineEdit->text().toDouble() * 0.01)))) - ui->dart2IntegralOfF0PlusDxtensionLineEditInput->text().toDouble()) / ui->k1PlusXtensionLineEditInput->text().toDouble()));
+    ui->Tall2LineEditOutput->insert(QString::number(
+            ui->dart2F0LineEditInput->text().toDouble() +
+            (((ui->mdart2PlusGLineEditInput->text().toDouble() +
+               ui->mLauncherPlusGLineEditInput->text().toDouble()) * 9.8 / 1000 *
+              ui->xLineEdit->text().toDouble() *
+              (ui->xLineEdit->text().toDouble()) /
+              (4 * qCos(ui->setaLineEdit_2->text().toDouble()) *
+               qCos(ui->setaLineEdit_2->text().toDouble()) *
+               ((ui->xLineEdit->text().toDouble()) *
+                qTan(ui->setaLineEdit_2->text().toDouble()) -
+                (ui->hLineEdit->text().toDouble() +
+                 ui->dart2RelativeHLineEdit->text().toDouble() * 0.01))
+              )) -
+             ui->dart2IntegralOfF0PlusDxtensionLineEditInput->text().toDouble()
+            ) /
+            ui->k1PlusXtensionLineEditInput->text().toDouble()
+    ));
 }
 
+/**
+ * @brief 飞镖2质量输入框编辑完成槽函数
+ *
+ * 当飞镖2质量输入框编辑完成后，触发计算飞镖2张力的槽函数
+ */
 void dartsParasComputingByTS::on_mdart2PlusGLineEditInput_editingFinished()
 {
-    this->on_computeTall2PushButton_clicked();
+    this->on_computeTall2PushButton_clicked(); // 触发计算飞镖2张力
 }
 
+/**
+ * @brief 偏航角2输入框编辑完成槽函数
+ *
+ * 当偏航角2输入框编辑完成后，触发计算飞镖2张力的槽函数
+ */
 void dartsParasComputingByTS::on_yaw2LineEdit_editingFinished()
 {
-    this->on_computeTall2PushButton_clicked();
+    this->on_computeTall2PushButton_clicked(); // 触发计算飞镖2张力
 }
 
+/**
+ * @brief 计算第三支飞镖张力槽函数
+ *
+ * 该函数计算第三支飞镖的张力值
+ *
+ * @note 计算公式与第一支飞镖类似，使用飞镖3的参数
+ */
 void dartsParasComputingByTS::on_computeTall3PushButton_clicked()
 {
     ui->Tall3LineEditOutput->clear();
-    ui->Tall3LineEditOutput->insert(QString::number(ui->dart3F0LineEditInput->text().toDouble() + (((ui->mdart3PlusGLineEditInput->text().toDouble() + ui->mLauncherPlusGLineEditInput->text().toDouble()) * 9.8 / 1000 * (ui->xLineEdit->text().toDouble()) * (ui->xLineEdit->text().toDouble() + ui->dart3RelativeHLineEdit->text().toDouble() * 0.01) /( 4 * qCos(ui->setaLineEdit_2->text().toDouble()) * qCos(ui->setaLineEdit_2->text().toDouble()) * ((ui->xLineEdit->text().toDouble() + ui->dart3RelativeHLineEdit->text().toDouble() * 0.01) * qTan(ui->setaLineEdit_2->text().toDouble()) - (ui->hLineEdit->text().toDouble() + ui->dart3RelativeHLineEdit->text().toDouble() * 0.01)))) - ui->dart3IntegralOfF0PlusDxtensionLineEditInput->text().toDouble()) / ui->k1PlusXtensionLineEditInput->text().toDouble()));
+    ui->Tall3LineEditOutput->insert(QString::number(
+            ui->dart3F0LineEditInput->text().toDouble() +
+            (((ui->mdart3PlusGLineEditInput->text().toDouble() +
+               ui->mLauncherPlusGLineEditInput->text().toDouble()) * 9.8 / 1000 *
+              ui->xLineEdit->text().toDouble() *
+              (ui->xLineEdit->text().toDouble()) /
+              (4 * qCos(ui->setaLineEdit_2->text().toDouble()) *
+               qCos(ui->setaLineEdit_2->text().toDouble()) *
+               ((ui->xLineEdit->text().toDouble()) *
+                qTan(ui->setaLineEdit_2->text().toDouble()) -
+                (ui->hLineEdit->text().toDouble() +
+                 ui->dart3RelativeHLineEdit->text().toDouble() * 0.01))
+              )) -
+             ui->dart3IntegralOfF0PlusDxtensionLineEditInput->text().toDouble()
+            ) /
+            ui->k1PlusXtensionLineEditInput->text().toDouble()
+    ));
 }
 
+/**
+ * @brief 飞镖3质量输入框编辑完成槽函数
+ *
+ * 当飞镖3质量输入框编辑完成后，触发计算飞镖3张力的槽函数
+ */
 void dartsParasComputingByTS::on_mdart3PlusGLineEditInput_editingFinished()
 {
-    this->on_computeTall3PushButton_clicked();
+    this->on_computeTall3PushButton_clicked(); // 触发计算飞镖3张力
 }
 
+/**
+ * @brief 偏航角3输入框编辑完成槽函数
+ *
+ * 当偏航角3输入框编辑完成后，触发计算飞镖3张力的槽函数
+ */
 void dartsParasComputingByTS::on_yaw3LineEdit_editingFinished()
 {
-    this->on_computeTall3PushButton_clicked();
+    this->on_computeTall3PushButton_clicked(); // 触发计算飞镖3张力
 }
 
+/**
+ * @brief 计算第四支飞镖张力槽函数
+ *
+ * 该函数计算第四支飞镖的张力值
+ *
+ * @note 计算公式与第一支飞镖类似，使用飞镖4的参数
+ */
 void dartsParasComputingByTS::on_computeTall4PushButton_clicked()
 {
     ui->Tall4LineEditOutput->clear();
-    ui->Tall4LineEditOutput->insert(QString::number(ui->dart4F0LineEditInput->text().toDouble() + (((ui->mdart4PlusGLineEditInput->text().toDouble() + ui->mLauncherPlusGLineEditInput->text().toDouble()) * 9.8 / 1000 * (ui->xLineEdit->text().toDouble()) * (ui->xLineEdit->text().toDouble() + ui->dart4RelativeHLineEdit->text().toDouble() * 0.01) /( 4 * qCos(ui->setaLineEdit_2->text().toDouble()) * qCos(ui->setaLineEdit_2->text().toDouble()) * ((ui->xLineEdit->text().toDouble() + ui->dart4RelativeHLineEdit->text().toDouble() * 0.01) * qTan(ui->setaLineEdit_2->text().toDouble()) - (ui->hLineEdit->text().toDouble() + ui->dart4RelativeHLineEdit->text().toDouble() * 0.01)))) - ui->dart4IntegralOfF0PlusDxtensionLineEditInput->text().toDouble()) / ui->k1PlusXtensionLineEditInput->text().toDouble()));
+    ui->Tall4LineEditOutput->insert(QString::number(
+            ui->dart4F0LineEditInput->text().toDouble() +
+            (((ui->mdart4PlusGLineEditInput->text().toDouble() +
+               ui->mLauncherPlusGLineEditInput->text().toDouble()) * 9.8 / 1000 *
+              ui->xLineEdit->text().toDouble() *
+              (ui->xLineEdit->text().toDouble()) /
+              (4 * qCos(ui->setaLineEdit_2->text().toDouble()) *
+               qCos(ui->setaLineEdit_2->text().toDouble()) *
+               ((ui->xLineEdit->text().toDouble()) *
+                qTan(ui->setaLineEdit_2->text().toDouble()) -
+                (ui->hLineEdit->text().toDouble() +
+                 ui->dart4RelativeHLineEdit->text().toDouble() * 0.01))
+              )) -
+             ui->dart4IntegralOfF0PlusDxtensionLineEditInput->text().toDouble()
+            ) /
+            ui->k1PlusXtensionLineEditInput->text().toDouble()
+    ));
 }
 
+/**
+ * @brief 飞镖4质量输入框编辑完成槽函数
+ *
+ * 当飞镖4质量输入框编辑完成后，触发计算飞镖4张力的槽函数
+ */
 void dartsParasComputingByTS::on_mdart4PlusGLineEditInput_editingFinished()
 {
-    this->on_computeTall4PushButton_clicked();
+    this->on_computeTall4PushButton_clicked(); // 触发计算飞镖4张力
 }
 
+/**
+ * @brief 偏航角4输入框编辑完成槽函数
+ *
+ * 当偏航角4输入框编辑完成后，触发计算飞镖4张力的槽函数
+ */
 void dartsParasComputingByTS::on_yaw4LineEdit_editingFinished()
 {
-    this->on_computeTall4PushButton_clicked();
+    this->on_computeTall4PushButton_clicked(); // 触发计算飞镖4张力
 }
 
+/**
+ * @brief 计算所有飞镖张力槽函数
+ *
+ * 该函数依次计算所有四支飞镖的张力值
+ */
 void dartsParasComputingByTS::on_computeTall4PushButton_2_clicked()
 {
-    this->on_computeTall1PushButton_clicked();
-    this->on_computeTall2PushButton_clicked();
-    this->on_computeTall3PushButton_clicked();
-    this->on_computeTall4PushButton_clicked();
+    this->on_computeTall1PushButton_clicked(); // 计算飞镖1张力
+    this->on_computeTall2PushButton_clicked(); // 计算飞镖2张力
+    this->on_computeTall3PushButton_clicked(); // 计算飞镖3张力
+    this->on_computeTall4PushButton_clicked(); // 计算飞镖4张力
 }
 
 void dartsParasComputingByTS::on_sendFirstDartParasPushButton_clicked()
