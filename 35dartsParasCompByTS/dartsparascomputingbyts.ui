@@ -659,7 +659,7 @@
     <rect>
      <x>0</x>
      <y>290</y>
-     <width>1386</width>
+     <width>1191</width>
      <height>395</height>
     </rect>
    </property>
@@ -674,7 +674,7 @@
     <item row="5" column="4">
      <widget class="QLabel" name="integralOfF0PlusDxtensionLabelInput_7">
       <property name="text">
-       <string>镖2x修正偏差cm(往前为正)</string>
+       <string>镖2h修正偏差cm</string>
       </property>
      </widget>
     </item>
@@ -689,7 +689,7 @@
      </widget>
     </item>
     <item row="10" column="4">
-     <widget class="QLineEdit" name="dart4RelativeXLineEdit">
+     <widget class="QLineEdit" name="dart4RelativeHLineEdit">
       <property name="text">
        <string/>
       </property>
@@ -708,7 +708,7 @@
     <item row="7" column="4">
      <widget class="QLabel" name="integralOfF0PlusDxtensionLabelInput_8">
       <property name="text">
-       <string>镖3x修正偏差cm往前为正)</string>
+       <string>镖3h修正偏差cm</string>
       </property>
      </widget>
     </item>
@@ -767,7 +767,7 @@
      </widget>
     </item>
     <item row="8" column="4">
-     <widget class="QLineEdit" name="dart3RelativeXLineEdit">
+     <widget class="QLineEdit" name="dart3RelativeHLineEdit">
       <property name="text">
        <string/>
       </property>
@@ -863,13 +863,6 @@
       </property>
       <property name="shortcut">
        <string>S</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="4">
-     <widget class="QLabel" name="integralOfF0PlusDxtensionLabelInput_6">
-      <property name="text">
-       <string>镖1x修正偏差cm(往前为正)</string>
       </property>
      </widget>
     </item>
@@ -1059,7 +1052,7 @@
      </widget>
     </item>
     <item row="4" column="4">
-     <widget class="QLineEdit" name="dart1RelativeXLineEdit">
+     <widget class="QLineEdit" name="dart1RelativeHLineEdit">
       <property name="text">
        <string/>
       </property>
@@ -1096,7 +1089,7 @@
      </widget>
     </item>
     <item row="6" column="4">
-     <widget class="QLineEdit" name="dart2RelativeXLineEdit">
+     <widget class="QLineEdit" name="dart2RelativeHLineEdit">
       <property name="text">
        <string/>
       </property>
@@ -1220,7 +1213,7 @@
     <item row="9" column="4">
      <widget class="QLabel" name="integralOfF0PlusDxtensionLabelInput_9">
       <property name="text">
-       <string>镖4x修正偏差cm(往前为正)</string>
+       <string>镖4h修正偏差cm</string>
       </property>
      </widget>
     </item>
@@ -1284,6 +1277,20 @@
      <widget class="QLabel" name="f0LabelInput_5">
       <property name="text">
        <string>F₀镖4</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="4">
+     <widget class="QLabel" name="integralOfF0PlusDxtensionLabelInput_6">
+      <property name="text">
+       <string>(往上修正为正)</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="4">
+     <widget class="QLabel" name="integralOfF0PlusDxtensionLabelInput_11">
+      <property name="text">
+       <string>镖1h修正偏差cm</string>
       </property>
      </widget>
     </item>
